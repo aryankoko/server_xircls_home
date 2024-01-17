@@ -105,7 +105,7 @@ const HomeLayout = () => {
           {/* xircls_frontend */}
           {
             <div className='content-body customeHomeDiv'>
-              <Container fluid="md" className='border p-0 overflow-hidden'>
+              <Container fluid="lg" className='border p-0 overflow-hidden'>
                 {
                   isDifferent ? <Navbar position={'notFixed'} /> : <Navbar />
                 }
@@ -113,7 +113,7 @@ const HomeLayout = () => {
                   isDifferent && SecondNavbar && <SubNavbar navTitle={SecondNavbar} />
                 }
 
-                <Outlet />
+                  <Outlet />
 
                 {/* <Footer /> */}
               </Container>

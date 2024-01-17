@@ -121,8 +121,16 @@ export default function Skin_type_form() {
                     display: flex;
                     align-items: center;
                     justify-content:start;
-                    gap:10px
+                    gap:10px;
       }
+      @media only screen and (max-width: 600px) {
+        .cyberpunk-checkbox-label {
+         font-size:calc(1.0836rem + 0.0032vw);
+         gap:7px
+
+        }
+      }
+
     `}
             </style>
             <div className='border rounded-3  m-auto  py-2 mt-2 px-2' style={{ maxWidth: "1000px" }}>
@@ -146,7 +154,7 @@ export default function Skin_type_form() {
                                                 {
                                                     data.opts.map((opt, index2) => (
 
-                                                        <label class="cyberpunk-checkbox-label h4 " style={{ marginTop: "4px" }}>
+                                                        <label class="cyberpunk-checkbox-label h4 " style={{marginTop:"2px"}}>
                                                             <input type="radio" name={`${index + 1}Q`} class="cyberpunk-checkbox " value={`${index + 1}Q- ${index2 + 1}opt`} />
                                                             {opt}</label>
                                                     ))}

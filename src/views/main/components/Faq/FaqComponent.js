@@ -24,7 +24,7 @@ export default function FaqComponent({ data, theme }) {
          
 
             <Row className={`justify-content-center     ${theme}`} >
-                <Col xs="10" md="12" xl="9">
+                <Col xs="12" md="12" xl="9">
 
                     <h1 className={`display-1 fw-bolder mb-2 text-center main-heading FAQ`} >FAQ</h1>
 

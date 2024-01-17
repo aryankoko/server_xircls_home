@@ -239,13 +239,13 @@ export default function Features() {
           </Col>
         </Row>
 
-        <Row className=" justify-content-center mt180 ">
+        <Row className=" justify-content-center mt180 px-2">
           <Col lg="12" xl="10">
             <h1 className="text-start display-4 fw-bolder main-heading mb-2">
               A no-code, drag & drop builder for <br /> high-converting pop-ups.</h1>
             {dragData.map((item, index) => (
               <Row key={index} className="mt-5 ">
-                <Col md={4} className=' d-flex justify-content-center  align-items-center '>
+                <Col md={4} className=' d-flex justify-content-start justify-content-md-center   align-items-center '>
                   <img
                     src={item.img}
                     alt={`img ${item.img}`}
@@ -280,10 +280,10 @@ export default function Features() {
         <Row className=' mt180 justify-content-center '>
           <Col xs="10" xl="10" className='  px-0 rounded-2'>
             <Row className='justify-content-center match-height flex-row-reverse'>
-              <Col lg="5" className=' p-0  rounded-2  d-flex justify-content-center  align-items-center '>
-                <img className=' ' src={need} alt="" style={{ width: "150px" }} />
+              <Col md="6" className=' p-0  rounded-2  d-flex justify-content-center  align-items-center '>
+                <img className=' ' src={need} alt="" style={{ width: "120px" }} />
               </Col>
-              <Col lg="6" className='text-end'>
+              <Col md="6" className='text-end'>
                 <div>
                   <h1 className='display-6 main-heading fw-bolder '>We have what you need.</h1>
                   <h3 className='fs-3 fw-bold text-black '>Transparent terminology, a simplified
@@ -296,10 +296,10 @@ export default function Features() {
               </Col>
             </Row>
             <Row className='justify-content-center mt-5 pt-5 match-height '>
-              <Col lg="5" className=' p-0 rounded-2  d-flex justify-content-center  align-items-center '>
-                <img className=' ' src={wastage} alt="" style={{ width: "150px" }} />
+              <Col md="6" className=' p-0 rounded-2  d-flex justify-content-center  align-items-center '>
+                <img className=' ' src={wastage} alt="" style={{ width: "120px" }} />
               </Col>
-              <Col lg="6" className='d-flex flex-column  gap-3 ps-2  '>
+              <Col md="6" className='d-flex flex-column  gap-3 ps-2  '>
                 <div>
                   <h1 className='display-6 main-heading fw-bolder'>No more wastage.</h1>
                   <h3 className='fs-3 fw-bold text-black '>Your marketing budget is reserved for <span className='fw-bolder'>SuperLeadz</span>most likely to convert. Not anonymous visitors with unverifiable intent.</h3>
@@ -313,19 +313,21 @@ export default function Features() {
 
 
         <Row className=' mt180 justify-content-center '>
-          <Col xs="10" xl="10" className='  px-0 rounded-2 '>
+          <Col xs="11" xl="10" className='  px-0 rounded-2 '>
             <h1 className='text-center display-2 main-heading fw-bolder '>NextGen LeadGen </h1>
             <h1 className='text-center text-black fw-bold '>Optimize your sales funnel with advanced lead management.</h1>
 
-            <div className='d-flex gap-5  justify-content-center mt-5 '>
+            <div className='d-flex gap-1 gap-lg-2 gap-lg-5 flex-wrap  justify-content-center mt-2 mt-md-5 '>
               {
                 nextgenData.map((data, index) => (
 
-                  <h1 key={index} onMouseEnter={() => { setActiveNextgen(index) }} className={`fw-bolder ms-3 cursor-pointer ${ActiveNextgen === index ? 'main-heading' : 'text-secondary'}`} >{data.title}</h1>
+                  <h1 key={index} onMouseEnter={() => { setActiveNextgen(index) }} className={`fw-bolder  cursor-pointer ${ActiveNextgen === index ? 'main-heading' : 'text-secondary'}`} >{data.title}</h1>
                 ))
               }
 
             </div>
+            <div className='px-2'>
+
             {
               nextgenData.map((data, index) => {
                 if (ActiveNextgen === index) {
@@ -354,6 +356,7 @@ export default function Features() {
                 return null
               }
               )}
+            </div>
 
           </Col>
         </Row>

@@ -142,7 +142,7 @@ const Navbar = ({ position }) => {
     <div className={`Container-subNav border-bottom py-1 py-md-0 bg-white  position-${isFixed === "notFixed" ? "relative" : "fixed"}  `} id="first_navbar" style={{ zIndex: "999", marginTop: '-5px', paddingBottom: "11px" }}>
       <div className=' justify-content-center bg-white m-0 p-0'>
         <nav className={`homeNav  `}>
-          <Link to="/">
+          <Link to="/" onClick={() => setToggleMenu(true)}>
             <img src={logo} alt="logo" className='mx-2 nav_logo_img' />
           </Link>
 
@@ -150,23 +150,20 @@ const Navbar = ({ position }) => {
             <ul className=' list-unstyled d-inline-flex gap-5 pt-1'>
 
               <li className='productLi ItemsList' onClick={() => mouseClick("products")} onMouseEnter={() => mouseEnter("products")} onMouseLeave={() => mouseLeave("products")}>
-                <h4 className='fs-4 text-dark'  >Products <IoIosArrowDown className={ShowProducts ? "rotate-180" : ""} /></h4>
-                <div className={`subMenu ${ShowProducts ? "productSubMenuDown" : "productSubMenuUp"} p-1 border border-1 rounded-3 px-md-3`}>
-                  {/* <div className={`subMenu ItemsList-cont  p-1 border border-1 rounded-3 px-md-3`}> */}
+                <h4 className='navTitle fs-4 text-dark'  >Products <IoIosArrowDown className={ShowProducts ? "rotate-180" : ""} /></h4>
+                <div className={`subMenu ${ShowProducts ? "productSubMenuDown" : "productSubMenuUp"} p-1 ps-3 pt-0 border border-1 rounded-3 px-md-3`}>
                   <ul className=' list-unstyled '>
                     {
                       productList.map((ele, index) => (
                         <li key={index}  className='mt-1 hoverItems' style={{ padding: "5px 5px" }} onClick={() => setToggleMenu(true)}>
                           <Link to={ele.link}>
-                            <div className=' d-flex flex-md-row flex-column align-items-center gap-2' style={{ marginBottom: "12px" }}>
-                              {/* <img src={ele.img} alt="XIRCLSLogo" width={50} /> */}
-                              <div className='nav-list-logo d-flex align-items-center justify-content-center  rounded-circle' style={{ minWidth: "50px", minHeight: "50px", background: "#F0F0F0" }}>
-                                {/* <BsCodeSquare size={25} color='' className='text-dark'/> */}
+                          <div className=' d-flex   align-items-center gap-2' style={{ marginBottom: "5px" }}>
+                              <div className='nav-list-logo d-flex align-items-center justify-content-center  rounded-circle' >
                                 {ele.logo}
                               </div>
-                              <div className='d-flex flex-column justify-content-center w-100 '>
-                                <h4 className='text-capitalize text-black fw-bolder' >{ele.title}</h4>
-                                <p className='m-0 text-dark fw-bold fs-6 ' style={{ marginBottom: "5px", marginTop: "5px" }}>For {ele.desc}</p>
+                              <div className='d-flex flex-column justify-content-center accordion text-start w-100 '>
+                                <h4 className='subtitle text-capitalize text-black fw-bolder  ' >{ele.title}</h4>
+                                <p className='subdesc text-dark fw-bold fs-6 ' > {ele.desc}</p>
                               </div>
                             </div>
                           </Link>
@@ -176,25 +173,25 @@ const Navbar = ({ position }) => {
                   </ul>
                 </div>
               </li>
-              <Link to='/partners' className='fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Partners</p></li></Link>
+              <Link to='/partners' className='navTitle fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Partners</p></li></Link>
               {/* <Link to='/developers' className='fs-4 text-dark text-center'> <li ><p>Developers</p></li></Link> */}
-              <Link to='/blog' className='fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Blog</p></li></Link>
+              <Link to='/blog' className='navTitle fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Blog</p></li></Link>
 
               <li className='aboutLi ItemsList' onClick={() => mouseClick("company")} onMouseEnter={() => mouseEnter("company")} onMouseLeave={() => mouseLeave("company")}>
-                <p className='text-dark fs-4'>Company <IoIosArrowDown className={ShowCompany ? "rotate-180" : ""} /></p>
-                <div className={`subMenu  ${ShowCompany ? "aboutSubMenuDown" : "aboutSubMenuUp"} p-1 border border-1 rounded-3 px-md-3`}>
+                <p className='navTitle text-dark fs-4 '>Company <IoIosArrowDown className={ShowCompany ? "rotate-180" : ""} /></p>
+                <div className={`subMenu  ${ShowCompany ? "aboutSubMenuDown" : "aboutSubMenuUp"} p-1 ps-3 pt-0 border border-1 rounded-3 px-md-3`}>
                   <ul className=' list-unstyled'>
                     {
                       aboutList.map((ele, index) => (
                         <li key={index} className='mt-1 hoverItems' style={{ padding: "5px 5px" }} onClick={() => setToggleMenu(true)}>
                           <Link to={ele.link}>
-                            <div className=' d-flex flex-md-row flex-column align-items-center gap-2' style={{ marginBottom: "5px" }}>
-                              <div className='nav-list-logo d-flex align-items-center justify-content-center  rounded-circle' style={{ minWidth: "50px", minHeight: "50px", background: "#F0F0F0" }}>
+                            <div className=' d-flex   align-items-center gap-2' style={{ marginBottom: "5px" }}>
+                              <div className='nav-list-logo d-flex align-items-center justify-content-center  rounded-circle' >
                                 {ele.logo}
                               </div>
-                              <div className='d-flex flex-column justify-content-center w-100 '>
-                                <h4 className='text-capitalize text-black fw-bolder' >{ele.title}</h4>
-                                <p className='m-0 text-dark fw-bold fs-6 ' style={{ marginBottom: "5px", marginTop: "5px" }}> {ele.desc}</p>
+                              <div className='d-flex flex-column justify-content-center accordion text-start w-100 '>
+                                <h4 className='subtitle text-capitalize text-black fw-bolder  ' >{ele.title}</h4>
+                                <p className='subdesc text-dark fw-bold fs-6 ' > {ele.desc}</p>
                               </div>
                             </div>
                           </Link>

@@ -1,10 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-// import 'swiper/css'
-// import 'swiper/css/navigation'
-// import 'swiper/css/pagination'
-// import 'swiper/css/free-mode'
-// import 'swiper/css/autoplay'
 import 'swiper/swiper-bundle.min.css'
 import 'swiper/swiper.min.css'
 import { Autoplay } from 'swiper'
@@ -21,51 +16,53 @@ import img9 from "./img/9.png"
 import img10 from "./img/10.png"
 
 const LogoSlider = () => {
-    const [numOfPages, setNumOfPages] = useState(6)
-    window.addEventListener("resize", () => {
-        if (window.innerWidth > 768) {
-            setNumOfPages(6)
-        } else if (window.innerWidth <= 576) {
-            setNumOfPages(2)
-        } else if (window.innerWidth <= 768) {
-            setNumOfPages(4)
-        }
-    })
-    return (
-        <div className='mt170' style={{ background: '#e5e7eb' }}  >
-            {/* <h1 className=' text-center display-5 main-heading fw-bolder mb-2 pt-3'>We Power Brands that Power the World</h1>style={{border: '2px solid #a0a0a0'}} */}
+  const [numOfPages, setNumOfPages] = useState(6)
 
-            <div className=' d-flex justify-content-center  align-items-center '>
-                <Swiper
-                    spaceBetween={30}
-                    slidesPerView={numOfPages}
-                    navigation={false}
-                    pagination={{ clickable: false }}
-                    loop={true}
-                    autoplay={{
-                        delay: 1000,
-                        disableOnInteraction: false
-                    }}
-                    modules={[Autoplay]}
-                    className='px-3 py-2 d-flex justify-content-center  align-items-center'
-                >
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setNumOfPages(6)
+      } else if (window.innerWidth <= 576) {
+        setNumOfPages(2)
+      } else if (window.innerWidth <= 768) {
+        setNumOfPages(4)
+      }
+    }
 
-                    <SwiperSlide ><img src={img1} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img2} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img3} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img4} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img5} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img6} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img7} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img8} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img9} width={150} /></SwiperSlide>
-                    <SwiperSlide ><img src={img10} width={150} /></SwiperSlide>
-                    
-                </Swiper>
-            </div>
+    window.addEventListener("resize", handleResize)
 
-        </div >
-    )
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  const imageArray = [img1, img2, img3, img4, img5, img6, img7, img8, img9, img10]
+
+  return (
+    <div className='mt170' style={{ background: '#e5e7eb' }}>
+      <div className='d-flex justify-content-center align-items-center'>
+        <Swiper
+          spaceBetween={30}
+          slidesPerView={numOfPages}
+          navigation={false}
+          pagination={{ clickable: false }}
+          loop={true}
+          autoplay={{
+            delay: 1000,
+            disableOnInteraction: false
+          }}
+          modules={[Autoplay]}
+          className='px-3 py-2 d-flex justify-content-center align-items-center'
+        >
+          {imageArray.map((image, key) => (
+            <SwiperSlide key={key} className='px-5'>
+              <img className='px-2' src={image} width={180} alt={`slide-${key + 1}`} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
+  )
 }
 
 export default LogoSlider

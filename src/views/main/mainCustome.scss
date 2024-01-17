@@ -76,7 +76,9 @@ $breakpoints: (
 .customeHomeDiv {
     max-width: 1440px;
     margin: auto;
-
+    @media screen and (max-width: 770px) {
+        max-width: 100%;
+    }
     // fonts classes ----------------------------------------------------------------------------
 
     * {
@@ -99,9 +101,7 @@ $breakpoints: (
         font-family: Colaborate Reg !important;
     }
 
-    @media screen and (max-width: 770px) {
-        max-width: 100%;
-    }
+   
 
     // primary color for headings
     .main-heading {
@@ -124,6 +124,9 @@ $breakpoints: (
 
     .lh-32 {
         line-height: 32px !important;
+        @include tab {
+            line-height: 25px !important;
+        }
     }
 
 
@@ -240,9 +243,14 @@ $breakpoints: (
         .mt#{$value} {
             margin-top: #{$value}px !important;
 
-            @if $i == 17 or $i ==18 {
+            @if $i == 17 or $i ==18  {
                 @include mobile {
                     margin-top: 80px !important;
+                }
+            }
+            @if $i == 16  {
+                @include tab {
+                    margin-top: 120px !important;
                 }
             }
             @if $i == 24  {
