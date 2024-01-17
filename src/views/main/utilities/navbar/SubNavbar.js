@@ -29,7 +29,7 @@ export default function SubNavbar({ navTitle }) {
   useEffect(() => {
     if (width < 500) {
       const second_navbar = document.getElementById("second_navbar")
-      second_navbar.style.top = "80px"
+      second_navbar.style.top = "74px"
     }
     window.addEventListener('scroll', () => {
       const Yscroll = window.scrollY
@@ -50,7 +50,7 @@ export default function SubNavbar({ navTitle }) {
   }, [])
 
   return (
-    <div className='Container-subNav bg-white border-bottom  second_navbar  p-0' id="second_navbar" style={{ position: 'fixed', top: '87px' }}>
+    <div className='Container-subNav bg-white border-bottom  second_navbar  p-0' id="second_navbar" style={{ position: 'fixed', top: '80px' }}>
       <div className=' justify-content-center bg-white m-0 p-0 px-2'>
         <nav className="navbar navbar-expand-lg navbar-light bg-light   m-0 bg-white   "  >
           <div className="container-fluid m-0  p-0 " >
@@ -62,7 +62,7 @@ export default function SubNavbar({ navTitle }) {
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-1 fs-5 px-2">
                 {
                   Links.map((menu, index) => (
-                    <li className="nav-item " key={index}>
+                    <li className="nav-item " key={index} onClick={() => setshowMenu(false)}> 
                       <Link to={menu.link} className="nav-link text-dark" aria-current="page" >{menu.title}</Link>
                     </li>
                   ))

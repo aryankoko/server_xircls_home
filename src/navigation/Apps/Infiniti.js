@@ -2,9 +2,11 @@ import { Circle, Home, Percent } from "react-feather"
 import { ownUrl } from "../../views/Validator"
 import { AiFillPhone, AiOutlineSmile } from "react-icons/ai"
 import { DefaultNav } from "./DefualtNav"
+import { BsWhatsapp } from "react-icons/bs"
 
 export const InfinitiNavigation = [
   ...DefaultNav,
+ 
   {
     header: 'Infiniti'
   },
@@ -13,6 +15,12 @@ export const InfinitiNavigation = [
     title: 'Dashboard',
     icon: <Home size={20} />,
     navLink: '/merchant/dashboard/'
+  },
+  {
+    id: 'WhatsApp',
+    title: 'WhatsApp',
+    icon: <BsWhatsapp size={20} />,
+    navLink: '/merchant/WhatsApp/'
   },
   {
     id: 'newtwork',

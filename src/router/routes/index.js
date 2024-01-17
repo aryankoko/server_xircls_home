@@ -35,9 +35,12 @@ import { ProductReview_Routes } from './ProductReviews'
 import { OhMyCustomer_Routes } from './OhMyCustomer'
 import HomeLayout from '../../@core/layouts/HomeLayout'
 import Homes_Routes from './Home'
+import {Test_routes} from './Test_routes'
+import NewBlankLayout from '../../@core/layouts/NewBlankLayout'
 
 const getLayout = {
   blank: <BlankLayout />,
+  NewBlank: <NewBlankLayout />,
   homeLayout: <HomeLayout />,
   vertical: <VerticalLayout />,
   horizontal: <HorizontalLayout />,
@@ -80,6 +83,7 @@ const DefaultRoute = '/'
 // }
 
 const Routes = [
+  ...Test_routes,
   ...Admin_Routes,
   ...Dashboard_Routes,
   ...Customers_Routes,
@@ -173,7 +177,7 @@ const MergeLayoutRoutes = (layout, defaultLayout) => {
 
 const getRoutes = layout => {
   const defaultLayout = layout || 'vertical'
-  const layouts = ['vertical', 'horizontal', 'blank', 'custom', 'fullWidthLayout', 'homeLayout']
+  const layouts = ['vertical', 'horizontal', 'blank', 'custom', 'fullWidthLayout', 'homeLayout', 'NewBlank']
 
   const AllRoutes = []
 

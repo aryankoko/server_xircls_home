@@ -2,6 +2,7 @@ import React, { lazy } from 'react'
 import ViewOffers from '../../views/CrossMarketing/ViewOffers'
 import ViewInnerXircl from '../../views/CrossMarketing/ViewInnerXircl'
 import PreviewInnerXircl from '../../views/CrossMarketing/PreviewInnerXircl'
+import WhatsApp from '../../views/test/WhatsApp'
 const Website = lazy(() => import('../../views/Plugin/Website/Website'))
 const Action = lazy(() => import('../../views/Plugin/Action/Action'))
 const Campaign = lazy(() => import('../../views/Plugin/Campaign/Campaign'))
@@ -100,6 +101,10 @@ const CrossMarketing_Routes = [
         layout: "custom"
       },
       element: <TermsConditions />
+    },
+    {
+      path: "/merchant/WhatsApp",
+      element: <WhatsApp />
     }
 
 ]

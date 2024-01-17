@@ -52,10 +52,12 @@
 
     .subMenu {
         position: absolute;
-        width: 500px;
+        width: 450px;
+        margin-left: -30px;
         background-color: rgb(255, 255, 255);
         z-index: 10;
         transition: 0.8s ease-in-out;
+        
 
         .hoverItems {
             &:hover {

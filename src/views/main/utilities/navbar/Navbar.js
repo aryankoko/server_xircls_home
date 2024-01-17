@@ -134,6 +134,7 @@ const Navbar = ({ position }) => {
     if (name === "company") {
       setShowCompany(!ShowCompany)
       setShowProducts(false)
+
     }
   }
 
@@ -145,7 +146,7 @@ const Navbar = ({ position }) => {
             <img src={logo} alt="logo" className='mx-2 nav_logo_img' />
           </Link>
 
-          <div className={`toggleMenu py-2 ${toggleMenu ? "toggleMenuUp" : "toggleMenuDown"}`}>
+          <div    className={`toggleMenu py-2 ${toggleMenu ? "toggleMenuUp" : "toggleMenuDown"}`} >
             <ul className=' list-unstyled d-inline-flex gap-5 pt-1'>
 
               <li className='productLi ItemsList' onClick={() => mouseClick("products")} onMouseEnter={() => mouseEnter("products")} onMouseLeave={() => mouseLeave("products")}>
@@ -155,7 +156,7 @@ const Navbar = ({ position }) => {
                   <ul className=' list-unstyled '>
                     {
                       productList.map((ele, index) => (
-                        <li key={index}  className='mt-1 hoverItems' style={{ padding: "5px 5px" }}>
+                        <li key={index}  className='mt-1 hoverItems' style={{ padding: "5px 5px" }} onClick={() => setToggleMenu(true)}>
                           <Link to={ele.link}>
                             <div className=' d-flex flex-md-row flex-column align-items-center gap-2' style={{ marginBottom: "12px" }}>
                               {/* <img src={ele.img} alt="XIRCLSLogo" width={50} /> */}
@@ -175,23 +176,20 @@ const Navbar = ({ position }) => {
                   </ul>
                 </div>
               </li>
-              <Link to='/partners' className='fs-4 text-dark text-center'> <li ><p>Partners</p></li></Link>
+              <Link to='/partners' className='fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Partners</p></li></Link>
               {/* <Link to='/developers' className='fs-4 text-dark text-center'> <li ><p>Developers</p></li></Link> */}
-              <Link to='/blog' className='fs-4 text-dark text-center'> <li ><p>Blog</p></li></Link>
+              <Link to='/blog' className='fs-4 text-dark text-center' onClick={() => setToggleMenu(true)}> <li ><p>Blog</p></li></Link>
 
               <li className='aboutLi ItemsList' onClick={() => mouseClick("company")} onMouseEnter={() => mouseEnter("company")} onMouseLeave={() => mouseLeave("company")}>
                 <p className='text-dark fs-4'>Company <IoIosArrowDown className={ShowCompany ? "rotate-180" : ""} /></p>
-                <div className={`subMenu ${ShowCompany ? "aboutSubMenuDown" : "aboutSubMenuUp"} p-1 border border-1 rounded-3 px-md-3`}>
-                  {/* <div className={`subMenu ItemsList-cont  p-1 border border-1 rounded-3 px-md-3`}> */}
+                <div className={`subMenu  ${ShowCompany ? "aboutSubMenuDown" : "aboutSubMenuUp"} p-1 border border-1 rounded-3 px-md-3`}>
                   <ul className=' list-unstyled'>
                     {
                       aboutList.map((ele, index) => (
-                        <li key={index} className='mt-1 hoverItems' style={{ padding: "5px 5px" }}>
+                        <li key={index} className='mt-1 hoverItems' style={{ padding: "5px 5px" }} onClick={() => setToggleMenu(true)}>
                           <Link to={ele.link}>
                             <div className=' d-flex flex-md-row flex-column align-items-center gap-2' style={{ marginBottom: "5px" }}>
-                              {/* <img src={ele.img} alt="XIRCLSLogo" width={50} /> */}
                               <div className='nav-list-logo d-flex align-items-center justify-content-center  rounded-circle' style={{ minWidth: "50px", minHeight: "50px", background: "#F0F0F0" }}>
-                                {/* <BsCodeSquare size={25} color='' className='text-dark'/> */}
                                 {ele.logo}
                               </div>
                               <div className='d-flex flex-column justify-content-center w-100 '>
@@ -209,9 +207,9 @@ const Navbar = ({ position }) => {
 
             </ul>
             <div className='navBtn gap-1'>
-              <Link to='/merchant/signup' className=' btn  btn-lg main-btn-blue-gra  fs-3 fw-lig'>Signup for Free</Link>
+              <Link onClick={() => setToggleMenu(true)} to='/merchant/signup' className=' btn  btn-lg main-btn-blue-gra  fs-3 fw-lig'>Signup for Free</Link>
 
-              <Link to='/merchant/login' className=' btn btn-lg main-btn-dark fs-3 fw-lig' >Login</Link>
+              <Link onClick={() => setToggleMenu(true)} to='/merchant/login' className=' btn btn-lg main-btn-dark fs-3 fw-lig' >Login</Link>
             </div>
           </div>
           <div className='menuBtn' onClick={() => { setToggleMenu(!toggleMenu); setShowProducts(false); setShowCompany(false) }}>
