@@ -18,10 +18,10 @@ const Footer = () => {
         navigator.clipboard.writeText(demo)
         toast.success(() => <h4 className="fw-bolder m-0 ">Copied !</h4>, {
             position: "top-center"
-          })
+        })
     }
     return (
-        <Container fluid="sm">
+        <div className="px-2">
             <Row className='justify-content-center py-5 homeFooter mt-2 '>
                 <Col md="10" xs="10" lg="11" xl="11">
                     <div className=' d-flex flex-wrap justify-content-between'  >
@@ -103,7 +103,7 @@ const Footer = () => {
 
 
             </Row>
-        </Container>
+        </div>
     )
 }
 

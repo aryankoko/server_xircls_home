@@ -32,7 +32,7 @@ export default function LogoSection() {
             slidesPerView: 6
           }
         }}
-        spaceBetween={6}
+        spaceBetween={26}
         navigation={false}
         autoplay={{ delay: 1000 }}
         speed={500}

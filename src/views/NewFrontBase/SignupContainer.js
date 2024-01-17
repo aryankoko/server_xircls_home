@@ -6,7 +6,7 @@ const SignupContainer = ({ outlet, heading }) => {
 
     return (
         <div>
-            <Container fluid>
+            <div>
                 <Row className="w-100 px-2">
                     <Col xs={2}>
                         <img className="py-2" width={'70%'} src="https://api.xircls.com/static/images/website-slide/logo-dark2.png" alt="Logo" />
@@ -70,7 +70,7 @@ const SignupContainer = ({ outlet, heading }) => {
                     <Col lg={6} style={{ backgroundImage: "url('https://static.vecteezy.com/system/resources/previews/020/598/535/large_2x/data-analytics-dashboard-and-business-finance-report-concept-with-people-character-outline-design-style-minimal-illustration-for-landing-page-web-banner-infographics-hero-images-vector.jpg')", backgroundSize: '100%', backgroundPosition: 'center' }}>
                     </Col>
                 </Row>
-            </Container>
+            </div>
         </div>
     )
 }

@@ -76,7 +76,7 @@ export default function LoginPage() {
                 apiLoader ? <FrontBaseLoader /> : ''
             }
             {/* <Navbar /> */}
-            <Container fluid="sm" className='  ' >
+            <div className='  ' >
                 <Row className=' justify-content-center mt-lg-1 pt-lg-5 '>
                     <Col md="10" xl="8">
                         <form className='mt-2  rounded-2  p-3 ' onSubmit={handleSubmit}>
@@ -105,7 +105,7 @@ export default function LoginPage() {
                         </form>
                     </Col>
                 </Row>
-            </Container>
+            </div>
             <hr className='mt-5' />
             <Footer />
 

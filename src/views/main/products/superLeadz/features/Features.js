@@ -516,7 +516,7 @@ export default function Features() {
                   <Link to="/merchant/signup" className="btn btn-lg fs-3 main-btn-blue fw-lig"  >
                     Start Free
                   </Link>
-                  <div className="pe-4 pe-md-0 mt-2">
+                  <div className=" mt-2">
                     <p className="fs-2 text-white"   >
                       For help getting started,
                       <Link to="/contact-us" className="fs-2 text-primary " style={{ marginLeft: "2px" }}>

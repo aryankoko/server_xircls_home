@@ -244,17 +244,17 @@ $breakpoints: (
             margin-top: #{$value}px !important;
 
             @if $i == 17 or $i ==18  {
-                @include mobile {
+                @include laptop {
                     margin-top: 80px !important;
                 }
             }
             @if $i == 16  {
-                @include tab {
+                @include laptop {
                     margin-top: 120px !important;
                 }
             }
             @if $i == 24  {
-                @include tab {
+                @include laptop {
                     margin-top: 120px !important;
                 }
             }

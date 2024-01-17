@@ -33,7 +33,7 @@ export default function SignupPage() {
         checkShop: false,
         checkEmail: false
     })
-    
+
 
     const CustErrorMsg = {
         first_name: 'Please enter your first name',
@@ -314,7 +314,7 @@ export default function SignupPage() {
                             <Row className=' px-0 px-md-5 mt-3 '>
                                 <Col xs="12" md="6" className=''>
                                     <label className="fs-4 main-heading">First Name  </label>
-                                    <input  type="text" className="form-control form-control  fs-5 text-capitalize text-dark rounded-1" onChange={handleInputChange} placeholder="First Name" name="first_name" style={{ marginTop: "4px" }} />
+                                    <input type="text" className="form-control form-control  fs-5 text-capitalize text-dark rounded-1" onChange={handleInputChange} placeholder="First Name" name="first_name" style={{ marginTop: "4px" }} />
                                     <span className="error text-danger ">{formErrors.first_name}</span>
                                 </Col>
                                 <Col xs="12" md="6" className='mt-1 mt-md-0'>
@@ -340,24 +340,31 @@ export default function SignupPage() {
                                 {/* mobile  */}
                                 <Col xs="12" className='mt-2'>
                                     <label className="fs-4 main-heading">Mobile Number</label>
+                                    <Row className=' row-gap-1 '>
+                                        <Col xs="12" md="4" className=''>
+                                            <Select
+                                                isMulti={false}
+                                                options={selectPhoneList}
+                                                closeMenuOnSelect={true}
+                                                name="phone_code"
+                                                onChange={(e) => setFormData({ ...formData, phone_code: e.value })}
+                                                styles={{
+                                                    control: (baseStyles) => ({
+                                                        ...baseStyles,
+                                                        fontSize: '14px',
+                                                        padding: "3px 0px",
+                                                        height: '100%'
+                                                    })
+                                                }}
+                                            />
+                                        </Col>
+                                        <Col xs="12" md="8" className=''>
+                                            <input type="number" className={`form-control form-control fs-5 text-dark rounded-1`} onChange={handleInputChange} name="phone_no" placeholder="Mobile" />
+
+                                        </Col>
+                                    </Row>
                                     <div className='d-flex justify-content-center  align-items-start ' style={{ marginTop: "4px" }}>
-                                        <Select
-                                            isMulti={false}
-                                            options={selectPhoneList}
-                                            closeMenuOnSelect={true}
-                                            name="phone_code"
-                                            onChange={(e) => setFormData({ ...formData, phone_code: e.value })}
-                                            styles={{
-                                                control: (baseStyles) => ({
-                                                    ...baseStyles,
-                                                    fontSize: '14px',
-                                                    width: "150px",
-                                                    padding:"3px 0px",
-                                                    height: '100%'
-                                                })
-                                            }}
-                                        />
-                                        <input type="number" className={`form-control form-control fs-5 text-dark rounded-1`} style={{ marginLeft: "5px" }} onChange={handleInputChange} name="phone_no" placeholder="Mobile" />
+
                                     </div>
                                     <span className="error text-danger ">{formErrors.phone_no}</span>
 

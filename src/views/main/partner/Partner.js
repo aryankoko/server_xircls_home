@@ -153,9 +153,9 @@ export default function Partner() {
                 <h1 className=' mt-1 text-center text-black fw-bold px-1 '>Grow your business while you hello your audience grow theirs.<br /><span className='text-black fw-bolder'> Earn a 20% commission every time </span>your referrals buy from us. </h1>
             </div>
             {/* section 2 */}
-            <Container fluid='sm'>
+            <div>
                 <Row className='justify-content-center mt160'>
-                    <Col xs="10" md="12" xl="10">
+                    <Col xs="10" >
                         <Row className='text-start match-height  justify-content-between m-auto'>
                             <Col lg="4" md="6" className=' d-flex justify-content-center align-items-center mb-2 mb-md-0'>
                                 <div >
@@ -181,33 +181,33 @@ export default function Partner() {
                                 Your Network, Our Ideal Audience
                             </h2>
 
-                            <Row className='match-height  py-2 d-flex justify-content-center px-5 px-md-0  px-sm-0' >
-                                <Col md="6" lg="3" sm="6" >
+                            <Row className='match-height  py-2 d-flex justify-content-center px- px-md-0  px-sm-0' >
+                                <Col md="6" lg="3"  >
                                     <Card className='border-dark shadow-none rounded-pill  py-1 m-0 mt-2 d-flex justify-content-center align-items-center  '>
                                         <h3 className='fs-3 text-center text-black m-0 '>Small Business Owners</h3>
                                     </Card>
                                 </Col>
-                                <Col md="6" lg="3" sm="6" >
+                                <Col md="6" lg="3"  >
                                     <Card className='border-dark shadow-none rounded-pill  py-1 m-0 mt-2 d-flex justify-content-center align-items-center '>
                                         <h3 className='fs-3 text-center text-black m-0 '>Reputed Brands</h3>
                                     </Card>
                                 </Col>
-                                <Col md="6" lg="3" sm="6" >
+                                <Col md="6" lg="3"  >
                                     <Card className='border-dark shadow-none rounded-pill  py-1 m-0 mt-2 d-flex justify-content-center align-items-center '>
                                         <h3 className='fs-3 text-center text-black m-0 '>Publications</h3>
                                     </Card>
                                 </Col>
-                                <Col md="6" lg="3" sm="6" >
+                                <Col md="6" lg="3"  >
                                     <Card className='border-dark shadow-none rounded-pill  py-1 m-0 mt-2 d-flex justify-content-center align-items-center '>
                                         <h3 className='fs-3 text-center text-black m-0 '>Ad & Media Agencies</h3>
                                     </Card>
                                 </Col>
-                                <Col md="6" sm="6" lg="5" xl="4" >
+                                <Col md="6"  lg="5" xl="4" >
                                     <Card className='border-dark  shadow-none rounded-pill py-1 m-0 mt-2 d-flex justify-content-center align-items-center  '>
                                         <h3 className='fs-3 text-center  text-black m-0 '>Infrastructure & Utilities Companies</h3>
                                     </Card>
                                 </Col>
-                                <Col md="6" sm="6" lg="5" xl="4" >
+                                <Col md="6"  lg="5" xl="4" >
                                     <Card className='border-dark shadow-none rounded-pill  py-1 m-0 mt-2 d-flex justify-content-center align-items-center '>
                                         <h3 className='fs-4 text-center text-black m-0 '>Financial Services</h3>
                                     </Card>
@@ -246,11 +246,11 @@ export default function Partner() {
 
                     </Col>
                 </Row>
-            </Container>
+            </div>
             {/* section6 */}
 
             <div className='section8Test d-flex flex-column justify-content-center align-items-center mt190 p-0 p-sm-5' style={{ background: "#000" }}>
-                <Container fluid='sm'>
+                <div>
                     <Row className='justify-content-center '>
                         <Col xs="10" md="12" xl="11">
                             <h1 className='display-1 fw-bolder mt-3 text-white text-start lh-sm ' >Get the <br />XIRCLS Partner <br /> Advantage.</h1>
@@ -277,19 +277,19 @@ export default function Partner() {
                             </Row>
                         </Col>
                     </Row>
-                </Container>
+                </div>
             </div>
 
 
             {/* section 7 */}
-            <Container fluid='sm'>
+            <div>
                 <Row className='justify-content-center  mt170'>
                     <Col xs="10" md="12" xl="10">
                         <div className='text-center'>
                             <h2 className='display-2 text-center main-heading fw-bolder'  > How it Works! </h2>
                             <h1 className='text-black ' >While anyone can become a XIRCLS partner,<br /> to be a successful partner you must: <span className='SelectBlack' style={{ color: "#000" }}>Three simple steps</span>.</h1>
                         </div>
-                        <Row className="mt-3 lh-32 justify-content-center " >
+                        <Row className="mt-3 lh-32 justify-content-center px-3 " >
                             {
                                 steps.map((data, index) => (
                                     <Col lg="4" className='mt-2 px-2' key={index}>
@@ -305,7 +305,7 @@ export default function Partner() {
                         </div>
                     </Col>
                 </Row>
-            </Container>
+            </div>
 
             {/* faQ */}
             <div className="mt170">
@@ -314,7 +314,7 @@ export default function Partner() {
             </div>
 
             {/* banner */}
-            <Container fluid='sm'>
+            <div>
                 <Row className='justify-content-center  mt170'>
                     <Col xs="12" md="12" xl="11">
                         <Card className=' p-2 p-md-5 border shadow-none' style={{ background: "#e5e7eb" }}>
@@ -327,13 +327,14 @@ export default function Partner() {
                                 </h1>
                                 <br />
                                 <Row className=''>
-                                    <Col className='mb-2' xs="10" md="6" xl="9">
+                                    <Col className='mb-2' xs="10" md="7" xl="6">
                                         <div className='d-flex gap-2 flex-wrap'>
                                             <Link to='/merchant/signup' className='btn main-btn-black btn-lg fs-3 px-3 py-1 '>Get Started</Link>
                                             <Link to='/contact-us' className='btn main-btn-dark btn-lg  fs-3 px-3 py-1' >Speak with our team</Link>
                                         </div>
                                     </Col>
-                                    <Col xs="10" md="4" xl="3"><Link to='/merchant/signup' className=' text-black fw-bold fs-3' style={{ boxShadow: 'none' }}>Sign up as a XIRCLS Partner<BiRightArrowAlt /></Link>
+                                    <Col xs="12" md="4  " xl="6" className='text-end'>
+                                        <Link to='/merchant/signup' className=' text-black fw-bold fs-3' style={{ boxShadow: 'none' }}>Sign up as a XIRCLS Partner<BiRightArrowAlt /></Link>
                                         
                                     </Col>
 
@@ -342,7 +343,7 @@ export default function Partner() {
                         </Card>
                     </Col>
                 </Row>
-            </Container>
+            </div>
 
 
             <hr className='mt100' />

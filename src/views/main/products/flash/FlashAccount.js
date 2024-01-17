@@ -43,15 +43,13 @@ export default function FlashAccount() {
         <div >
             <div fluid='sm' className='mt190' >
                 <Row className=' justify-content-center'>
-                    <Col md='12' lg="11" className='' >
+                    <Col xs='11' lg="11" className='' >
                         <Row className=' ' >
                             <Col md="7" className='d-flex justify-content-center flex-column align-items-start'>
-                                <div className=' text-center text-sm-start '>
-                                    <h3 className='fs-3 fw-bolder  text-dark'>ACCOUNT CREATION</h3>
+                                <div className='  text-md-start '>
+                                    <h3 className='fs-3 fw-bolder  text-dark '>ACCOUNT CREATION</h3>
                                     <h1 className='display-1 lh-83 text-start main-heading fw-bolder'>
                                         Tailored for Sign-Ups
-                                        <br />
-                                        Optimized for Sign-Ups
                                     </h1>
 
                                     <h1 className=' text-black  mt-1' >Convert guest customers into registered users

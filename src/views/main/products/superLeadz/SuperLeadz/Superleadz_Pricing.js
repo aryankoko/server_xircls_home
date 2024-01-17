@@ -32,7 +32,7 @@ export default function Superleadz_Pricing() {
         "No XIRCLS branding",
         "2 Domains"
 
-        
+
       ]
     },
     {
@@ -45,7 +45,7 @@ export default function Superleadz_Pricing() {
         "No XIRCLS branding",
         "5 Domains"
 
-        
+
       ]
     }
 
@@ -53,32 +53,37 @@ export default function Superleadz_Pricing() {
 
   return (
     <div style={{ background: "#fff" }} className=' p-0 px-3 px-md-0 '>
-        {/* <Navbar position={'notFixed'} /> */}
-        {/* <SubNavbar navTitle={'superLeadz'} /> */}
+      {/* <Navbar position={'notFixed'} /> */}
+      {/* <SubNavbar navTitle={'superLeadz'} /> */}
 
-        <div className='text-center mt160'>
-          <h1 className='display-1 text-center main-heading fw-bolder mt-0'>Thoughtfully priced to help you <br/> thrive and expand.</h1>
-          <h1 className=' text-center text-black px-3'>Start for free and upgrade when you want to. Cancel anytime. No hidden fees.</h1>
-        </div>
-
-
-        <Row className=' justify-content-center mt-5  '>
-          <Col md='11' lg="11" className='' >
-            <Row className=' justify-content-center  match-height'>
-              {
-                pricingData.map((data) => (
-                  <Col md="5" lg="3" className='  '>
-                    <Price_Card data={data} isFeature='true' />
-                  </Col>
-                ))
-              }
-            </Row>
+      <div className='text-center mt160'>
+        <Row className=' justify-content-center '>
+          <Col lg="12" xl="9">
+            <h1 className='display-1 text-center main-heading fw-bolder mt-0'>Thoughtfully priced to help you  thrive and expand.</h1>
           </Col>
         </Row>
-      
 
-        <hr className='mt-5' />
-        <Footer />
+        <h1 className=' text-center text-black px-3'>Start for free and upgrade when you want to. Cancel anytime. No hidden fees.</h1>
+      </div>
+
+
+      <Row className=' justify-content-center mt-5  '>
+        <Col md='11' lg="11" className='' >
+          <Row className=' justify-content-center  match-height'>
+            {
+              pricingData.map((data) => (
+                <Col md="5" lg="3" className='  '>
+                  <Price_Card data={data} isFeature='true' />
+                </Col>
+              ))
+            }
+          </Row>
+        </Col>
+      </Row>
+
+
+      <hr className='mt-5' />
+      <Footer />
 
     </div>
   )

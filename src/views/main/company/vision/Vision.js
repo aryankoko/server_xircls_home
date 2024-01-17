@@ -78,11 +78,11 @@ const VisionPage = () => {
 
 
       {/* What We Believe */}
-      <Container fluid='sm' >
+      <div >
         <Row className="justify-content-center mt180 ">
           <Col xs='10' lg='10' md='10'>
             <h1 className=" text-center display-2 main-heading fw-bolder  ">What We Believe</h1>
-            <Row className="gy-3 ">
+            <Row className="gy-3  mt-1">
               {
                 WWBelieveData.map((item, index1) => (
                   <Col sm='12' xs='12' key={index1} className="text-start mt-3 d-flex justify-content-center align-items-center" >
@@ -105,13 +105,13 @@ const VisionPage = () => {
             </Row>
           </Col>
         </Row>
-      </Container>
+      </div>
 
       {/* Our Culture */}
       <Row className="justify-content-center mt170 py-5" style={{ background: "#000" }}>
 
         <Col lg='10' xs='10'>
-          <Container fluid='sm'>
+          <div>
             <Row className=" align-items-center   text-start ">
               <Col lg='6' >
                 <h1 className="display-1 fw-bolder text-white ms-2">Our Culture</h1>
@@ -129,7 +129,7 @@ const VisionPage = () => {
                 <h3 className="lh-32 text-white">At XIRCLS, we embody a state of constant value delivery, guided by the question: "How can I be of service today?" Service is not merely a concept; it's our overarching aim, shaping interactions with everyone around us - from clients, coworkers, friends & family, to a stranger on the street.</h3>
               </Col>
             </Row>
-          </Container>
+          </div>
         </Col>
       </Row>
 
@@ -137,16 +137,16 @@ const VisionPage = () => {
 
       <Row className="justify-content-center mt170 align-items-center py-5 " style={{ backgroundColor: '#e5e7eb' }}>
         <Col lg='10' xs='10'>
-          <Container fluid='sm' className='p-0'>
+          <div className='p-0'>
             <h1 className="display-2 main-heading text-center fw-bolder mb-5">
               Why Culture Matters to Us
             </h1>
-            <Row className=" gx-2 h-100 align-items-center justify-content-center">
-              <Col xl='6' md='9' lg='10' xs='12' className="d-flex align-items-start justify-content-center ">
+            <Row className=" gx-2 py-2 h-100 align-items-center justify-content-center">
+              <Col xl='6' md='12' lg='10'  className="d-flex align-items-start justify-content-center ">
                 <video className='w-100' controls src="https://api.xircls.com/static/images/website-slide/videos/xircls_in_three_words7.mp4" autoPlay muted loop />
 
               </Col>
-              <Col xl='6' md='9' lg='10' xs='12' className=" h-100 ">
+              <Col xl='6' md='12' lg='10'  className="mt-1 h-100 ">
                 <div className="  text-start h-100">
                   <ol className=" ">
                     <li className="text-black fs-2 fw-lig mt-1">
@@ -162,12 +162,12 @@ const VisionPage = () => {
                 </div>
               </Col>
             </Row>
-          </Container>
+          </div>
         </Col>
 
       </Row>
       {/* Our Core Values */}
-      <Container fluid='sm'>
+      <div>
 
         <Row className="justify-content-center mt170 ">
           <Col xl='10' lg='10' xs='10' className="p-0" >
@@ -184,7 +184,7 @@ const VisionPage = () => {
             </Row>
           </Col>
         </Row>
-      </Container>
+      </div>
 
       <hr className='mt100' />
       <Footer />

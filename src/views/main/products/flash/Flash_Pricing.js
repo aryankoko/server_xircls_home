@@ -27,10 +27,11 @@ export default function Flash_Pricing() {
         {/* <Navbar position={'notFixed'} /> */}
         {/* <SubNavbar navTitle={'superLeadz'} /> */}
 
-        <div className='text-center mt160'>
-          <h1 className='display-1 text-center main-heading fw-bolder mt-0'>Thoughtfully priced to help you <br/> thrive and expand.</h1>
-          <h1 className=' text-center text-black px-3'>Start for free and upgrade when you want to. Cancel anytime. No hidden fees.</h1>
-        </div>
+        <Row className=' justify-content-center '>
+          <Col md="11" lg="11" xl="9">
+            <h1 className='display-1 text-center main-heading fw-bolder mt-0'>Thoughtfully priced to help you  thrive and expand.</h1>
+          </Col>
+        </Row>
 
 
         <Row className=' justify-content-center mt-5  '>

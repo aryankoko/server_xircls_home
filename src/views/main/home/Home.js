@@ -181,7 +181,7 @@ const Home = () => {
 
 
         {/* section 3 */}
-        <Container fluid='sm'>
+        <div>
 
           <Row className='section8 justify-content-center mt180 '>
               <h1 className=' text-center display-2 fw-bolder main-heading  px-0' >Technology That Sells. <br />The Way You Would.</h1>
@@ -200,10 +200,10 @@ const Home = () => {
               </Row>
             </Col>
           </Row>
-        </Container>
+        </div>
 
         {/* we her for you */}
-        <Container fluid='sm'>
+        <div>
           <style>
             {`
                       .numBor {
@@ -266,8 +266,8 @@ const Home = () => {
             </Col>
 
           </Row>
-        </Container>
-        <Container fluid='sm'>
+        </div>
+        <div>
           <Row className=' justify-content-center mt170 '>
             <Col lg="12" xl="10">
               <Card className='shadow-none p-5 border'>
@@ -287,7 +287,7 @@ const Home = () => {
               </Card>
             </Col>
           </Row>
-        </Container>
+        </div>
 
 
         {/* TESTIMONIAL */}
@@ -295,7 +295,7 @@ const Home = () => {
 
 
         {/* card */}
-        <Container fluid='sm'>
+        <div>
           <Row className=' justify-content-center mt170 '>
             <Col lg="12" xl="10">
               <Card className='shadow-none p-5 border'>
@@ -317,7 +317,7 @@ const Home = () => {
               </Card>
             </Col>
           </Row>
-        </Container>
+        </div>
 
 
         {/* black card */}
@@ -326,7 +326,7 @@ const Home = () => {
 
 
             <div className=' d-flex justify-content-center align-items-center '>
-              <h1 className='display-2 fw-bolder m-0  text-white'>Grow Your Business With XIRCLS.</h1>
+              <h1 className='display-2 fw-bolder m-0 text-center text-white'>Grow Your Business With XIRCLS.</h1>
             </div>
 
             <h1 className=' display- text-center mt-0 text-white ' >Reach out for customized solutions.</h1>
