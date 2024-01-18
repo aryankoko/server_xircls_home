@@ -6,7 +6,6 @@ import { BsWhatsapp } from "react-icons/bs"
 
 export const InfinitiNavigation = [
   ...DefaultNav,
- 
   {
     header: 'Infiniti'
   },

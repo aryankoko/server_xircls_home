@@ -4,6 +4,7 @@ import NewPassword from '../../views/XirclsFrontend/NewPassword'
 import VerfiyYourEmail from '../../views/XirclsFrontend/VerfiyYourAccount'
 import InstallFailed from '../../views/XirclsFrontend/InstallFailed'
 import ProductSuperleads from '../../views/XirclsFrontend/ProductSuperLeadz'
+import Skin_type_form from '../../views/XirclsFrontend/test/Skin_type_form'
 const Allie = lazy(() => import('../../views/XirclsFrontend/Blog/Authors/Allie'))
 const Lauren = lazy(() => import('../../views/XirclsFrontend/Blog/Authors/Lauren'))
 const Dineo = lazy(() => import('../../views/XirclsFrontend/Blog/Authors/Dineo'))
@@ -482,6 +483,14 @@ const Xircls_Frontend_Routes = [
     meta: {
       layout: 'blank',
       publicRoute: true
+    }
+  },
+  {
+    path: '/codeskin/skin-type-test',
+    element: <Skin_type_form />,
+    meta: {
+        layout: "NewBlank",
+        publicRoute: true
     }
   }
 ]

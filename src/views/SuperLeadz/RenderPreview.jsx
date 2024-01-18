@@ -18,11 +18,9 @@ import BasicEditor from '../Components/Editor/BaseEditor'
 
 const RenderPreview = (props) => {
     const { outletData, slPrevBg, bgsettings, currPage, setCurrPage, currPosition, setCurrPosition, indexes, setIndexes, popPosition, bgStyles, crossStyle, values, setValues, showBrand, handleColDrop, handleDragOver, handleElementDrop, handleLayoutDrop, handleRearrangeElement, mouseEnterIndex, setMouseEnterIndex, mousePos, setMousePos, isEqual, makActive, colWise, setcolWise, setDragStartIndex, setDragOverIndex, isMobile, finalObj, setFinalObj, mobileCondition, openPage, setOpenPage, brandStyles, gotOffers, setTransfered, sideNav, setSideNav, btnStyles, offerTheme, navigate, triggerImage, gotDragOver, setGotDragOver, indicatorPosition, setIndicatorPosition, selectedOffer, setSelectedOffer, renamePage, setRenamePage, pageName, setPageName, undo, updatePresent, openToolbar, setOpenToolbar, updateTextRes } = props
-    // console.log({ openToolbar })
     const [editorBar, setEditorBar] = useState(true)
     const { userPermission } = useContext(PermissionProvider)
     const setDragEnter = ({ position, id }) => {
-        // console.log(type)
         setGotDragOver({ ...position })
         const elem = document.getElementById(id)
         const { y, height } = elem?.getBoundingClientRect()
@@ -71,8 +69,6 @@ const RenderPreview = (props) => {
         finalObj.rules.visited,
         finalObj.rules.not_active_page
     ])
-
-    console.log(finalObj.rules.display_when, currPosition, "hh")
     return (
         sideNav === "rules" ? (
             <>
@@ -288,7 +284,7 @@ const RenderPreview = (props) => {
                                 style={{ border: "1px solid #eee", overflowY: "auto" }}
                                 onClick={() => setEditorBar(!editorBar)} onBlur={() => setEditorBar(!editorBar)}
                             >
-                                <CardBody style={{ height: '400px', overflowY: 'auto' }}>
+                                <CardBody style={{ height: '500px', overflowY: 'auto' }}>
                                     <div
                                         style={{ padding: "10px 20px", lineHeight: '25px', color: "#424242" }}
                                         colSpan={2}
@@ -299,12 +295,11 @@ const RenderPreview = (props) => {
                                             <div >
                                                 <div id="emailTemplateId"></div>
                                                 <BasicEditor elementId={`emailTemplateId`}
-                                                    style={{ width: '100%' }} key={sideNav}
+                                                    style={{ width: '100%' }} key={finalObj?.email_settings?.editorState}
                                                     // hideToolbar={editorBar}
-                                                    editorState={'{\"root\":{\"children\":[{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 2;\",\"text\":\"Hello,\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1},{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 1;\",\"text\":\"Activate Your Account\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"type\":\"root\",\"version\":1}}'}
-                                                    htmlContent={'<p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 2; white-space: pre-wrap;\">Hello,</strong></b></p><p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 1; white-space: pre-wrap;\">Activate Your Account</strong></b></p>'}
+                                                    editorState={finalObj?.email_settings?.editorState}
+                                                    htmlContent={finalObj?.email_settings?.htmlContent}
                                                     onChange={(html, ediorState) => {
-                                                        // console.log(html, ediorState)
                                                         // const updatedData = {
                                                         //     editorState: ediorState,
                                                         //     htmlContent: html
@@ -337,12 +332,13 @@ const RenderPreview = (props) => {
                                 <div className='rounded-circle' style={{ padding: '0.5rem', backgroundColor: '#ef4444' }}></div>
                             </div>}
                         </div>
-                        <div className="flex-grow-1 position-relative" style={{ backgroundImage: `url(${slPrevBg})`, backgroundSize: '100% 100%' }}>
+                        <div onClick={() => {
+                            setCurrPosition({ ...currPosition, selectedType: "navMenuStyles" })
+                            setIndexes({ cur: 0, curElem: "left", subElem: "grandparent" })
+                            setSelectedOffer({})
+                        }} className="flex-grow-1 position-relative" style={{ backgroundImage: `url(${slPrevBg})`, backgroundSize: '100% 100%' }}>
                             <div className="flex-grow-1 position-relative h-100" style={{ backgroundImage: `url(${slPrevBg})`, backgroundSize: '100% 100%', backgroundPosition: 'top center', overflowY: "auto", position: "relative", ...bgsettings, backgroundImage: currPage === "button" ? "none" : bgsettings?.backgroundImage, backgroundColor: currPage === "button" ? "none" : bgsettings?.backgroundColor, display: "flex", flexDirection: "column" }}>
-                                <div id='preview_section' onClick={() => {
-                                    setCurrPosition({ ...currPosition, selectedType: "navMenuStyles" })
-                                    setIndexes({ cur: 0, curElem: "left", subElem: "grandparent" })
-                                }} style={{ width: "100%", height: "100%", position: "relative", overflowY: "auto", display: "flex", justifyContent: popPosition?.includes("L") ? "start" : popPosition?.includes("C") ? "center" : "end", alignItems: popPosition?.includes("T") ? "start" : popPosition?.includes("M") ? "center" : "end", flexGrow: "1" }}>
+                                <div id='preview_section' style={{ width: "100%", height: "100%", position: "relative", overflowY: "auto", display: "flex", justifyContent: popPosition?.includes("L") ? "start" : popPosition?.includes("C") ? "center" : "end", alignItems: popPosition?.includes("T") ? "start" : popPosition?.includes("M") ? "center" : "end", flexGrow: "1" }}>
                                     <div style={currPage === "button" ? { position: "relative", width: btnStyles?.width, maxWidth: btnStyles?.maxWidth, maxHeight: "100%", minHeight: btnStyles?.minHeight, marginTop: btnStyles?.marginTop, marginRight: btnStyles?.marginRight, marginBottom: btnStyles?.marginBottom, marginLeft: btnStyles?.marginLeft, borderRadius: btnStyles?.borderRadius } : { position: "relative", width: bgStyles?.width, maxWidth: bgStyles?.maxWidth, maxHeight: "100%", minHeight: bgStyles?.minHeight, marginTop: bgStyles?.marginTop, marginRight: bgStyles?.marginRight, marginBottom: bgStyles?.marginBottom, marginLeft: bgStyles?.marginLeft, borderRadius: bgStyles?.borderRadius }}>
                                         {currPage !== "button" &&
                                             <div id="cross_btn_cont" tabindex="0" style={{ position: "absolute", inset: "0px 0px auto auto", zIndex: "2", backgroundColor: crossStyle?.backgroundColor, borderRadius: crossStyle?.borderRadius, padding: `3px`, marginBottom: crossStyle?.marginBottom, transform: `translate(${crossStyle?.translateX}, ${crossStyle?.translateY})` }}>
@@ -366,6 +362,7 @@ const RenderPreview = (props) => {
                                             handleDragOver(e)
                                         }}
                                             onDrop={(e) => {
+                                                e.stopPropagation()
                                                 const transferType = e.dataTransfer.getData("type")
                                                 setGotDragOver({ cur: false, curElem: false, subElem: false })
                                                 if (transferType !== "") {
@@ -384,8 +381,7 @@ const RenderPreview = (props) => {
                                                 navigate("/")
                                             }} className="text-decoration-underline">XIRCLS</span></span></div>}
                                             {/* render layout Here */}
-                                            {
-                                                colWise?.map((cur, key) => {
+                                            {colWise.length > 0 ? colWise?.map((cur, key) => {
                                                     return <div style={{ ...cur?.style, display: "flex", justifyContent: "center", alignItems: "center", position: "relative", zIndex: cur === indexes.cur ? "2" : "0" }} key={key}
                                                         onClick={(e) => {
                                                             e.stopPropagation()
@@ -431,15 +427,25 @@ const RenderPreview = (props) => {
                                                             <Trash color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }} onClick={(e) => {
                                                                 e.stopPropagation()
                                                                 if (colWise.length <= 1) {
-                                                                    // setCurrPosition({ ...currPosition, selectedType: "main" })
                                                                     setIndexes({ cur: 0, curElem: "left", subElem: "grandparent" })
                                                                 } else {
-                                                                    // setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                     setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                 }
-                                                                const arr = [...colWise]
+                                                                const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                 arr.splice(key, 1)
-                                                                setcolWise([...arr])
+                                                                // setcolWise([...arr])
+                                                                const newObj = { ...finalObj }
+                                                                if (currPage === "button") {
+                                                                    newObj.button = arr
+                                                                    newObj.mobile_button = arrRev
+                                                                } else {
+                                                                    const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                    const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                    newObj.pages[pageIndex].values = arr
+                                                                    newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                }
+                                                                updatePresent({ ...newObj })
                                                                 setMouseEnterIndex({ cur: false, curElem: false, subElem: false })
                                                             }} />
                                                             {/* <Copy color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }} onClick={(e) => {
@@ -495,9 +501,9 @@ const RenderPreview = (props) => {
                                                                             id={`${currPage}-${key}-${curElem.positionType}-parent`}
                                                                             className={`${isEqual({ cur: key, curElem: curElem.positionType, subElem: "parent" }, { ...indexes }) ? "active-elem" : ""}`}>
 
-                                                                            {isEqual({ cur: key, curElem: curElem.positionType, subElem: "parent" }, { ...gotDragOver }) && (
+                                                                            {/* {isEqual({ cur: key, curElem: curElem.positionType, subElem: "parent" }, { ...gotDragOver }) && (
                                                                                 <span style={{ position: "absolute", top: indicatorPosition === "top" ? "0px" : "100%", width: "100%", border: "1px solid #727272" }}></span>
-                                                                            )}
+                                                                            )} */}
                                                                             {isEqual({ ...mouseEnterIndex }, { cur: key, curElem: curElem?.positionType, subElem: "parent" }) && <div className="position-absolute" style={{ inset: "0px", outline: "2px solid #727272", pointerEvents: "none", zIndex: "0", backgroundColor: "rgb(114, 114, 114, 0.3)" }}></div>}
                                                                             {curElem?.element?.map((subElem, j) => {
                                                                                 switch (subElem?.type) {
@@ -577,53 +583,84 @@ const RenderPreview = (props) => {
                                                                                                             setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                             setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                         }
-                                                                                                        const arr = [...colWise]
+                                                                                                        const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                        const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                         if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                             arr.splice(key, 1)
+                                                                                                            arrRev.splice(key, 1)
                                                                                                         } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                         } else {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                         }
-                                                                                                        setcolWise([...arr])
+                                                                                                        const newObj = { ...finalObj }
+                                                                                                        if (currPage === "button") {
+                                                                                                            newObj.button = arr
+                                                                                                            newObj.mobile_button = arrRev
+                                                                                                        } else {
+                                                                                                            const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                            const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                            newObj.pages[pageIndex].values = arr
+                                                                                                            newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                        }
+                                                                                                        updatePresent({ ...newObj })
+                                                                                                        // setcolWise([...arr])
                                                                                                     }} />
                                                                                                     <Edit color="#ffffff" size={30} className="cursor-pointer" style={{ backgroundColor: "#727272", padding: "0.5rem" }} onClick={() => setOpenToolbar(!openToolbar)} />
                                                                                                 </span>}
                                                                                                 {isEqual({ ...mouseEnterIndex }, { cur: key, curElem: curElem?.positionType, subElem: j }) && <div className="position-absolute" style={{ inset: "0px", outline: "2px solid #727272", pointerEvents: "none", zIndex: "0", backgroundColor: "rgb(114, 114, 114, 0.3)" }}></div>}
                                                                                                 <div style={{ width: "100%", resize: isEqual({ ...mouseEnterIndex }, { cur: key, curElem: curElem?.positionType, subElem: j }) ? "vertical" : "none" }} id={`textField-${key}-${curElem?.positionType}-${j}`} className="text-field" >
-                                                                                                    <Editor customElemnt={(
-                                                                                                        <UncontrolledButtonDropdown>
-                                                                                                            <DropdownToggle color='dark' style={{ padding: "0.5rem" }} className='hide-after-dropdown rounded'>
-                                                                                                                {(subElem.isSameText || !isMobile) && <Monitor size={subElem.isSameText ? "12px" : "15px"} />}{(subElem.isSameText || isMobile) && <Smartphone size={subElem.isSameText ? "12px" : "15px"} />}
-                                                                                                            </DropdownToggle>
-                                                                                                            <DropdownMenu end>
-                                                                                                                <DropdownItem onClick={e => updateTextRes({ e, arrCondition: false, mobCondition: false, key, i, j })} className={`w-100 ${!subElem?.isSameText && !isMobile ? "activeDrop" : ""}`}>
-                                                                                                                    Desktop View Only
-                                                                                                                </DropdownItem>
-                                                                                                                <DropdownItem onClick={e => updateTextRes({ e, arrCondition: false, mobCondition: true, key, i, j })} className={`w-100 ${!subElem?.isSameText && isMobile ? "activeDrop" : ""}`}>
-                                                                                                                    Mobile View Only
-                                                                                                                </DropdownItem>
-                                                                                                                <DropdownItem onClick={e => updateTextRes({ e, arrCondition: true, mobCondition: isMobile, key, i, j })} className={`w-100 ${subElem?.isSameText ? "activeDrop" : ""}`}>
-                                                                                                                    Desktop and Mobile View
-                                                                                                                </DropdownItem>
-                                                                                                            </DropdownMenu>
-                                                                                                        </UncontrolledButtonDropdown>
-                                                                                                    )} fontColor={subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : ""} fontFamilies={subElem.isInitialFont ? finalObj?.fontFamilies[subElem.textType] : ""} elementId={`${currPage}-${key}-${curElem?.positionType}-${j}`} key={`${currPage}-${key}-${curElem?.positionType}-${j}-${isMobile}`} id={`${currPage}-${key}-${curElem?.positionType}-${j}`} style={{ ...subElem?.style, width: "100%", position: "relative", display: "flex", justifyContent: subElem?.style?.justifyContent, alignItems: subElem?.style?.alignItems, fontFamily: subElem?.isInitialFont ? finalObj?.fontFamilies?.[subElem.textType] : subElem?.style?.fontFamily, color: subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : "" }} openToolbar={openToolbar} setOpenToolbar={setOpenToolbar} showToolbar={openToolbar && isEqual({ ...indexes }, { cur: key, curElem: curElem.positionType, subElem: j })}
+                                                                                                    <Editor
+                                                                                                        customElemnt={(
+                                                                                                            <UncontrolledButtonDropdown>
+                                                                                                                <DropdownToggle color='dark' style={{ padding: "0.5rem" }}
+                                                                                                                    className='hide-after-dropdown rounded'>
+                                                                                                                    {(subElem.isSameText || !isMobile) && <Monitor size={subElem.isSameText ? "12px" : "15px"} />}{(subElem.isSameText || isMobile) && <Smartphone size={subElem.isSameText ? "12px" : "15px"} />}
+                                                                                                                </DropdownToggle>
+                                                                                                                <DropdownMenu end>
+                                                                                                                    <DropdownItem onClick={e => updateTextRes({ e, arrCondition: false, mobCondition: false, key, i, j })} className={`w-100 ${!subElem?.isSameText && !isMobile ? "activeDrop" : ""}`}>
+                                                                                                                        Desktop View Only
+                                                                                                                    </DropdownItem>
+                                                                                                                    <DropdownItem onClick={e => updateTextRes({ e, arrCondition: false, mobCondition: true, key, i, j })} className={`w-100 ${!subElem?.isSameText && isMobile ? "activeDrop" : ""}`}>
+                                                                                                                        Mobile View Only
+                                                                                                                    </DropdownItem>
+                                                                                                                    <DropdownItem onClick={e => updateTextRes({ e, arrCondition: true, mobCondition: isMobile, key, i, j })} className={`w-100 ${subElem?.isSameText ? "activeDrop" : ""}`}>
+                                                                                                                        Desktop and Mobile View
+                                                                                                                    </DropdownItem>
+                                                                                                                </DropdownMenu>
+                                                                                                            </UncontrolledButtonDropdown>
+                                                                                                        )}
+                                                                                                        fontColor={subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : ""}
+                                                                                                        fontFamilies={subElem.isInitialFont ? finalObj?.fontFamilies[subElem.textType] : ""}
+                                                                                                        elementId={`${currPage}-${key}-${curElem?.positionType}-${j}`}
+                                                                                                        key={`${currPage}-${key}-${curElem?.positionType}-${j}-${isMobile}-${subElem?.textValue}`} id={`${currPage}-${key}-${curElem?.positionType}-${j}`}
+                                                                                                        style={{ ...subElem?.style, width: "100%", position: "relative", display: "flex", justifyContent: subElem?.style?.justifyContent, alignItems: subElem?.style?.alignItems, fontFamily: subElem?.isInitialFont ? finalObj?.fontFamilies?.[subElem.textType] : subElem?.style?.fontFamily, color: subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : "" }} openToolbar={openToolbar} setOpenToolbar={setOpenToolbar} showToolbar={openToolbar && isEqual({ ...indexes }, { cur: key, curElem: curElem.positionType, subElem: j })}
                                                                                                         onChange={(content, editorState) => {
                                                                                                             if (!isEqual(content, subElem?.editorState)) {
                                                                                                                 const newObj = { ...finalObj }
-                                                                                                                const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
-                                                                                                                const positionIndex = newObj?.pages[pageIndex]?.values[key]?.elements?.findIndex($ => $?.positionType === curElem.positionType)
-                                                                                                                console.log("color changed", 1)
-                                                                                                                if (newObj?.pages[pageIndex]?.values[key]?.elements[positionIndex]?.element[j] && (!isMobile || subElem?.isSameText)) {
-                                                                                                                    console.log("color changed", 2, { content, editorState })
-                                                                                                                    newObj.pages[pageIndex].values[key].elements[positionIndex].element[j].textValue = content
-                                                                                                                    newObj.pages[pageIndex].values[key].elements[positionIndex].element[j].editorState = editorState
-                                                                                                                }
-                                                                                                                if (newObj?.mobile_pages[pageIndex]?.values[key]?.elements[positionIndex]?.element[j] && (isMobile || subElem?.isSameText)) {
-                                                                                                                    console.log("color changed", 3, { content, editorState })
-                                                                                                                    newObj.mobile_pages[pageIndex].values[key].elements[positionIndex].element[j].textValue = content
-                                                                                                                    newObj.mobile_pages[pageIndex].values[key].elements[positionIndex].element[j].editorState = editorState
+                                                                                                                if (currPage === "button") {
+                                                                                                                    const positionIndex = newObj?.button[key]?.elements?.findIndex($ => $?.positionType === curElem.positionType)
+                                                                                                                    if (newObj?.button[key]?.elements[positionIndex]?.element[j] && (!isMobile || subElem?.isSameText)) {
+                                                                                                                        newObj.button[key].elements[positionIndex].element[j].textValue = content
+                                                                                                                        newObj.button[key].elements[positionIndex].element[j].editorState = editorState
+                                                                                                                    }
+                                                                                                                    if (newObj?.mobile_button[key]?.elements[positionIndex]?.element[j] && (isMobile || subElem?.isSameText)) {
+                                                                                                                        newObj.mobile_button[key].elements[positionIndex].element[j].textValue = content
+                                                                                                                        newObj.mobile_button[key].elements[positionIndex].element[j].editorState = editorState
+                                                                                                                    }
+                                                                                                                } else {
+                                                                                                                    const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                                    const positionIndex = newObj?.pages[pageIndex]?.values[key]?.elements?.findIndex($ => $?.positionType === curElem.positionType)
+                                                                                                                    if (newObj?.pages[pageIndex]?.values[key]?.elements[positionIndex]?.element[j] && (!isMobile || subElem?.isSameText)) {
+                                                                                                                        newObj.pages[pageIndex].values[key].elements[positionIndex].element[j].textValue = content
+                                                                                                                        newObj.pages[pageIndex].values[key].elements[positionIndex].element[j].editorState = editorState
+                                                                                                                    }
+                                                                                                                    if (newObj?.mobile_pages[pageIndex]?.values[key]?.elements[positionIndex]?.element[j] && (isMobile || subElem?.isSameText)) {
+                                                                                                                        newObj.mobile_pages[pageIndex].values[key].elements[positionIndex].element[j].textValue = content
+                                                                                                                        newObj.mobile_pages[pageIndex].values[key].elements[positionIndex].element[j].editorState = editorState
+                                                                                                                    }
                                                                                                                 }
                                                                                                                 updatePresent(newObj)
                                                                                                             }
@@ -710,15 +747,30 @@ const RenderPreview = (props) => {
                                                                                                                 setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                                 setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                             }
-                                                                                                            const arr = [...colWise]
+                                                                                                            const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                            const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                             if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                                 arr.splice(key, 1)
+                                                                                                                arrRev.splice(key, 1)
                                                                                                             } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                                 arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                                arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                             } else {
                                                                                                                 arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                                arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                             }
-                                                                                                            setcolWise([...arr])
+                                                                                                            const newObj = { ...finalObj }
+                                                                                                            if (currPage === "button") {
+                                                                                                                newObj.button = arr
+                                                                                                                newObj.mobile_button = arrRev
+                                                                                                            } else {
+                                                                                                                const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                                const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                                newObj.pages[pageIndex].values = arr
+                                                                                                                newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                            }
+                                                                                                            updatePresent({ ...newObj })
+                                                                                                            // setcolWise([...arr])
                                                                                                         }} />
                                                                                                         {/* <Copy color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }}
                                                                                                                                     onClick={(e) => {
@@ -822,15 +874,30 @@ const RenderPreview = (props) => {
                                                                                                             setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                             setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                         }
-                                                                                                        const arr = [...colWise]
+                                                                                                        const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                        const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                         if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                             arr.splice(key, 1)
+                                                                                                            arrRev.splice(key, 1)
                                                                                                         } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                         } else {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                         }
-                                                                                                        setcolWise([...arr])
+                                                                                                        const newObj = { ...finalObj }
+                                                                                                        if (currPage === "button") {
+                                                                                                            newObj.button = arr
+                                                                                                            newObj.mobile_button = arrRev
+                                                                                                        } else {
+                                                                                                            const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                            const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                            newObj.pages[pageIndex].values = arr
+                                                                                                            newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                        }
+                                                                                                        updatePresent({ ...newObj })
+                                                                                                        // setcolWise([...arr])
                                                                                                     }} />
                                                                                                     <Edit color="#ffffff" size={30} className="cursor-pointer" style={{ backgroundColor: "#727272", padding: "0.5rem" }} onClick={() => setOpenToolbar(!openToolbar)} />
                                                                                                     {/* <Copy color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }}
@@ -847,7 +914,8 @@ const RenderPreview = (props) => {
                                                                                                 {isEqual({ ...mouseEnterIndex }, { cur: key, curElem: curElem?.positionType, subElem: j }) && <div className="position-absolute" style={{ inset: "0px", outline: "2px solid #727272", pointerEvents: "none", zIndex: "0", backgroundColor: "rgb(114, 114, 114, 0.3)" }}></div>}
                                                                                                 <div style={{ ...subElem?.style, display: "inline-flex", justifyContent: "center", alignItems: "center", fontFamily: subElem?.isInitialFont ? finalObj?.fontFamilies?.[subElem.textType] : subElem?.style?.fontFamily }} >
                                                                                                     <span onDragStart={e => e.stopPropagation()} id={`textField-${key}-${curElem?.positionType}-${j}`} style={{ display: "flex", justifyContent: subElem?.style?.justifyContent, alignItems: subElem?.style?.alignItems }}>
-                                                                                                        <Editor fontColor={subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : ""} fontFamilies={subElem.isInitialFont ? finalObj?.fontFamilies[subElem.textType] : ""} elementId={`${currPage}-${key}-${curElem?.positionType}-${j}`} key={`${currPage}-${key}-${curElem?.positionType}-${j}-${isMobile}`} id={`${currPage}-${key}-${curElem?.positionType}-${j}`} openToolbar={openToolbar} setOpenToolbar={setOpenToolbar} showToolbar={openToolbar && isEqual({ ...indexes }, { cur: key, curElem: curElem.positionType, subElem: j })}
+                                                                                                        <Editor fontColor={subElem.style.isInitialColor ? finalObj?.defaultThemeColors[subElem.style.initialColor] : ""} fontFamilies={subElem.isInitialFont ? finalObj?.fontFamilies[subElem.textType] : ""} elementId={`${currPage}-${key}-${curElem?.positionType}-${j}`}
+                                                                                                            key={`${currPage}-${key}-${curElem?.positionType}-${j}-${isMobile}-${subElem?.textValue}`} id={`${currPage}-${key}-${curElem?.positionType}-${j}`} openToolbar={openToolbar} setOpenToolbar={setOpenToolbar} showToolbar={openToolbar && isEqual({ ...indexes }, { cur: key, curElem: curElem.positionType, subElem: j })}
                                                                                                             onChange={(content, editorState) => {
                                                                                                                 if (!isEqual(content, subElem?.editorState)) {
                                                                                                                     const newObj = { ...finalObj }
@@ -945,15 +1013,30 @@ const RenderPreview = (props) => {
                                                                                                             setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                             setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                         }
-                                                                                                        const arr = [...colWise]
+                                                                                                        const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                        const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                         if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                             arr.splice(key, 1)
+                                                                                                            arrRev.splice(key, 1)
                                                                                                         } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                         } else {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                         }
-                                                                                                        setcolWise([...arr])
+                                                                                                        const newObj = { ...finalObj }
+                                                                                                        if (currPage === "button") {
+                                                                                                            newObj.button = arr
+                                                                                                            newObj.mobile_button = arrRev
+                                                                                                        } else {
+                                                                                                            const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                            const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                            newObj.pages[pageIndex].values = arr
+                                                                                                            newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                        }
+                                                                                                        updatePresent({ ...newObj })
+                                                                                                        // setcolWise([...arr])
                                                                                                     }} />
                                                                                                     {subElem?.hasLabel && <Edit color="#ffffff" size={30} className="cursor-pointer" style={{ backgroundColor: "#727272", padding: "0.5rem" }} onClick={() => setOpenToolbar(!openToolbar)} />}
                                                                                                     {/* <Copy color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }}
@@ -1068,15 +1151,30 @@ const RenderPreview = (props) => {
                                                                                                             setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                             setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                         }
-                                                                                                        const arr = [...colWise]
+                                                                                                        const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                        const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                         if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                             arr.splice(key, 1)
+                                                                                                            arrRev.splice(key, 1)
                                                                                                         } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                         } else {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                         }
-                                                                                                        setcolWise([...arr])
+                                                                                                        const newObj = { ...finalObj }
+                                                                                                        if (currPage === "button") {
+                                                                                                            newObj.button = arr
+                                                                                                            newObj.mobile_button = arrRev
+                                                                                                        } else {
+                                                                                                            const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                            const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                            newObj.pages[pageIndex].values = arr
+                                                                                                            newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                        }
+                                                                                                        updatePresent({ ...newObj })
+                                                                                                        // setcolWise([...arr])
                                                                                                     }} />
                                                                                                     {/* <Copy color="#ffffff" size={30} className="cursor-pointer" style={{ padding: "0.5rem" }}
                                                                                                         onClick={(e) => {
@@ -1091,7 +1189,6 @@ const RenderPreview = (props) => {
                                                                                                 </span>}
                                                                                                 {isEqual({ ...mouseEnterIndex }, { cur: key, curElem: curElem?.positionType, subElem: j }) && <div className="position-absolute" style={{ inset: "0px", outline: "2px solid #727272", pointerEvents: "none", zIndex: "0", backgroundColor: "rgb(114, 114, 114, 0.3)" }}></div>}
                                                                                                 {gotOffers ? finalObj?.selectedOffers?.map((ele, key) => {
-                                                                                                    // console.log({ isEqual: isEqual(ele, selectedOffer), ele, selectedOffer })
                                                                                                     return (
                                                                                                         <div title="Click on offer to edit more settings" style={{ position: "relative" }} onClick={() => {
                                                                                                             setSelectedOffer(ele)
@@ -1188,15 +1285,30 @@ const RenderPreview = (props) => {
                                                                                                             setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                                                             setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                                                         }
-                                                                                                        const arr = [...colWise]
+                                                                                                        const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                                                        const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                                                         if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                                                             arr.splice(key, 1)
+                                                                                                            arrRev.splice(key, 1)
                                                                                                         } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                                                         } else {
                                                                                                             arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                                                            arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                                                         }
-                                                                                                        setcolWise([...arr])
+                                                                                                        const newObj = { ...finalObj }
+                                                                                                        if (currPage === "button") {
+                                                                                                            newObj.button = arr
+                                                                                                            newObj.mobile_button = arrRev
+                                                                                                        } else {
+                                                                                                            const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                                                            const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                                                            newObj.pages[pageIndex].values = arr
+                                                                                                            newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                                                        }
+                                                                                                        updatePresent({ ...newObj })
+                                                                                                        // setcolWise([...arr])
                                                                                                     }} />
                                                                                                     <Edit color="#ffffff" size={30} className="cursor-pointer" style={{ backgroundColor: "#727272", padding: "0.5rem" }} onClick={() => setOpenToolbar(!openToolbar)} />
                                                                                                 </span>}
@@ -1254,8 +1366,27 @@ const RenderPreview = (props) => {
                                                             }
                                                         </div>
                                                     </div>
-                                                })
-                                            }
+                                                }) : (
+                                                    <div onDragOver={(e) => {
+                                                        handleDragOver(e)
+                                                    }}
+                                                        onDrop={(e) => {
+                                                            e.stopPropagation()
+                                                            const transferType = e.dataTransfer.getData("type")
+                                                            setGotDragOver({ cur: false, curElem: false, subElem: false })
+                                                            if (transferType !== "") {
+                                                                handleLayoutDrop(e)
+                                                                setIndexes(transferType.includes("col") ? { cur: colWise.length, curElem: "parent", subElem: "grandparent" } : { cur: colWise.length, curElem: "left", subElem: 0 })
+                                                                setCurrPosition({ ...currPosition, id: colWise.length, selectedType: transferType.includes("col") ? "block" : transferType })
+                                                                setValues(elementStyles[transferType.includes("col") ? "block" : transferType])
+                                                            }
+                                                        }} className='' style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", padding: "1rem" }}
+                                                    // onClick={(e) => makActive(e, cur)}
+                                                    >
+                                                    <Download size={10} style={{ color: 'grey' }} />
+                                                    <p style={{ margin: '0px', fontSize: '10px', color: 'grey' }}>Drop an element here</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -1323,7 +1454,6 @@ const RenderPreview = (props) => {
                                                                                         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "center", alignItems: "stretch", position: "relative", width: "100%" }}>
                                                                                             {
                                                                                                 cur?.elements?.map((curElem) => {
-                                                                                                    // console.log(i)
                                                                                                     return (
                                                                                                         <div style={{ ...curElem?.style, position: "relative", width: currPage === "button" ? curElem?.style?.width : isMobile ? "100%" : curElem?.style?.width, zIndex: (cur === indexes.cur) && (curElem.positionType === indexes.curElem) ? "2" : "0" }}
                                                                                                             id={`${currPage}-${key}-${curElem.positionType}-parent`}>
@@ -1374,7 +1504,6 @@ const RenderPreview = (props) => {
                                                                                                                             <div style={{ ...subElem?.style, position: "relative", fontFamily: subElem?.isInitialFont ? finalObj?.fontFamilies?.[subElem.textType] : subElem?.style?.fontFamily, zIndex: isEqual({ ...indexes }, { cur: key, curElem: curElem.positionType, subElem: j }) ? "2" : "1" }}
                                                                                                                                 id={`${currPage}-${key}-${curElem.positionType}-${j}`}>
                                                                                                                                 {gotOffers ? finalObj?.selectedOffers?.map((ele, key) => {
-                                                                                                                                    // console.log({ isEqual: isEqual(ele, selectedOffer), ele, selectedOffer })
                                                                                                                                     return (
                                                                                                                                         <div title="Click on offer to edit more settings" style={{ position: "relative" }} onClick={() => {
                                                                                                                                             setSelectedOffer(ele)
@@ -1475,22 +1604,14 @@ const RenderPreview = (props) => {
                                                                         const newObj = finalObj
                                                                         const pageCurrentIndex = newObj?.pages?.findIndex(($) => $?.id === ele?.id)
                                                                         const mobilePageCurrentIndex = newObj?.mobile_pages?.findIndex(($) => $?.id === ele?.id)
-                                                                        const responsivePageArray = newObj?.responsive?.findIndex($ => $?.pageName === ele?.id)
 
                                                                         const page = newObj?.pages[pageCurrentIndex]
                                                                         const mobilePage = newObj?.mobile_pages[mobilePageCurrentIndex]
-                                                                        const responsiveArray = newObj?.responsive[responsivePageArray]
 
                                                                         const duplicatedPage = { ...page, id: `Page${newObj?.pages.length + 1}`, pageName: `Page ${newObj?.pages.length + 1}` }
                                                                         const duplicatedMobilePage = { ...mobilePage, id: `Page${newObj?.mobile_pages.length + 1}`, pageName: `Page ${newObj?.mobile_pages.length + 1}` }
-                                                                        const duplicatedresponsiveArray = { ...responsiveArray, pageName: `Page${newObj?.pages.length + 1}` }
-
-
                                                                         newObj?.pages?.splice(pageCurrentIndex + 1, 0, duplicatedPage)
                                                                         newObj?.mobile_pages?.splice(mobilePageCurrentIndex + 1, 0, duplicatedMobilePage)
-                                                                        newObj?.responsive?.splice(responsivePageArray + 1, 0, duplicatedresponsiveArray)
-
-                                                                        // console.log(newObj, "newObj")
                                                                         setFinalObj({ ...newObj })
                                                                     }}>
                                                                         <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
@@ -1502,12 +1623,11 @@ const RenderPreview = (props) => {
 
                                                                         const pageArray = newObj?.pages?.filter($ => $?.id !== ele?.id)
                                                                         const mobilePageArray = newObj?.mobile_pages?.filter($ => $?.id !== ele?.id)
-                                                                        const responsivePageArray = newObj?.responsive?.filter($ => $?.pageName !== ele?.id)
                                                                         if (currPage === ele?.id) {
                                                                             setCurrPage(pageArray[0]?.id)
                                                                         }
                                                                         toast.success(<div className="d-flex gap-1 align-items-center">Page removed! <button onClick={undo} className="btn-primary btn">Undo</button></div>)
-                                                                        setFinalObj({ ...finalObj, pages: pageArray, mobile_pages: mobilePageArray, responsive: responsivePageArray })
+                                                                        setFinalObj({ ...finalObj, pages: pageArray, mobile_pages: mobilePageArray })
                                                                     }} className='w-100'>
                                                                         <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
                                                                             <Trash stroke='red' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Delete</span>
@@ -1518,13 +1638,12 @@ const RenderPreview = (props) => {
 
                                                                         const pageArray = newObj?.pages?.filter($ => $?.id !== ele?.id)
                                                                         const mobilePageArray = newObj?.mobile_pages?.filter($ => $?.id !== ele?.id)
-                                                                        const responsivePageArray = newObj?.responsive?.filter($ => $?.pageName !== ele?.id)
 
                                                                         if (currPage === ele?.id) {
                                                                             setCurrPage(pageArray[0]?.id)
                                                                         }
                                                                         toast.success(<div className="d-flex gap-1 align-items-center">Page removed! <button onClick={undo} className="btn-primary btn">Undo</button></div>)
-                                                                        setFinalObj({ ...finalObj, pages: pageArray, mobile_pages: mobilePageArray, responsive: responsivePageArray })
+                                                                        setFinalObj({ ...finalObj, pages: pageArray, mobile_pages: mobilePageArray })
                                                                     }} className='w-100'>
                                                                         <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
                                                                             <Trash stroke='red' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Delete</span>

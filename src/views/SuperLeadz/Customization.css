@@ -52,9 +52,9 @@
     display: none;
 }
 
-.modal-backdrop.fade.show {
+/* .modal-backdrop.fade.show {
     opacity: 0 !important;
-}
+} */
 
 .gen-text {
     box-shadow: 0px 0px 0px rgba(0, 0, 0, 0) !important;
@@ -170,6 +170,7 @@ input[type=range] {
 #dropZoneParent::-webkit-scrollbar, .nav-sidebar::-webkit-scrollbar {
     display: none;
 }
+
 #dropZoneParent p {
     margin: 0px;
 }
@@ -193,12 +194,25 @@ input[type=range] {
     color: white !important;
 }
 
-#cross_btn_cont:hover > #cross_btn_box{
+#cross_btn_cont:hover>#cross_btn_box {
     background-color: rgba(0, 0, 0, 0.5);
 }
-.cross_btn_box_border{
+
+.cross_btn_box_border {
     outline: solid 1px rgb(0, 0, 0, 0.5);
     outline-offset: -2px;
+}
+
+.hideScroll::-webkit-scrollbar {
+    display: none !important;
+}
+
+.transformSideBar {
+    transform: translateX(0px)
+}
+
+.sideNav-items:hover>.transformSideBar {
+    transform: translateX(3px)
 }
 
 @media only screen and (max-width: 1280px) {

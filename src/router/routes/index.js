@@ -33,19 +33,19 @@ import Referral_Routes from './Referral'
 import FlashAccounts_Routes from './FlashAccounts'
 import { ProductReview_Routes } from './ProductReviews'
 import { OhMyCustomer_Routes } from './OhMyCustomer'
-import HomeLayout from '../../@core/layouts/HomeLayout'
-import Homes_Routes from './Home'
-import {Test_routes} from './Test_routes'
 import NewBlankLayout from '../../@core/layouts/NewBlankLayout'
+import Homes_Routes from './Home'
+import { Test_routes } from './Test_routes'
+import HomeLayout from '../../@core/layouts/HomeLayout'
 
 const getLayout = {
   blank: <BlankLayout />,
-  NewBlank: <NewBlankLayout />,
   homeLayout: <HomeLayout />,
   vertical: <VerticalLayout />,
   horizontal: <HorizontalLayout />,
   custom: <CustomLayout />,
-  fullWidthLayout: <FullWidthLayout />
+  fullWidthLayout: <FullWidthLayout />,
+  NewBlank: <NewBlankLayout />
 }
 
 // const { appName } = useContext(PermissionProvider)
@@ -75,13 +75,6 @@ const DefaultRoute = '/'
 
 // const app_name = localStorage.getItem('app_name')
 
-// if (route.title) {
-//   document.title = "sdfsdf"
-  
-// } else {
-//   document.title = "blsmm"
-// }
-
 const Routes = [
   ...Test_routes,
   ...Admin_Routes,
@@ -99,8 +92,8 @@ const Routes = [
   ...FlashAccounts_Routes,
   // ...Xircls_Frontend_Routes,
   ...Profile_Routes,
-  ...ProductReview_Routes,
   ...Homes_Routes,
+  ...ProductReview_Routes,
   ...OhMyCustomer_Routes
 ]
 // if (app_name && Routess[app_name]) {
@@ -138,7 +131,7 @@ const MergeLayoutRoutes = (layout, defaultLayout) => {
         (route.meta && route.meta.layout && route.meta.layout === layout) ||
         ((route.meta === undefined || route.meta.layout === undefined) && defaultLayout === layout)
       ) {
-
+        
         const RouteTag = route?.meta?.publicRoute ? PublicRoute : route?.meta?.isAdmin ? AdminRoute : PrivateRoute
         // const RouteTag = PublicRoute
 
@@ -152,7 +145,7 @@ const MergeLayoutRoutes = (layout, defaultLayout) => {
             // eslint-disable-next-line multiline-ternary
             isObjEmpty(route.element.props) && isBlank === false
               ? // eslint-disable-next-line multiline-ternary
-              LayoutWrapper
+                LayoutWrapper
               : Fragment
 
           route.element = (
@@ -167,7 +160,7 @@ const MergeLayoutRoutes = (layout, defaultLayout) => {
         // }
         LayoutRoutes.push(route)
         // Push route to LayoutRoutes
-
+        
       }
       return LayoutRoutes
     })
@@ -178,7 +171,6 @@ const MergeLayoutRoutes = (layout, defaultLayout) => {
 const getRoutes = layout => {
   const defaultLayout = layout || 'vertical'
   const layouts = ['vertical', 'horizontal', 'blank', 'custom', 'fullWidthLayout', 'homeLayout', 'NewBlank']
-
   const AllRoutes = []
 
   layouts.forEach(layoutItem => {

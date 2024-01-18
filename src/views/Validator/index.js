@@ -189,23 +189,26 @@ export const purpose = [
 ]
 
 export const strategy = [
-    {label: 'Newsletter Subscription', value: 'Newsletter Subscription', purpose_id: "1", id: "1"},
-    {label: 'Birthday Incentives', value: 'Birthday Incentives', purpose_id: "1", id: "2"},
-    {label: 'Birthday Incentives', value: 'Birthday Incentives', purpose_id: "2", id: "3"},
-    {label: 'Sign-up Only', value: 'Sign-up Only', purpose_id: "3", id: "4"},
-    {label: 'Membership', value: 'Membership', purpose_id: "3", id: "5"},
-    {label: 'Birthday Incentives', value: 'Birthday Incentives', purpose_id: "3", id: "6"},
-    {label: 'Gender Classification', value: 'Gender Classification', purpose_id: "3", id: "7"},
-    {label: 'Newsletter Subscription', value: 'Newsletter Subscription', purpose_id: "3", id: "8"},
-    {label: 'Gender Classification', value: 'Gender Classification', purpose_id: "4", id: "9"},
-    {label: 'Birthday Incentives', value: 'Birthday Incentives', purpose_id: "4", id: "10"}
+    {label: 'Newsletter Subscription', value: 'Newsletter Subscription', purpose_id: ["1", "3"], id: "1"},
+    {label: 'Birthday Incentives', value: 'Birthday Incentives', purpose_id: ["1", "2", "3", "4"], id: "2"},
+    {label: 'Sign-up Only', value: 'Sign-up Only', purpose_id: ["3"], id: "3"},
+    {label: 'Membership', value: 'Membership', purpose_id: ["3"], id: "4"},
+    {label: 'Gender Classification', value: 'Gender Classification', purpose_id: ["3", "4"], id: "5"}
 ]
 
 export const Tone = [
-    {label: 'Professional', value: 'Professional'},
-    {label: 'Friendly', value: 'Friendly'},
-    {label: 'Encouraging', value: 'Encouraging'},
-    {label: 'Concise', value: 'Concise'}
+    {label: 'Direct', value: 'Direct', strategy_id: ["3", "5"], id: "1"},
+    {label: 'Casual/Chatty', value: 'Casual/Chatty', strategy_id: ["3", "5"], id: "2"},
+    {label: 'Sophisticated', value: 'Sophisticated', strategy_id: ["3", "1"], id: "3"},
+    {label: 'Urgent', value: 'Urgent', strategy_id: ["3", "4", "1"], id: "4"},
+    {label: 'Incentivizing', value: 'Incentivizing', strategy_id:["4"], id: "5"},
+    {label: 'Enticing', value: 'Enticing', strategy_id: ["4", "5", "1"], id: "6"},
+    {label: 'Enthusiastic', value: 'Enthusiastic', strategy_id: ["4", "2", "5", "1"], id: "7"},
+    {label: 'Mysterious', value: 'Mysterious', strategy_id: ["4", "2"], id: "8"},
+    {label: 'Warm', value: 'Warm', strategy_id: ["2", "1"], id: "9"},
+    {label: 'Complimentary', value: 'Complimentary', strategy_id: ["2"], id: "10"},
+    {label: 'Astrological', value: 'Astrological', strategy_id: ["2"], id: "11"},
+    {label: 'Privacy-Focused', value: 'Privacy-Focused', strategy_id: ["5"], id: "12"}
 ]
 
 export const affiliateTracking = (aft_no) => {

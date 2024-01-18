@@ -1,4 +1,5 @@
 import Skin_type_form from "../../views/test/Skin_type_form"
+import Template from "../../views/test/Template"
 
 export const Test_routes = [
     {
@@ -8,5 +9,9 @@ export const Test_routes = [
             layout: "NewBlank",
             publicRoute: true
         }
+    },
+    {
+        path: '/template',
+        element: <Template />
     }
 ]

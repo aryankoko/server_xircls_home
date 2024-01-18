@@ -60,7 +60,6 @@ const Login = () => {
     return (
         <>
             <div className="xircls_front_base products">
-                
                 <Container className='login py-6 d-flex justify-content-center'>
                     <Row className="w-100">
                         <div className='mx-auto' style={{ width: `666px`, maxWidth: `95%` }}>

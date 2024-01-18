@@ -39,12 +39,12 @@ export const flashAccountsNavigation = [
     //     icon: <Circle size={16} />,
     //     navLink: '/merchant/Flash_Accounts/form/'
     // },
-    {
-        id: 'setting',
-        title: 'Settings',
-        icon: <Circle size={16} />,
-        navLink: '/merchant/Flash_Accounts/settings/'
-    },
+    // {
+    //     id: 'setting',
+    //     title: 'Settings',
+    //     icon: <Circle size={16} />,
+    //     navLink: '/merchant/Flash_Accounts/settings/'
+    // },
     {
         id: 'billing',
         title: 'Billing',

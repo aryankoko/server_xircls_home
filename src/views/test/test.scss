@@ -1,0 +1,29 @@
+.test{
+
+    
+    
+    .noArrow{
+        *{
+            
+            pointer-events: auto! important;
+            cursor: not-allowed! important;
+        }
+        .accordion-button{
+            &::after{
+                display: none !important;
+            }
+        }
+    }
+    .accordion-button{
+        &::after{
+            transform: rotate(-90deg) !important;
+
+        }
+    }
+     .accordion-button:not(.collapsed)::after{
+        transform: rotate(0deg) !important;
+     }
+
+
+
+}

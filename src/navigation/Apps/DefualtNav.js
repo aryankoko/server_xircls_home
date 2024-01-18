@@ -13,5 +13,11 @@ export const DefaultNav = [
         title: 'Apps',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
         navLink: '/merchant/apps/'
+    },
+    {
+        id: 'Manage',
+        title: 'Template',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template'
     }
 ]

@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react"
 import { SuperLeadzBaseURL, getReq } from "../../assets/auth/jwtService"
-import { Tone, getCurrentOutlet, strategy } from "../Validator"
+import { Tone, generateRandomString, getCurrentOutlet, purpose, strategy } from "../Validator"
 import { PermissionProvider } from "../../Helper/Context"
 import toast from "react-hot-toast"
 import axios from "axios"
+// import Flatpickr from "react-flatpickr"
 import Select from 'react-select'
-import { ArrowLeft, ChevronUp, Circle, Mail, Send, Settings, Type, X } from "react-feather"
-import { Row, Col, Card, CardBody, Container, UncontrolledButtonDropdown, DropdownItem, DropdownToggle, DropdownMenu, UncontrolledDropdown, UncontrolledAccordion, AccordionItem, AccordionHeader, AccordionBody, Modal, ModalBody, ModalFooter, Button } from "reactstrap"
+import { ArrowLeft, Check, ChevronUp, Circle, Crosshair, Edit, Mail, Plus, Send, Settings, Type, X } from "react-feather"
+import { Row, Col, Card, CardBody, Container, UncontrolledButtonDropdown, DropdownItem, DropdownToggle, DropdownMenu, UncontrolledDropdown, UncontrolledAccordion, AccordionItem, AccordionHeader, AccordionBody, Modal, ModalBody, ModalFooter, Button, ModalHeader, Input } from "reactstrap"
 import CustomColorModifier from "../FormBuilder/FormBuilder(components)/CustomColorModifier"
 import FrontBaseLoader from "../Components/Loader/Loader"
 import { Pagination, Navigation } from 'swiper'
@@ -18,24 +19,82 @@ import 'swiper/modules/autoplay/autoplay.min.css'
 import "./Form.css"
 import BasicEditor from "../Components/Editor/BaseEditor"
 import { useNavigate } from "react-router"
-import { Link, useParams } from "react-router-dom"
-// import Editor from "../NewCustomizationFlow/Editor"
+import { Link, useParams, useLocation } from "react-router-dom"
+import PickerDefault from "../Components/Date-picker/NormalDatePicker"
+import ComTable from "../Components/DataTable/ComTable"
 
 const Setting = ({ isAdmin = false }) => {
-  // const [toggle, setToggle] = useState(false)
+
   const [sendTest, setSendTest] = useState(false)
   const [editorBar, setEditorBar] = useState(true)
-  // const outletDetail = getCurrentOutlet()
   const [sideHeaderNav, setSideHeaderNav] = useState('form')
   const [sideNav, setSideNav] = useState('contentBF')
   const outletData = getCurrentOutlet()
-  // const [openPage, setOpenPage] = useState(true)
   const [outletSenderId, setOutletSenderId] = useState("")
   const { id } = useParams()
-  // const [tone, setTone] = useState("")
-
+  const location = useLocation()
   const navigate = useNavigate()
+  const [themeName, setThemeName] = useState("")
+  const [nameEdit, setNameEdit] = useState(true)
 
+  // Email 
+
+  const [emailTemplate, setEmailTemplate] = useState([])
+  const [placeholder, setPlaceholder] = useState([])
+  const [verifyYourEmail, setVerifyYourEmail] = useState(false)
+  const [changeSenderEmail, setChangeSenderEmail] = useState(false)
+  const [textValue, setTextValue] = useState("")
+  const [senderName, setSenderName] = useState("")
+  const [data, setdata] = useState([])
+  const [emailList, setEmailList] = useState("")
+  const [searchValue, setSearchValue] = useState('')
+  const [filteredData, setFilteredData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const defaultTheme = {
+    page_1: {
+      heading: "Template DOB Increase",
+      sub_heading: "Track your order, request support and get updates on current & upcoming promotions.",
+      heading_color: "#000000",
+      sub_heading_color: "#000000",
+      primary_font: "sans-serif",
+      secondary_font: "sans-serif",
+      button_text: "Submit",
+      button_color: "#ffffff",
+      button_bg_color: "#000000",
+      password: "Password",
+      confirm_password: "Confirm Password",
+      heading_font_size: "24px",
+      sub_heading_font_size: "14px",
+      opt_in_email: "email",
+      opt_in_sms: "sms",
+      opt_in_both: "",
+      label_text_email: "Subscribe to email",
+      label_text_sms: "Subscribe to sms",
+      label_text_both: "Subscribe",
+      email_check: true,
+      sms_check: true,
+      both_check: true,
+      redirect_url: "/products",
+      nextPage: false,
+      email_from: "",
+      subject: "Elevate Your Experience: Sign Up Now",
+      contain: true,
+      hidePassword: true,
+      reEnter: true,
+      strategy: "2",
+      tone: "7",
+      headingAf: "",
+      primary_fontAf: "sans-serif",
+      heading_colorAf: "rgba(74,144,226,1)",
+      heading_font_sizeAf: "24px",
+      passwordLength: "6",
+      validationMessage: "Password should be {{n}} digits",
+      editorState: "{\"root\":{\"children\":[{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 2;\",\"text\":\"Hello,\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1},{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 1;\",\"text\":\"Activate Your Account\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"type\":\"root\",\"version\":1}}",
+      htmlContent: "<p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 2; white-space: pre-wrap;\">Hello,</strong></b></p><p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 1; white-space: pre-wrap;\">Activate Your Account</strong></b></p>",
+      purpose: "2"
+    }
+  }
 
   const fontStyles = [
     { label: "Abril Fatface", value: `Abril Fatface` },
@@ -77,59 +136,6 @@ const Setting = ({ isAdmin = false }) => {
     { label: '25px', value: '25px' }
   ]
 
-  // const defaultData = {
-  //   Direct: {
-  //     page_1: {
-  //       heading: `Create an account`,
-  //       sub_heading: `Track your order, request support and get updates on current & upcoming promotions.`,
-  //       heading_color: `#000000`,
-  //       sub_heading_color: `#000000`,
-  //       primary_font: "sans-serif",
-  //       secondary_font: "sans-serif",
-  //       button_text: "Submit",
-  //       button_color: "#ffffff",
-  //       button_bg_color: "#000000",
-  //       password: "Password",
-  //       confirm_password: "Confirm Password",
-  //       heading_font_size: "24px",
-  //       sub_heading_font_size: "14px",
-  //       opt_in_email: "",
-  //       opt_in_sms: "",
-  //       opt_in_both: "",
-  //       label_text_email: "Subscribe to email",
-  //       label_text_sms: "Subscribe to sms",
-  //       label_text_both: "Subscribe",
-  //       email_check: true,
-  //       sms_check: true,
-  //       both_check: true,
-  //       redirect_url: "",
-  //       nextPage: false,
-  //       email_from: "",
-  //       subject: "Elevate Your Experience: Sign Up Now",
-  //       contain: true,
-  //       hidePassword: true,
-  //       reEnter: true
-  //     },
-  //     page_2: {
-  //       heading: `Congratulations! Your account has been activated.`,
-  //       sub_heading: `Remember to login to track your orders, request support, see updates and more.`,
-  //       heading_color: `#000000`,
-  //       sub_heading_color: `#000000`,
-  //       primary_font: "sans-serif",
-  //       secondary_font: "sans-serif",
-  //       button_text: "Login",
-  //       button_color: "#ffffff",
-  //       button_bg_color: "#000000",
-  //       heading_font_size: "19px",
-  //       sub_heading_font_size: "14px",
-  //       redirect_url: ""
-  //     },
-  //     editorState: "{\"root\":{\"children\":[{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 2;\",\"text\":\"Hello,\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1},{\"children\":[{\"detail\":0,\"format\":1,\"mode\":\"normal\",\"style\":\"font-weight: 600;font-size: 17px;line-height: 1;\",\"text\":\"Activate Your Account\",\"type\":\"text\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"center\",\"indent\":0,\"type\":\"paragraph\",\"version\":1}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"type\":\"root\",\"version\":1}}",
-  //     htmlContent: "<p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 2; white-space: pre-wrap;\">Hello,</strong></b></p><p class=\"editor-paragraph\" style=\"text-align: center;\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 600; font-size: 17px; line-height: 1; white-space: pre-wrap;\">Activate Your Account</strong></b></p>"
-
-  //   }
-  // }
-
   const [currPage, setCurrPage] = useState("page_1")
   console.log(setCurrPage)
   const [prevData, setPrevData] = useState({})
@@ -140,128 +146,273 @@ const Setting = ({ isAdmin = false }) => {
 
   const { userPermission } = useContext(PermissionProvider)
 
-  // const getData = () => {
-  //   axios.get(`${SuperLeadzBaseURL}/api/v1/change-app-status/?shop=${outletDetail[0]?.web_url}&app=${userPermission?.appName}`)
-  //     .then((resp) => {
-  //       console.log(resp)
-  //       setToggle(resp?.data?.status)
-  //       //   const updatedData = {
-  //       //     data: ""
-  //       //   }
-
-  //       //   setData((preData) => ({
-  //       //     ...preData,
-  //       //     ...updatedData
-  //       //   }))
-  //     })
-  //     .catch((error) => {
-  //       console.log(error)
-  //     })
-  // }
-
-  // const changeStatus = (e) => {
-  //   const form_data = new FormData()
-
-  //   form_data.append("shop", outletDetail[0]?.web_url)
-  //   form_data.append("app", userPermission?.appName)
-  //   form_data.append("value", e.target.checked ? "1" : "0")
-  //   axios.post(`${SuperLeadzBaseURL}/api/v1/change-app-status/`, form_data)
-  //     .then((resp) => {
-  //       console.log(resp)
-  //       toast.success(!e.target.checked ? "Plugin Activated" : "Plugin Deactivated")
-  //       setToggle(!e.target.checked)
-  //     })
-  //     .catch((error) => {
-  //       console.log(error)
-  //       setToggle(e.target.checked)
-  //       toast.error("Something went wrong")
-  //     })
-  // }
-
   const getTemplate = () => {
-    const url = new URL(`${SuperLeadzBaseURL}/api/v1/add_default_theme/?id=${id}&app=${userPermission?.appName}`)
+
+    const url = new URL(`${SuperLeadzBaseURL}/api/v2/form_builder_template/?shop=${outletData[0]?.web_url}&app=${userPermission?.appName}&theme_id=${id}`)
     axios({
       method: "GET",
       url
     }).then((data) => {
-      const jsonData = JSON.parse(data?.data?.success[0]?.default_theme)
+      console.log(data, "dpfjsdopf")
+      const jsonData = JSON.parse(data?.data?.data[0]?.custom_theme)
       console.log(jsonData, jsonData[currPage], "jsonData")
       setPrevData(jsonData)
       console.log(data.data.success, "success")
       setCurrObj(jsonData[currPage])
+      setThemeName(data?.data?.data[0]?.campaign_name)
 
-
-    }).catch((error) => {
-      console.log({ error })
-      setCurrObj({})
-      setPrevData([])
-      toast.error("Could not fetch your data, try reloading the page")
     })
+      .catch((error) => {
+        console.log({ error })
+        setCurrObj({})
+        setPrevData([])
+        toast.error("Could not fetch your data, try reloading the page")
+      })
   }
 
-  const getActiveTemplate = () => {
-    const url = new URL(`${SuperLeadzBaseURL}/flash_accounts/add_template_json/?shop=${outletData[0]?.web_url}&app=${userPermission?.appName}`)
-    axios({
-      method: "GET",
-      url
-    }).then((data) => {
-      console.log(data)
-      if (data?.data?.error) {
-        // setCurrObj(defaultData)
-      } else {
-        setPrevData({ ...data?.data?.success })
-        console.log(data.data.success)
-        setCurrObj({ ...data?.data?.success?.[currPage] })
+  const getEmailSettings = () => {
+    getReq('outletsDetails', `?OUTLET_ID=${outletData[0]?.id}&OUTLET_TYPE=SINGLE`)
+      .then((resp) => {
+        // setAboutUs(String(resp.data.data.outlet_detail?.outlet_description).split('.'))
+        setOutletSenderId(resp?.data?.data?.outlet_detail[0]?.outlet_sender_id)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+    fetch(`${SuperLeadzBaseURL}/talks/api/template-placeholders/?app=${userPermission?.appName}`)
+      .then((data) => data.json())
+      .then((resp) => {
+        console.log(resp, "pfjpsaofjopa")
+        setPlaceholder(resp)
+      })
+      .catch((error) => {
+        console.log(error)
+        setPlaceholder([])
+      })
+
+    fetch(`${SuperLeadzBaseURL}/api/v1/get_campaign_details/?shop=${outletData[0]?.web_url}&app=${userPermission?.appName}`)
+      .then((data) => data.json())
+      .then((resp) => {
+        const templateData = resp?.data?.map((curElem) => {
+          return { label: curElem[1], value: curElem[0] }
+        })
+        // setEmailTemplate([])
+        setEmailTemplate(templateData)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
+  const handleFilter = e => {
+    const value = e.target.value
+    let updatedData = []
+    setSearchValue(value)
+
+    if (value.length) {
+      updatedData = data.filter(item => {
+        const startsWith =
+            item.email_id.toLowerCase().startsWith(value.toLowerCase())
+
+        const includes =
+            item.email_id.toLowerCase().includes(value.toLowerCase())
+
+        if (startsWith) {
+            return startsWith
+        } else if (!startsWith && includes) {
+            return includes
+        } else return null
+      })
+      setFilteredData(updatedData)
+      setSearchValue(value)
+    }
+  }
+
+
+  const defferContent = <>
+    <Col className='d-flex align-items-center justify-content-center' md='4' sm='12'>
+      <h4 className='m-0'>Verified Email</h4>
+    </Col>
+    <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
+      <a className="btn btn-primary d-flex justify-content-center align-items-center" style={{ gap: '5px' }} onClick={() => {
+        setChangeSenderEmail(false)
+        setVerifyYourEmail(true)
+      }}>
+        <Plus size={17} /> Email
+      </a>
+      <Input
+        className='dataTable-filter form-control ms-1'
+        style={{ width: `130px`, height: `2.714rem` }}
+        type='text'
+        bsSize='sm'
+        id='search-input-1'
+        placeholder='Search...'
+        value={searchValue}
+        onChange={handleFilter}
+      />
+    </Col>
+  </>
+
+  const getData = () => {
+    setIsLoading(true)
+    getReq('verifyEmail')
+      .then((resp) => {
+        setdata(resp?.data?.data?.oulet_email)
+        setEmailList(resp?.data?.data?.sender)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.log(error)
+        setIsLoading(false)
+      })
+  }
+
+  const emailStatusChange = (e, row) => {
+    if (row.is_verified) {
+      setApiLoader(true)
+      const form_data = new FormData()
+      // form_data.append('email_to_verify', email_id)
+      form_data.append('email_to_toggle', row?.email_id)
+      form_data.append('activate_status', e.target.checked ? "1" : "0")
+      form_data.append('sender_name', row?.sender_name)
+      postReq('verifyEmail', form_data)
+        .then((resp) => {
+          toast.success(resp.data.message)
+          getData()
+          setApiLoader(false)
+        })
+        .catch((error) => {
+          console.log(error)
+          setApiLoader(false)
+          toast.error("Something went wrong!")
+        })
+    } else {
+      e.target.checked = !e.target.checked
+      toast.error("Please verify your email!")
+    }
+  }
+
+  const verifyEmail = () => {
+    setApiLoader(true)
+    if (senderName === "") {
+      setApiLoader(false)
+      toast.error("Please enter sender name")
+      return
+    }
+
+    if (textValue === "") {
+      setApiLoader(false)
+      toast.error("Please enter your email")
+      return
+    }
+
+    setVerifyYourEmail(false)
+    // if (textValue) {
+
+    const form_data = new FormData()
+    form_data.append("email_to_verify", textValue)
+    form_data.append("sender_name", senderName)
+    postReq('verifyEmail', form_data)
+      .then(() => {
+        getData()
+        getEmailSettings()
+        setApiLoader(false)
+        setChangeSenderEmail(true)
+        toast.success(`Verification email has been sent to ${textValue}`)
+        setTextValue("")
+        setSenderName("")
+      })
+      .catch((error) => {
+        console.log(error)
+        setApiLoader(false)
+
+        toast.success("Something went wrong!")
+      })
+  }
+
+  const columns = [
+    {
+      name: 'Sr No.',
+      cell: (row, index) => index + 1,
+      width: '90px'
+    },
+    {
+      name: 'Sender Name',
+      minWidth: '200px',
+      selector: row => row.sender_name
+    },
+    {
+      name: 'Email Id',
+      minWidth: '200px',
+      selector: row => row.email_id
+    },
+    {
+      name: 'Verfication Status',
+      cell: (row) => {
+        return (
+          row.is_verified ? <>
+            <span className="badge badge-light-primary">Verified</span>
+          </> : <>
+            <span className="badge badge-light-danger">Not Verified</span>
+          </>
+
+        )
 
       }
-    }).catch((error) => {
-      console.log({ error })
-      // setCurrObj(defaultData)
-      toast.error("Could not fetch your data, try reloading the page")
-    })
-  }
+    },
+    {
+      name: 'Activate Sender ID',
+      cell: (row) => {
+        return (
+          <>
+            <div className='form-check form-switch form-check-primary mb-1'>
+              <Input type='checkbox' id='verify' defaultChecked={emailList === row.email_id} className='cursor-pointer' onChange={(e) => emailStatusChange(e, row)} />
+            </div>
+          </>
+        )
+      }
+    }
+  ]
 
   useEffect(() => {
     // getData()
-
+    getEmailSettings()
     if (id) {
       getTemplate()
     } else {
-      getActiveTemplate()
+      const jsonData = location.state?.data
+      if (jsonData) {
+        setPrevData(jsonData)
+        setCurrObj(jsonData[currPage])
+      } else {
+        setPrevData(defaultTheme)
+        setCurrObj(defaultTheme[currPage])
+
+      }
+      setThemeName(`Campaign-${generateRandomString()}`)
+
     }
 
     console.log(currObj, "currObj")
 
     getReq('outletsDetails', `?OUTLET_ID=${outletData[0]?.id}&OUTLET_TYPE=SINGLE`)
-    .then((resp) => {
-      console.log(resp)
-      // setAboutUs(String(resp.data.data.outlet_detail?.outlet_description).split('.'))
-      setOutletSenderId(resp?.data?.data?.outlet_detail[0]?.outlet_sender_id)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+      .then((resp) => {
+        console.log(resp)
+        // setAboutUs(String(resp.data.data.outlet_detail?.outlet_description).split('.'))
+        setOutletSenderId(resp?.data?.data?.outlet_detail[0]?.outlet_sender_id)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
 
   }, [])
-
-  // useEffect(() => {
-  //   console.log(tone, "tone")
-  //   setPrevData(defaultData[tone])
-  // }, [tone])
 
   console.log(prevData, setOutletSenderId)
 
   const handleDataChange = (e) => {
-    // const obj = { ...prevData }
-
-    // setPrevData({ ...prevData, page_1: { ...prevData?.page_1, [e.target.name]: e.target.value } })
     setCurrObj({ ...currObj, [e.target.name]: e.target.value })
   }
-
-  // const handleDataChange2 = (e) => {
-  //   // const obj = { ...prevData }
-  //   setCurrObj({ ...currObj, [e.target.name]: e.target.value })
-  // }
 
   const getColorPicker = ({ key }) => {
     return <CustomColorModifier styles={currObj} setStyles={setCurrObj} isHex={false} colorType={key} />
@@ -269,7 +420,7 @@ const Setting = ({ isAdmin = false }) => {
 
   let saveTimer
 
-  const handleSaveData = (e) => {
+  const handleSaveDataAdmin = (e, type) => {
     e.preventDefault()
     setApiLoader(true)
     const timeout = 300
@@ -279,22 +430,73 @@ const Setting = ({ isAdmin = false }) => {
       const sendObj = {
         shop: outletData[0]?.web_url,
         app: userPermission?.appName,
-        template_json: JSON.stringify(prevData)
+        default_theme: JSON.stringify(prevData)
       }
       Object.entries({ ...sendObj })?.map(([key, value]) => {
         form_data.append(key, value)
       })
-      form_data.append('email_template', prevData?.page_1?.htmlContent)
-      form_data.append('email_subject', prevData?.page_1?.subject)
-      const url = new URL(`${SuperLeadzBaseURL}/flash_accounts/add_template_json/`)
+      form_data.append('email_template', prevData?.htmlContent)
+      const url = new URL(`${SuperLeadzBaseURL}/api/v1/add_default_theme/`)
       axios({
         method: "POST",
         data: form_data,
         url
       }).then((data) => {
-        if (data?.data?.success === "successfully updated") {
-          setApiLoader(false)
-          toast.success('Saved Successfully')
+        console.log(data)
+        toast.success('Saved Successfully')
+        setApiLoader(false)
+        if (type === "Save & Close") {
+          navigate(-1)
+        }
+      }).catch((error) => {
+        console.log({ error })
+        toast.error("There was an error while saving your data")
+        setApiLoader(false)
+      })
+    }, timeout)
+  }
+
+  const handleSaveData = (e, type) => {
+    e.preventDefault()
+    setApiLoader(true)
+    const timeout = 300
+    clearTimeout(saveTimer)
+    saveTimer = setTimeout(() => {
+      const form_data = new FormData()
+
+      const email_settings = {
+        editorState: prevData?.page_1?.email_settings?.editorState,
+        htmlContent: prevData?.page_1?.email_settings?.htmlContent,
+        subject: prevData?.page_1?.email_settings?.subject
+      }
+
+      form_data.append("shop", outletData[0]?.web_url)
+      form_data.append("app", userPermission?.appName)
+      form_data.append("json_list", JSON.stringify(prevData))
+      form_data.append("email_template_json", JSON.stringify(email_settings))
+      form_data.append("campaign_name", themeName)
+      if (prevData?.page_1?.campaignStartDate) {
+        form_data.append("start_date", prevData?.page_1?.campaignStartDate)
+      }
+      if (prevData?.page_1?.campaignEndDate) {
+        form_data.append("end_date", prevData?.page_1?.campaignEndDate)
+      }
+
+      if (id) {
+        form_data.append("theme_id", id)
+      }
+
+      const url = new URL(`${SuperLeadzBaseURL}/api/v2/form_builder_template/`)
+      axios({
+        method: "POST",
+        data: form_data,
+        url
+      }).then((data) => {
+
+        setApiLoader(false)
+        toast.success('Saved Successfully')
+        if (type === "Save & Close") {
+          navigate(-1)
         }
         console.log(data)
       }).catch((error) => {
@@ -305,17 +507,6 @@ const Setting = ({ isAdmin = false }) => {
     }, timeout)
   }
 
-  // const handleSlideChange = (swiper) => {
-  //   let pageName
-  //   Object.keys(defaultData).forEach((key, index) => {
-  //     if (index === swiper?.activeIndex) {
-  //       pageName = key
-  //     }
-  //   })
-  //   setCurrPage(pageName)
-  //   setCurrObj({ ...prevData[pageName] })
-  // }
-
   useEffect(() => {
     setPrevData({ ...prevData, [currPage]: currObj })
   }, [currObj])
@@ -325,19 +516,35 @@ const Setting = ({ isAdmin = false }) => {
   const sendTestMail = () => {
     const form_data = new FormData()
     form_data.append('email', prevData?.page_1?.testMail)
+    form_data.append('html_content', prevData?.page_1?.email_settings?.htmlContent)
+    form_data.append('subject', prevData?.page_1?.email_settings?.subject)
+
     fetch(`${SuperLeadzBaseURL}/merchant/test_mail/`, {
       method: "POST",
       body: form_data
     })
-      .then((resp) => {
-        console.log(resp)
-        setSendTest(false)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    .then((resp) => {
+      console.log(resp)
+      setSendTest(false)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
   }
 
+  const strategyFilter = strategy?.filter((curElem) => {
+    return curElem?.purpose_id.some((pur_id) => {
+
+      return prevData?.page_1?.purpose?.includes(pur_id)
+    })
+  })
+
+  const toneFilter = Tone?.filter((curElem) => {
+    return curElem?.strategy_id?.some((strat_id) => {
+
+      return prevData?.page_1?.strategy?.includes(strat_id)
+    })
+  })
 
   return (
     <>
@@ -369,36 +576,56 @@ const Setting = ({ isAdmin = false }) => {
                 <input className="form-check-input cursor-pointer" type="checkbox" role="switch" id="form-switch" onClick={(e) => {
                   setSideHeaderNav("form")
                   setSideNav("contentBF")
-                  setCurrObj({...currObj, nextPage: e.target.checked})
+                  setCurrObj({ ...currObj, nextPage: e.target.checked })
                 }} checked={prevData?.page_1?.nextPage} />
                 {/* <label className="form-check-label" htmlFor="form-switch" style={{ paddingLeft: '10px', whiteSpace: 'nowrap' }}>Plugin Setting</label> */}
               </div>
             </div>
           </div>
-          
+
           <div className='col-md-6 d-flex flex-row justify-content-end align-items-center' style={{ padding: "0.5rem", gap: "0.5rem" }}>
             <div className="d-flex justify-content-center align-items-center" style={{ gap: '15px', padding: '0px 10px' }}>
               {
                 isAdmin ? <>
-                <select className="form-control" onChange={(e) => setCurrObj({...currObj, strategy: e.target.value})}>
-                  <option value="" disabled selected>Strategy</option>
-                  {
-                    strategy?.map((curElem) => {
-                      return <option value={curElem?.value}>{curElem?.label}</option>
-                    })
-                  }
-                </select>
-                <select className="form-control" onChange={(e) => setCurrObj({...currObj, tone: e.target.value})}>
-                  <option value="" disabled selected>Tone</option>
-                  {
-                    Tone?.map((curElem) => {
-                      return <option value={curElem?.value}>{curElem?.label}</option>
-                    })
-                  }
-                </select>
-                
+
+                  <select className="form-control" onChange={(e) => setCurrObj({ ...currObj, purpose: e.target.value })}>
+                    <option value="" disabled selected>Purpose</option>
+                    {
+                      purpose?.map((curElem) => {
+                        return <option value={curElem?.id}>{curElem?.label}</option>
+                      })
+                    }
+                  </select>
+
+                  <select className="form-control" onChange={(e) => setCurrObj({ ...currObj, strategy: e.target.value })}>
+                    <option value="" disabled selected>Strategy</option>
+                    {
+                      strategyFilter?.map((curElem) => {
+                        return <option value={curElem?.id}>{curElem?.label}</option>
+                      })
+                    }
+                  </select>
+                  <select className="form-control" onChange={(e) => setCurrObj({ ...currObj, tone: e.target.value })}>
+                    <option value="" disabled selected>Tone</option>
+                    {
+                      toneFilter?.map((curElem) => {
+                        return <option value={curElem?.id}>{curElem?.label}</option>
+                      })
+                    }
+                  </select>
+
                 </> : ''
               }
+              <div className="d-flex justify-content-center align-items-center" style={{ border: '1px solid #d8d6de', borderRadius: '0.357rem', gap: '5px' }}>
+                <input id='campaignNameInput' type="text" placeholder='Enter theme name' value={themeName} onKeyDown={e => e.key === "Enter" && setNameEdit(!nameEdit)} onChange={e => {
+                  setThemeName(e.target.value)
+                }} disabled={nameEdit} className="form-control" style={{ width: '250px', border: 'none' }} />
+                <a style={{ marginRight: '5px' }} onClick={() => setNameEdit(!nameEdit)}>
+                  {
+                    nameEdit ? <Edit size={'18px'} /> : <Check size={'18px'} />
+                  }
+                </a>
+              </div>
               {
                 sideNav === "Email" ? (
                   <>
@@ -406,11 +633,12 @@ const Setting = ({ isAdmin = false }) => {
                   </>
                 ) : ''
               }
-
-              <button onClick={(e) => handleSaveData(e, "Save")} id='saveBtn' className="btn btn-primary-main" style={{ whiteSpace: 'nowrap' }}>Save</button>
+              <button className="btn custom-btn-outline">Cancel</button>
+              <button onClick={isAdmin ? (e) => handleSaveDataAdmin(e, "Save") : (e) => handleSaveData(e, "Save")} id='saveBtn' className="btn btn-primary-main" style={{ whiteSpace: 'nowrap' }}>Save</button>
+              <button onClick={isAdmin ? (e) => handleSaveDataAdmin(e, "Save & Close") : (e) => handleSaveData(e, "Save & Close")} id='saveBtn' className="btn btn-primary-main" style={{ whiteSpace: 'nowrap' }}>Save & Close</button>
             </div>
           </div>
-          
+
 
         </Row>
       </Container>
@@ -418,7 +646,7 @@ const Setting = ({ isAdmin = false }) => {
         apiLoader ? <FrontBaseLoader /> : ''
       }
 
-      
+
       <div className="d-flex justify-content-center align-items-stretch border position-relative" style={{ height: "calc(100vh - 55px)" }}>
 
         <div className="nav-sidebar d-flex flex-column align-items-stretch justify-content-start border-end text-center h-100" style={{ padding: "0.5rem 18px", width: "100px", overflow: "auto", gap: '20px' }}>
@@ -488,6 +716,13 @@ const Setting = ({ isAdmin = false }) => {
                           <Circle size={'15px'} />
                         </button>
                         <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Security</span>
+                      </div>
+
+                      <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "schedule" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "schedule" ? "" : "schedule")}>
+                        <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
+                          <Crosshair size={'15px'} />
+                        </button>
+                        <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Schedule</span>
                       </div>
                     </>
                   )
@@ -1243,6 +1478,37 @@ const Setting = ({ isAdmin = false }) => {
                 </div>
               }
 
+              {
+                sideNav === "schedule" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "450px", transform: `translateX(${sideNav === "schedule" ? "0px" : "-450px"})`, position: "absolute", inset: "0px" }}>
+                  <UncontrolledAccordion defaultOpen={['1', '2']} stayOpen>
+                    <AccordionItem className='bg-white border-bottom'>
+                      <AccordionHeader className='acc-header border-bottom' targetId='1'>
+                        <p className='m-0 fw-bolder text-black text-uppercase' style={{ fontSize: "0.75rem" }}>Schedule Campaign</p>
+                      </AccordionHeader>
+                      <AccordionBody accordionId='1'>
+                        <div className='p-0 mx-0 my-1'>
+                          <label htmlFor="" className='form-control-label' style={{ fontSize: "0.85rem" }}>Start Date</label>
+                          <PickerDefault picker={prevData?.page_1?.campaignStartDate} minDate={"today"} maxDate={prevData?.page_1?.campaignEndDate} dateFormat={"Y-m-d h:i K"} enableTime={true} type={"start"} setMainStyle={setCurrObj} mainStyle={prevData?.page_1} />
+
+                          <div className="form-check d-flex align-items-center gap-1 mx-0 p-0 my-2">
+                            <label style={{ fontSize: "0.85rem" }} htmlFor="endDateCheck" className="form-check-label m-0 p-0">Set end date</label>
+                            <input id='endDateCheck' checked={prevData?.page_1?.campaignHasEndDate} type="checkbox" onChange={e => setCurrObj({ ...currObj, campaignHasEndDate: e.target.checked })} className="form-check-input m-0 cursor-pointer" />
+                          </div>
+                          {prevData?.page_1?.campaignHasEndDate && (
+                            <>
+                              <label htmlFor="" className='form-control-label' style={{ fontSize: "0.85rem" }} >End Date</label>
+                              <PickerDefault picker={prevData?.page_1?.campaignEndDate} minDate={prevData?.page_1?.campaignStartDate} dateFormat={"Y-m-d h:i K"} enableTime={true} type="end" mainStyle={prevData?.page_1} setMainStyle={setCurrObj} />
+
+                            </>
+                          )}
+                        </div>
+                      </AccordionBody>
+                    </AccordionItem>
+                  </UncontrolledAccordion>
+
+                </div>
+              }
+
               {sideNav === "button" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "450px", transform: `translateX(${sideNav === "button" ? "0px" : "-450px"})`, position: "absolute", inset: "0px" }}>
 
                 <UncontrolledAccordion stayOpen defaultOpen={["1"]}>
@@ -1306,15 +1572,83 @@ const Setting = ({ isAdmin = false }) => {
                     <AccordionBody accordionId='1'>
                       <div className="py-1">
                         <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email From</label>
-                        {
-                          outletSenderId ? <input onChange={handleDataChange} value={outletSenderId} name="email_from" type="text" className="form-control" id="email_from" placeholder="Email From" disabled /> : <Link className="btn btn-sm btn-primary" to={`/merchant/campaign/verify_your_email/${outletData[0]?.id}`}>Select Sender Email</Link>
-                        }
+                        <div className="d-flex justify-content-center align-items-center" style={{ border: '1px solid #d8d6de', borderRadius: '0.357rem', gap: '5px' }}>
+                          <input type="text" value={outletSenderId ? outletSenderId : "no_reply@xircls.com"} className="form-control" style={{ width: '100%', border: 'none' }} disabled />
+                          <a style={{ marginRight: '5px' }} onClick={() => setChangeSenderEmail(!changeSenderEmail)}>
+                            <Edit size={'18px'} />
+                          </a>
+                        </div>
 
+                      </div>
+
+                      <div className='py-1'>
+                        <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email Template</label>
+
+                        <Select onChange={(e) => {
+                          const form_data = new FormData()
+                          form_data.append("id", e.value)
+                          fetch(`${SuperLeadzBaseURL}/api/v1/get_single_camp_details/`, {
+                            method: "POST",
+                            body: form_data
+                          })
+                            .then((data) => data.json())
+                            .then((resp) => {
+                              if (resp.data) {
+                                setCurrObj({ ...currObj, email_settings: { ...resp.data } })
+
+                              }
+                            })
+                            .catch((error) => {
+                              console.log(error)
+                            })
+                        }} options={emailTemplate} />
                       </div>
 
                       <div className="py-1">
                         <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Subject</label>
-                        <input onChange={handleDataChange} value={prevData?.page_1?.subject} name="subject" type="text" className="form-control" id="subject" placeholder="Subject" />
+                        <input value={currObj?.email_settings?.subject} onChange={(e) => setCurrObj({ ...currObj, email_settings: { ...currObj.email_settings, subject: e.target.value } })} name="subject" type="text" className="form-control" id="subject" placeholder="Subject" />
+                      </div>
+
+                      <div className="py-1">
+                        <label style={{ fontSize: "0.85rem" }} className="form-check-label m-0 p-0">Placeholders</label>
+                        <div className='border p-1 rounded' style={{ height: '250px', overflowY: 'auto' }}>
+                          {
+                            placeholder?.map((curElem) => {
+                              return <>
+                                <div className="toggleSection d-flex flex-column align-items-start justify-content-start mb-1">
+                                  <div style={{ width: "100%", padding: "0.5rem" }}>
+                                    <div
+                                      className=" shadow-sm border rounded text-dark w-100 d-flex flex-column justify-content-between align-items-center p-1"
+                                      onClick={() => {
+                                        // Create a temporary input element to copy the value to the clipboard
+                                        const tempInput = document.createElement('input')
+                                        tempInput.value = curElem.placeholders
+                                        document.body.appendChild(tempInput)
+
+                                        // Select the value in the input field
+                                        tempInput.select()
+                                        tempInput.setSelectionRange(0, 99999) // For mobile devices
+
+                                        // Copy the selected text to the clipboard
+                                        document.execCommand('copy')
+
+                                        // Remove the temporary input element
+                                        document.body.removeChild(tempInput)
+                                        toast.success("Value Copied Successfully")
+                                        // You can also provide some feedback to the user to indicate that the value has been copied
+                                        // alert('Value copied to clipboard: ' + customer.value)
+                                      }}
+                                      style={{ cursor: "pointer" }} // Changed cursor style to "pointer" for better UX
+                                    >
+                                      <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>{curElem.variable}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                            })
+                          }
+
+                        </div>
                       </div>
                     </AccordionBody>
                   </AccordionItem>
@@ -1382,21 +1716,17 @@ const Setting = ({ isAdmin = false }) => {
                                 <div >
                                   <div id="emailTemplateId"></div>
                                   <BasicEditor elementId={`emailTemplateId`}
-                                    style={{ width: '100%' }} key={sideNav}
+                                    style={{ width: '100%' }} key={prevData?.page_1?.email_settings?.editorState}
                                     hideToolbar={editorBar}
-                                    editorState={prevData?.editorState}
-                                    htmlContent={prevData?.htmlContent}
+                                    editorState={prevData?.page_1?.email_settings?.editorState}
+                                    htmlContent={prevData?.page_1?.email_settings?.htmlContent}
                                     onChange={(html, ediorState) => {
                                       console.log(html, ediorState)
                                       const updatedData = {
                                         editorState: ediorState,
                                         htmlContent: html
                                       }
-
-                                      setCurrObj((pre) => ({
-                                        ...pre,
-                                        ...updatedData
-                                      }))
+                                      setCurrObj({ ...currObj, email_settings: updatedData})
 
                                     }}
                                   />
@@ -1667,10 +1997,10 @@ const Setting = ({ isAdmin = false }) => {
                           <div className="previewSection">
                             <div style={{ padding: '40px', border: 'solid 1px rgb(239, 239, 239)', boxShadow: '1px 1px 13px 3px rgba(0,0,0,0.05)', background: 'white', borderRadius: '10px', width: '500px', margin: "auto", wordBreak: "break-word" }}>
                               <div onClick={(e) => {
-                                    e.stopPropagation()
-                                    setSideHeaderNav("form")
-                                    setSideNav("successMessage")
-                                  }}>
+                                e.stopPropagation()
+                                setSideHeaderNav("form")
+                                setSideNav("successMessage")
+                              }}>
                                 <div>
                                   <div style={{ color: 'rgb(62, 62, 62)', marginTop: 0, fontSize: prevData?.["page_1"]?.successheading_font_size, fontWeight: 600, lineHeight: 'auto', color: prevData?.["page_1"]?.successheading_color, fontFamily: prevData?.page_1?.successprimary_font }}>
                                     {prevData?.["page_1"]?.successheading}</div>
@@ -1702,7 +2032,78 @@ const Setting = ({ isAdmin = false }) => {
           </div>
         </div>
       </div>
-      
+
+      <Modal
+        isOpen={verifyYourEmail}
+        toggle={() => setVerifyYourEmail(!verifyYourEmail)}
+        className='modal-dialog-centered'
+        size='lg'
+      >
+        <ModalHeader toggle={() => setVerifyYourEmail(!verifyYourEmail)}>Sender Email</ModalHeader>
+        <ModalBody>
+          {/* <VerifyYourEmailQuick /> */}
+          <div className='d-flex justify-content-center align-items-end gap-2'>
+            <div className='w-50'>
+              <label>Sender Name</label>
+              <input type='text' className='form-control' value={senderName} onChange={(e) => setSenderName(e.target.value)} />
+              <p id="sender_name_val" className="text-danger m-0 p-0 vaildMessage"></p>
+            </div>
+            <div className='w-50'>
+              <label>Email</label>
+              <input type='text' className='form-control' value={textValue} onChange={(e) => setTextValue(e.target.value)} />
+              <p id="textValue_val" className="text-danger m-0 p-0 vaildMessage"></p>
+            </div>
+            {/* <input type='text' className='form-control' value={textValue} onChange={(e) => setTextValue(e.target.value)} /> */}
+            {/* <a style={{whiteSpace: 'nowrap'}} className='btn btn-primary'> Click to Get Verification mail </a> */}
+          </div>
+          {/* <VerifyYourEmail isQuick={true} /> */}
+        </ModalBody>
+        <ModalFooter>
+          <Button outline onClick={() => setVerifyYourEmail(!verifyYourEmail)}>
+            Cancel
+          </Button>
+          <Button outline onClick={() => {
+            verifyEmail()
+            // setVerifyYourEmail(!verifyYourEmail)
+            // getEmailSettings()
+            // getData()
+          }}>
+            Verify
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+
+      <Modal
+        isOpen={changeSenderEmail}
+        toggle={() => setChangeSenderEmail(!changeSenderEmail)}
+        className='modal-dialog-centered'
+        size='lg'
+      >
+        <ModalHeader toggle={() => setChangeSenderEmail(!changeSenderEmail)}>Change Sender Email</ModalHeader>
+        <ModalBody>
+          {
+            <Row className='mt-2'>
+              <ComTable
+                // tableName="Verified Email"
+                content={defferContent}
+                tableCol={columns}
+                data={data}
+                searchValue={searchValue}
+                // handleFilter={handleFilter}
+                filteredData={filteredData}
+                isLoading={isLoading}
+              />
+            </Row>
+          }
+        </ModalBody>
+        <ModalFooter>
+          <Button outline onClick={() => setChangeSenderEmail(!changeSenderEmail)}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <Modal className='modal-dialog-centered' isOpen={sendTest} toggle={() => setSendTest(!sendTest)}>
         <div class="modal-header d-flex justify-content-between align-items-center">
           <h5 class="modal-title m-0">Send Test Mail</h5>

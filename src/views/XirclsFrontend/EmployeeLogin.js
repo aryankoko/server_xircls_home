@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import $ from "jquery"
 import { postReq } from "../../assets/auth/jwtService"
-import {  setToken } from "../../assets/auth/auth"
+import { setToken } from "../../assets/auth/auth"
 import toast from "react-hot-toast"
 import { affiliateTracking, validForm, validateEmail } from "../Validator"
 import { PermissionProvider } from "../../Helper/Context"
@@ -36,6 +36,7 @@ const Emplogin = () => {
     const { pathname } = useLocation()
     const navigate = useNavigate()
     const { setUserPermission } = useContext(PermissionProvider)
+
     useEffect(() => {
         if (pathname === "/merchant/login/") {
             $("#check_login").html(`Login to your Account`)
@@ -49,7 +50,7 @@ const Emplogin = () => {
     }
 
     const loginButtonHandler = () => {
-
+        
         const checkForm = validForm(valueToCheck, data)
         console.log(checkForm)
 
@@ -62,39 +63,39 @@ const Emplogin = () => {
                 const formData = new FormData()
                 Object.entries(data).map(([key, value]) => formData.append(key, value))
                 postReq("login", formData)
-                    .then((res) => {
-                        console.log(res)
-                        setApiLoader(false)
-                        if (res?.data?.errors === "Email not verified yet") {
-                            toast.error("Email not verified yet. Please check your inbox")
-                        } else {
-
-                            const tokenValue = JSON.stringify(res?.data?.token)
-                            const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === res?.data?.outlet_list[0]?.outlet_currency)
-                            setToken(tokenValue)
-                            const updatedPermission = {
-                                appName: "",
-                                multipleDomain: res?.data?.outlet_list ? res?.data?.outlet_list : [],
-                                apiKey: res?.data?.outlet_list ? res?.data?.outlet_list[0].api_key : "",
-                                installedApps: res?.data?.installed_apps,
-                                campagin: res?.data?.status,
-                                currencySymbol: merchantCurrency[0]?.currency?.symbol ? merchantCurrency[0]?.currency?.symbol : '₹'
-                            }
-                            setUserPermission((curData) => ({
-                                ...curData,
-                                ...updatedPermission
-                            }))
-
-                            toast.success('Logged In Successfully')
-                            navigate("/merchant/apps/")
-
+                .then((res) => {
+                    console.log(res)
+                    setApiLoader(false)
+                    if (res?.data?.errors === "Email not verified yet") {
+                        toast.error("Email not verified yet. Please check your inbox")
+                    } else {
+                        
+                        const tokenValue = JSON.stringify(res?.data?.token)
+                        const merchantCurrency = countries.filter((curElem) => curElem?.currency?.code === res?.data?.outlet_list[0]?.outlet_currency)
+                        setToken(tokenValue)
+                        const updatedPermission = {
+                            appName: "",
+                            multipleDomain: res?.data?.outlet_list ? res?.data?.outlet_list : [],
+                            apiKey: res?.data?.outlet_list ? res?.data?.outlet_list[0].api_key : "",
+                            installedApps: res?.data?.installed_apps,
+                            campagin: res?.data?.status,
+                            currencySymbol: merchantCurrency[0]?.currency?.symbol ? merchantCurrency[0]?.currency?.symbol : '₹'
                         }
-                    })
-                    .catch((err) => {
-                        toast.error('Invaild email or password')
-                        setApiLoader(false)
-                        console.log(err)
-                    })
+                        setUserPermission((curData) => ({
+                            ...curData,
+                            ...updatedPermission
+                        }))
+                        
+                        toast.success('Logged In Successfully')
+                        navigate("/merchant/apps/")
+                        
+                    }
+                })
+                .catch((err) => {
+                    toast.error('Invaild email or password')
+                    setApiLoader(false)
+                    console.log(err)
+                })
             }
         }
     }
@@ -131,7 +132,7 @@ const Emplogin = () => {
                                     onChange={(e) => {
                                         inputChangeHandler(e)
                                     }} />
-                                <p id="email_val" className="text-danger m-0 p-0 vaildMessage"></p>
+                                    <p id="email_val" className="text-danger m-0 p-0 vaildMessage"></p>
                                 {/* {showError && data.email === "" ? (
                                     <p
                                         className="text-danger m-0 p-0"
@@ -150,7 +151,7 @@ const Emplogin = () => {
                                         }
                                     }}
                                     onChange={(e) => inputChangeHandler(e)} />
-                                <p id="password_val" className="text-danger m-0 p-0 vaildMessage"></p>
+                                    <p id="password_val" className="text-danger m-0 p-0 vaildMessage"></p>
                                 {/* {showError && data.password === "" ? (
                                     <p
                                         className="text-danger m-0 p-0 mb-3"

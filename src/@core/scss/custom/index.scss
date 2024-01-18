@@ -22,6 +22,28 @@ a.btn-primary, a.btn-outline-primary, a.btn-primary-main {
     color: #464646 !important
 }
 
+label {
+    font-size: 13px;
+    width: 100% !important;
+    padding-bottom: 3px;
+}
+
+.form-control {
+    // padding: 0.45rem 1rem !important;0.5rem 1rem !important
+    padding: 0.5rem 1rem !important;
+    font-size: 0.86rem !important;
+}
+
+.css-1s2u09g-control, .css-1pahdxg-control {
+    height: 33.5px !important;
+    min-height: 33.5px !important;
+    font-size: 0.86rem !important;
+}
+
+.css-tlfecz-indicatorContainer {
+    padding: 0px !important;
+}
+
 // [dir] .btn-primary:focus, [dir] .btn-primary:active, [dir] .btn-primary.active, 
 // .btn-primary-main:focus, [dir] .btn-primary-main:active, [dir] .btn-primary-main.active
 // {

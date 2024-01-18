@@ -1,5 +1,5 @@
 import React, { Suspense, useContext, useEffect, useState } from 'react'
-import { Crosshair, Edit, Image, Monitor, PlusCircle, Smartphone, Square, Tag, Target, Type, X, Trash2, XCircle, Columns, Disc, Trash, Percent, MoreVertical, ArrowLeft, Home, CheckSquare, Mail, RotateCcw, RotateCw, Check, ChevronRight } from 'react-feather'
+import { Crosshair, Edit, Image, Monitor, PlusCircle, Smartphone, Square, Tag, Target, Type, X, Trash2, XCircle, Columns, Disc, Trash, Percent, MoreVertical, ArrowLeft, Home, CheckSquare, Mail, RotateCcw, RotateCw, Check, ChevronRight, Plus } from 'react-feather'
 import { AccordionBody, AccordionHeader, AccordionItem, Card, Container, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, Row, UncontrolledAccordion, UncontrolledDropdown, Col, ModalHeader, UncontrolledButtonDropdown, CardBody, ModalFooter, Button, Input } from 'reactstrap'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import pixels from "../../assets/images/superLeadz/pixels.png"
@@ -76,6 +76,13 @@ const convertToSeconds = ({ time, type }) => {
     }
 }
 
+const sectionWidths = {
+    sidebar: "70",
+    drawerWidth: "300",
+    editSection: "280"
+
+}
+
 const CustomizationParent = () => {
     const { userPermission } = useContext(PermissionProvider)
 
@@ -95,11 +102,7 @@ const CustomizationParent = () => {
 
     // const [isDragging, setIsDragging] = useState(false)
 
-    // console.log({ isDragging, setIsDragging })
-
     // const [suggestions, setSuggestions] = useState([])
-
-    // console.log({suggestions})
 
     const mobileCondition = isMobile ? "mobile_" : ""
     const mobileConditionRev = !isMobile ? "mobile_" : ""
@@ -115,7 +118,8 @@ const CustomizationParent = () => {
     const [future, setFuture] = useState([])
     const [themeName, setThemeName] = useState(themeLoc?.state?.custom_theme ? finalObj.theme_name : `Campaign-${generateRandomString()}`)
     const [defColors, setDefColors] = useState(finalObj.defaultThemeColors || {})
-
+    const [textValue, setTextValue] = useState("")
+    const [senderName, setSenderName] = useState("")
     const [currColor, setCurrColor] = useState("primary")
     const [nameEdit, setNameEdit] = useState(true)
     const [currPage, setCurrPage] = useState(finalObj?.[`${mobileCondition}pages`][0]?.id)
@@ -157,6 +161,7 @@ const CustomizationParent = () => {
 
     const [allOffers, setAllOffers] = useState([])
     const [allImages, setAllImages] = useState([])
+    const [prodImages, setProdImages] = useState([])
     const [emailTemplate, setEmailTemplate] = useState([])
     const [gotOffers, setGotOffers] = useState(false)
     const [currPosition, setCurrPosition] = useState({
@@ -223,7 +228,7 @@ const CustomizationParent = () => {
     const [selectedOffer, setSelectedOffer] = useState({})
     const [renamePage, setRenamePage] = useState("")
     const [pageName, setPageName] = useState("")
-    const [openToolbar, setOpenToolbar] = useState(false)
+    const [openToolbar, setOpenToolbar] = useState(true)
     const [toggleView, setToggleView] = useState(1)
     const [prevOpen, setPrevOpen] = useState(1)
 
@@ -232,6 +237,8 @@ const CustomizationParent = () => {
     const [searchValue, setSearchValue] = useState('')
     const [filteredData, setFilteredData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+    const [disableIpDrag, setDisableIpDrag] = useState([])
+    const [imageTab, setImageTab] = useState("default")
     // const [textValue, setTextValue] = useState("")
     // const [senderName, setSenderName] = useState("")
     // const [apiLoader, setApiLoader] = useState(false)
@@ -288,75 +295,74 @@ const CustomizationParent = () => {
     const updatePresent = (newState) => {
         const data = JSON.stringify(finalObj)
         const newObj = { ...newState }
-        // console.log(newState?.responsive, "responsice")
-        if (Array.isArray(newState?.responsive)) {
-            newState?.responsive?.forEach((responsive) => {
-                if (Array.isArray(responsive?.position)) {
-                    responsive?.position?.forEach((position) => {
-                        if (Array.isArray(position?.style)) {
-                            position?.style?.forEach((style) => {
-                                if (style?.isSame) {
-                                    if (responsive?.pageName === "close") {
-                                        const closeArr1 = newObj?.crossButtons[`${mobileConditionRev}main`]
-                                        const closeArr2 = newObj?.crossButtons[`${mobileCondition}main`]
+        // if (Array.isArray(newState?.responsive)) {
+        //     newState?.responsive?.forEach((responsive) => {
+        //         if (Array.isArray(responsive?.position)) {
+        //             responsive?.position?.forEach((position) => {
+        //                 if (Array.isArray(position?.style)) {
+        //                     position?.style?.forEach((style) => {
+        //                         if (style?.isSame) {
+        //                             if (responsive?.pageName === "close") {
+        //                                 const closeArr1 = newObj?.crossButtons[`${mobileConditionRev}main`]
+        //                                 const closeArr2 = newObj?.crossButtons[`${mobileCondition}main`]
 
-                                        if (closeArr1.length > 0 && closeArr2.length > 0) {
-                                            closeArr1.style[style?.styleName] = closeArr2?.style[style?.styleName]
-                                        }
+        //                                 if (closeArr1.length > 0 && closeArr2.length > 0) {
+        //                                     closeArr1.style[style?.styleName] = closeArr2?.style[style?.styleName]
+        //                                 }
 
-                                        newObj.crossButtons[`${mobileConditionRev}main`] = closeArr1
-                                        newObj.crossButtons[`${mobileConditionRev}main`] = closeArr2
+        //                                 newObj.crossButtons[`${mobileConditionRev}main`] = closeArr1
+        //                                 newObj.crossButtons[`${mobileConditionRev}main`] = closeArr2
 
-                                    } else {
-                                        const arr1 = currPage === "button" ? newObj[`${mobileConditionRev}button`] : newObj[`${mobileConditionRev}pages`][newObj[`${mobileConditionRev}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
-                                        const arr2 = currPage === "button" ? newObj[`${mobileCondition}button`] : newObj[`${mobileCondition}pages`][newObj[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
-                                        if (arr1.length > 0 && arr2.length > 0) {
-                                            const positionIndex = arr1[position?.id?.cur]?.elements?.findIndex($ => $?.positionType === position?.id?.curElem)
-                                            const updateCustom = (list, obj1, obj2) => {
-                                                list.forEach(listName => {
-                                                    obj1[listName] = obj2[listName]
-                                                })
-                                            }
-                                            if (position?.id?.subElem === "grandparent") {
-                                                arr1[position?.id?.cur].style[style?.styleName] = arr2[position?.id?.cur].style[style?.styleName]
-                                                if (style?.styleName === "bgType") {
-                                                    updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur]?.style, arr2[position?.id?.cur]?.style)
-                                                }
-                                            } else if (position?.id?.subElem === "parent" && positionIndex !== -1) {
-                                                arr1[position?.id?.cur].elements[positionIndex].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].style[style?.styleName]
-                                                if (style?.styleName === "bgType") {
-                                                    updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex]?.style, arr2[position?.id?.cur].elements[positionIndex]?.style)
-                                                }
-                                            } else {
-                                                if (positionIndex !== -1) {
-                                                    arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName]
-                                                    if (style?.styleName === "bgType") {
-                                                        updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style, arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style)
-                                                    }
+        //                             } else {
+        //                                 const arr1 = currPage === "button" ? newObj[`${mobileConditionRev}button`] : newObj[`${mobileConditionRev}pages`][newObj[`${mobileConditionRev}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
+        //                                 const arr2 = currPage === "button" ? newObj[`${mobileCondition}button`] : newObj[`${mobileCondition}pages`][newObj[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values || []
+        //                                 if (arr1.length > 0 && arr2.length > 0) {
+        //                                     const positionIndex = arr1[position?.id?.cur]?.elements?.findIndex($ => $?.positionType === position?.id?.curElem)
+        //                                     const updateCustom = (list, obj1, obj2) => {
+        //                                         list.forEach(listName => {
+        //                                             obj1[listName] = obj2[listName]
+        //                                         })
+        //                                     }
+        //                                     if (position?.id?.subElem === "grandparent") {
+        //                                         arr1[position?.id?.cur].style[style?.styleName] = arr2[position?.id?.cur].style[style?.styleName]
+        //                                         if (style?.styleName === "bgType") {
+        //                                             updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur]?.style, arr2[position?.id?.cur]?.style)
+        //                                         }
+        //                                     } else if (position?.id?.subElem === "parent" && positionIndex !== -1) {
+        //                                         arr1[position?.id?.cur].elements[positionIndex].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex]?.style[style?.styleName]
+        //                                         if (style?.styleName === "bgType") {
+        //                                             updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex]?.style, arr2[position?.id?.cur].elements[positionIndex]?.style)
+        //                                         }
+        //                                     } else {
+        //                                         if (positionIndex !== -1) {
+        //                                             arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem].style[style?.styleName] = arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem]?.style[style?.styleName]
+        //                                             if (style?.styleName === "bgType") {
+        //                                                 updateCustom(["backgroundColor", "backgroundImage"], arr1[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem]?.style, arr2[position?.id?.cur].elements[positionIndex].element[position?.id?.subElem]?.style)
+        //                                             }
 
-                                                }
-                                            }
+        //                                         }
+        //                                     }
 
-                                            if (currPage === "button") {
-                                                newObj[`${mobileConditionRev}button`] = arr1
-                                                newObj[`${mobileCondition}button`] = arr2
-                                            } else {
-                                                const pageIndex = newObj[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)
-                                                newObj[`${mobileConditionRev}pages`][pageIndex].values = arr1
-                                                newObj[`${mobileCondition}pages`][pageIndex].values = arr2
-                                            }
+        //                                     if (currPage === "button") {
+        //                                         newObj[`${mobileConditionRev}button`] = arr1
+        //                                         newObj[`${mobileCondition}button`] = arr2
+        //                                     } else {
+        //                                         const pageIndex = newObj[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)
+        //                                         newObj[`${mobileConditionRev}pages`][pageIndex].values = arr1
+        //                                         newObj[`${mobileCondition}pages`][pageIndex].values = arr2
+        //                                     }
 
-                                        }
-                                    }
+        //                                 }
+        //                             }
 
 
-                                }
-                            })
-                        }
-                    })
-                }
-            })
-        }
+        //                         }
+        //                     })
+        //                 }
+        //             })
+        //         }
+        //     })
+        // }
         const clonedFinalObj = JSON.parse(data)
         setFinalObj({ ...newObj })
         const delay = 200
@@ -531,125 +537,125 @@ const CustomizationParent = () => {
         const transferedData = dataTransfered?.includes("rearrange") ? dataTransfered?.split("rearrange_") : dataTransfered
         const newObj = { ...finalObj }
 
-        let updatedColWise = []
-        let mobile_updatedColWise = []
-        const pageIndex = newObj?.pages?.findIndex($ => $.id === currPage)
-        const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $.id === currPage)
+        let updatedColWise = currPage === "button" ? finalObj?.button : finalObj?.pages[newObj?.pages?.findIndex($ => $.id === currPage)].values
+        let mobile_updatedColWise = currPage === "button" ? finalObj?.mobile_button : finalObj?.mobile_pages[newObj?.mobile_pages?.findIndex($ => $.id === currPage)].values
+        // const pageIndex = newObj?.pages?.findIndex($ => $.id === currPage)
+        // const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $.id === currPage)
 
         if (transferedData && transferedData !== "row") {
             if (transferedData === "col3") {
                 updatedColWise = [
-                    ...finalObj?.pages[pageIndex]?.values, {
-                        id: finalObj?.pages[pageIndex]?.values?.length + 1,
+                    ...updatedColWise, {
+                        id: updatedColWise?.length + 1,
                         col: 3,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             },
                             {
                                 positionType: 'center',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             },
                             {
                                 positionType: 'right',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             }
                         ]
                     }
                 ]
                 mobile_updatedColWise = [
-                    ...finalObj?.mobile_pages[mobile_pageIndex]?.values, {
-                        id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length + 1,
+                    ...mobile_updatedColWise, {
+                        id: mobile_updatedColWise?.length + 1,
                         col: 3,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             },
                             {
                                 positionType: 'center',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             },
                             {
                                 positionType: 'right',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             }
                         ]
                     }
                 ]
             } else if (transferedData === "col2") {
                 updatedColWise = [
-                    ...finalObj?.pages[pageIndex]?.values, {
-                        id: finalObj?.pages[pageIndex]?.values?.length + 1,
+                    ...updatedColWise, {
+                        id: updatedColWise?.length + 1,
                         col: 2,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             },
                             {
                                 positionType: 'right',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             }
                         ]
                     }
                 ]
                 mobile_updatedColWise = [
-                    ...finalObj?.mobile_pages[mobile_pageIndex]?.values, {
-                        id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length + 1,
+                    ...mobile_updatedColWise, {
+                        id: mobile_updatedColWise?.length + 1,
                         col: 2,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             },
                             {
                                 positionType: 'right',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             }
                         ]
                     }
                 ]
             } else if (transferedData === "col1") {
                 updatedColWise = [
-                    ...finalObj?.pages[pageIndex]?.values, {
-                        id: finalObj?.pages[pageIndex]?.values?.length + 1,
+                    ...updatedColWise, {
+                        id: updatedColWise?.length + 1,
                         col: 1,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.pages[pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: updatedColWise?.length }]
                             }
                         ]
                     }
                 ]
                 mobile_updatedColWise = [
-                    ...finalObj?.mobile_pages[mobile_pageIndex]?.values, {
-                        id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length + 1,
+                    ...mobile_updatedColWise, {
+                        id: mobile_updatedColWise?.length + 1,
                         col: 1,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [{ ...commonObj, type: "", id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length }]
+                                element: [{ ...commonObj, type: "", id: mobile_updatedColWise?.length }]
                             }
                         ]
                     }
@@ -657,29 +663,29 @@ const CustomizationParent = () => {
             } else if (transferedData !== "" && !transferedData?.includes("col")) {
                 const inputTypeCondition = draggedInputType === "none" ? commonObj?.inputType : draggedInputType
                 updatedColWise = [
-                    ...finalObj?.pages[pageIndex]?.values, {
-                        id: finalObj?.pages[pageIndex]?.values?.length + 1,
+                    ...updatedColWise, {
+                        id: updatedColWise?.length + 1,
                         col: 1,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.pages[pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
+                                element: [dataTransfered?.includes("rearrange") ? { ...updatedColWise[dragStartIndex?.cur]?.elements[updatedColWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: updatedColWise?.length, style: elementStyles?.[transferedData] }]
                             }
                         ]
                     }
                 ]
                 mobile_updatedColWise = [
-                    ...finalObj?.mobile_pages[mobile_pageIndex]?.values, {
-                        id: finalObj?.mobile_pages[mobile_pageIndex]?.values?.length + 1,
+                    ...mobile_updatedColWise, {
+                        id: mobile_updatedColWise?.length + 1,
                         col: 1,
                         style: elementStyles?.block,
                         elements: [
                             {
                                 positionType: 'left',
                                 style: elementStyles?.col,
-                                element: [dataTransfered?.includes("rearrange") ? { ...finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements[finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: finalObj?.pages[pageIndex]?.values?.length, style: elementStyles?.[transferedData] }]
+                                element: [dataTransfered?.includes("rearrange") ? { ...mobile_updatedColWise[dragStartIndex?.cur]?.elements[mobile_updatedColWise[dragStartIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element[dragStartIndex?.subElem] } : { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, id: updatedColWise?.length, style: elementStyles?.[transferedData] }]
                             }
                         ]
                     }
@@ -689,8 +695,8 @@ const CustomizationParent = () => {
 
 
         if (dataTransfered.includes("rearrange")) {
-            updatedColWise[dragStartIndex.cur]?.elements[finalObj?.pages[pageIndex]?.values[dragStartIndex.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element?.splice(dragStartIndex?.subElem, 1, { ...commonObj })
-            mobile_updatedColWise[dragStartIndex.cur]?.elements[finalObj?.mobile_pages[mobile_pageIndex]?.values[dragStartIndex.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element?.splice(dragStartIndex?.subElem, 1, { ...commonObj })
+            updatedColWise[dragStartIndex.cur]?.elements[updatedColWise[dragStartIndex.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element?.splice(dragStartIndex?.subElem, 1, { ...commonObj })
+            mobile_updatedColWise[dragStartIndex.cur]?.elements[mobile_updatedColWise[dragStartIndex.cur]?.elements?.findIndex($ => $?.positionType === dragStartIndex.curElem)]?.element?.splice(dragStartIndex?.subElem, 1, { ...commonObj })
         }
 
         setcolWise(isMobile ? mobile_updatedColWise : updatedColWise)
@@ -883,52 +889,110 @@ const CustomizationParent = () => {
                 }
             })
             .catch(err => console.log(err))
+
+
+        getReq('productDetails', `/?app=${userPermission.appName}`)
+            .then((res) => {
+                const imgArray = new Array()
+                res?.data?.data?.product_details?.Product_Details?.products.forEach(prod => {
+                    prod.images.forEach(img => {
+                        imgArray.push({ image: img.src })
+                    })
+                })
+                setProdImages(imgArray)
+            })
+            .catch(err => console.log(err))
     }
 
-    const getMDToggle = ({ label, value }) => {
+    const getMDToggle = ({ label, value }, isMainBg) => {
         const newObj = { ...finalObj }
-        const arr1 = Array.isArray(finalObj?.responsive) ? [...finalObj?.responsive] : []
-        const index1 = arr1?.findIndex($ => {
-            return currPosition?.selectedType === "close" ? $?.pageName === "close" : $?.pageName === currPage
-        })
-        const arr2 = Array.isArray(arr1[index1]?.position) ? [...arr1[index1]?.position] : []
-        const index2 = arr2?.findIndex($ => isEqual($?.id, { ...indexes }))
-        const arr3 = Array.isArray(arr2[index2]?.style) ? [...arr2[index2]?.style] : []
-        const index3 = arr3?.findIndex($ => $?.styleName === value)
-
-        const condition1 = arr1?.some($ => {
-            return currPosition?.selectedType === "close" ? $?.pageName === "close" : $?.pageName === currPage
-        })
-        const condition2 = arr2?.some($ => isEqual($?.id, { ...indexes }))
-        const condition3 = arr3?.some($ => $?.styleName === value)
 
         let icon
-        if (condition1 && condition2 && condition3 && arr3[index3]?.isSame) {
-            icon = <div className="d-flex align-items-center gap-2">
-                <Monitor size={"12px"} /><Smartphone size={"12px"} />
-            </div>
+
+        let setBoolean = false
+
+        if (isMainBg) {
+            setBoolean = Array.isArray(value) ? value.every($ => finalObj?.responsiveStyles?.[`${pageCondition}`].includes($)) : finalObj?.responsiveStyles?.[`${pageCondition}`].includes(value)
+        } else if (currPosition?.selectedType === "close") {
+            setBoolean = Array.isArray(value) ? value.every($ => finalObj?.responsiveStyles?.[`close`].includes($)) : finalObj?.responsiveStyles?.[`close`].includes(value)
+        } else {
+            let responsiveStyles
+            const arr = currPage === "button" ? finalObj?.button : finalObj?.pages[finalObj?.pages?.findIndex($ => $?.id === currPage)]?.values
+            if (indexes?.subElem === "grandparent") {
+                responsiveStyles = arr[indexes?.cur]?.responsiveStyles
+            } else if (indexes?.subElem === "parent") {
+                const positionIndex = arr[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes.curElem)
+                responsiveStyles = arr[indexes?.cur]?.elements[positionIndex]?.responsiveStyles
+            } else {
+                const positionIndex = arr[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes.curElem)
+                responsiveStyles = arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.responsiveStyles
+            }
+
+            if (Array.isArray(responsiveStyles)) {
+                setBoolean = Array.isArray(value) ? value.every($ => responsiveStyles.includes($)) : responsiveStyles.includes(value)
+            }
+        }
+
+        if (setBoolean) {
+            icon = <><Monitor size={"12px"} /><Smartphone size={"12px"} /></>
         } else {
             icon = isMobile ? <Smartphone size={"15px"} /> : <Monitor size={"15px"} />
         }
 
         const setCondition = (condition) => {
-            if (condition1 && condition2 && condition3) {
-                newObj.responsive[index1].position[index2].style[index3].isSame = condition
+            const arr = currPage === "button" ? finalObj?.button : finalObj?.pages[finalObj?.pages?.findIndex($ => $?.id === currPage)]?.values
+            const mobile_arr = currPage === "button" ? finalObj?.mobile_button : finalObj?.mobile_pages[finalObj?.mobile_pages?.findIndex($ => $?.id === currPage)]?.values
+
+            const setArr = (arr1, arr2) => {
+                if (arr1 && Array.isArray(arr1)) {
+                    if (condition) {
+                        Array.isArray(value) ? value.forEach($ => arr1.push($)) : arr1?.push(value)
+                    } else {
+                        arr1 = Array.isArray(value) ? arr1?.filter($ => !value.includes($)) : arr1?.filter($ => $ !== value)
+                    }
+                    arr2 = arr1
+                } else if (condition) {
+                    let newArr = []
+                    Array.isArray(value) ? value.map($ => newArr.push($)) : newArr = [value]
+                    arr1 = [...newArr]
+                    arr2 = [...newArr]
+                }
+                return { arr1, arr2 }
+            }
+
+            if (isMainBg) {
+                const trObj = setArr(newObj?.responsiveStyles?.[`${isMainBg}`], [])
+                const { arr1 } = trObj
+                newObj.responsiveStyles[`${isMainBg}`] = arr1
+            } else if (currPosition?.selectedType === "close") {
+                const trObj = setArr(newObj?.responsiveStyles?.[`close`], [])
+                const { arr1 } = trObj
+                newObj.responsiveStyles[`close`] = arr1
             } else {
-                if (!condition1) {
-                    newObj.responsive = [...arr1, { pageName: currPosition?.selectedType === "close" ? "close" : currPage, position: [{ id: { ...indexes }, style: [{ styleName: value, isSame: condition, view: isMobile ? "mobile" : "desktop" }] }] }]
-                } else if (!condition2) {
-                    if (newObj?.responsive[index1]) {
-                        newObj.responsive[index1].position = [...arr2, { id: { ...indexes }, style: [{ styleName: value, isSame: condition, view: isMobile ? "mobile" : "desktop" }] }]
-                    } else {
-                        newObj?.responsive?.push({ pageName: currPosition?.selectedType === "close" ? "close" : currPage, position: [{ id: { ...indexes }, style: [{ styleName: value, isSame: condition, view: isMobile ? "mobile" : "desktop" }] }] })
-                    }
-                } else if (!condition3) {
-                    if (newObj?.responsive[index1]?.position[index2]) {
-                        newObj.responsive[index1].position[index2].style = [...arr3, { styleName: value, isSame: condition, view: isMobile ? "mobile" : "desktop" }]
-                    } else {
-                        newObj?.responsive[index1]?.position?.push({ id: { ...indexes }, style: [{ styleName: value, isSame: condition, view: isMobile ? "mobile" : "desktop" }] })
-                    }
+                if (indexes?.subElem === "grandparent") {
+                    const trObj = setArr(arr[indexes?.cur]?.responsiveStyles, mobile_arr[indexes?.cur]?.responsiveStyles)
+                    const { arr1, arr2 } = trObj
+                    arr[indexes?.cur].responsiveStyles = arr1
+                    mobile_arr[indexes?.cur].responsiveStyles = arr2
+                } else if (indexes?.subElem === "parent") {
+                    const positionIndex = arr[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes.curElem)
+                    const trObj = setArr(arr[indexes?.cur]?.elements[positionIndex]?.responsiveStyles, mobile_arr[indexes?.cur]?.elements[positionIndex]?.responsiveStyles)
+                    const { arr1, arr2 } = trObj
+                    arr[indexes?.cur].elements[positionIndex].responsiveStyles = arr1
+                    mobile_arr[indexes?.cur].elements[positionIndex].responsiveStyles = arr2
+                } else {
+                    const positionIndex = arr[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes.curElem)
+                    const trObj = setArr(arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.responsiveStyles, mobile_arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.responsiveStyles)
+                    const { arr1, arr2 } = trObj
+                    arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].responsiveStyles = arr1
+                    mobile_arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].responsiveStyles = arr2
+                }
+                if (currPage === "button") {
+                    newObj.button = arr
+                    newObj.mobile_button = mobile_arr
+                } else {
+                    newObj.pages[newObj?.pages?.findIndex($ => $?.id === currPage)].values = arr
+                    newObj.mobile_pages[newObj?.mobile_pages?.findIndex($ => $?.id === currPage)].values = mobile_arr
                 }
             }
             updatePresent({ ...newObj })
@@ -945,16 +1009,18 @@ const CustomizationParent = () => {
                         <DropdownItem onClick={() => {
                             setCondition(false)
                             setIsMobile(false)
-                        }} className={`w-100 ${(!condition1 && !condition2 && !condition3 && !isMobile && !arr3[index3]?.isSame) ? "btn-primary-main" : ""}`}>
+                        }} className={`w-100`}>
                             Desktop View Only
                         </DropdownItem>
                         <DropdownItem onClick={() => {
                             setCondition(false)
                             setIsMobile(true)
-                        }} className={`w-100 ${(!condition1 && !condition2 && !condition3 && isMobile && !arr3[index3]?.isSame) ? "btn-primary-main" : ""}`}>
+                        }} className={`w-100`}>
                             Mobile View Only
                         </DropdownItem>
-                        <DropdownItem onClick={() => setCondition(true)} className={`w-100 ${(condition1 && condition2 && condition3 && arr3[index3]?.isSame) ? "btn-primary-main" : ""}`}>
+                        <DropdownItem onClick={() => {
+                            setCondition(true)
+                        }} className={`w-100`}>
                             Desktop and Mobile View
                         </DropdownItem>
                     </DropdownMenu>
@@ -974,18 +1040,6 @@ const CustomizationParent = () => {
         const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
         const { selectedType } = currPosition
         let styles, general, spacing
-
-        const draggedTypes = new Array()
-
-        colWise?.forEach(cur => {
-            cur?.elements?.forEach(curElem => {
-                curElem.element?.forEach(subElem => {
-                    if (subElem?.type === "input") {
-                        draggedTypes?.push(subElem?.inputType)
-                    }
-                })
-            })
-        })
 
         const timeSelectOptions = [
             { value: "seconds", label: "Seconds" },
@@ -1060,7 +1114,7 @@ const CustomizationParent = () => {
                                             label: <>Height: <input value={parseFloat(values?.height)} type='number' className='form-control' style={{ width: "8ch" }} onChange={e => {
                                                 setValues({ ...values, height: `${parseFloat(e.target.value)}px`, maxHeight: `${parseFloat(e.target.value)}px` })
                                             }} />px</>,
-                                            value: "height"
+                                            value: ["height", "maxHeight"]
                                         })}
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
                                             <input value={parseFloat(values?.height)} type='range' className='w-100' onChange={e => {
@@ -1131,7 +1185,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='2'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Background: `, value: "bgType" })}
+                                        {getMDToggle({ label: `Background: `, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div className="border p-1 rounded mb-2" style={{ backgroundColor: values?.backgroundColor, backgroundImage: values?.backgroundImage }} onClick={() => setBgModal0(!bgModal0)}></div>
                                         {/* <UncontrolledButtonDropdown>
                                             <DropdownToggle color='dark' style={{ padding: "0.5rem" }} className='hide-after-dropdown rounded'>
@@ -1155,7 +1209,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='3'>
-                                <BorderChange getMDToggle={getMDToggle} setStyles={setValues} styles={values} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} setStyles={setValues} styles={values} />
                             </AccordionBody>
                         </AccordionItem>
                     </UncontrolledAccordion>
@@ -1304,7 +1358,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='2'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Background`, value: `bgType` })}
+                                        {getMDToggle({ label: `Background`, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div style={{ backgroundImage: `url(${pixels})` }}>
                                             <div className="p-1 border rounded" style={{ backgroundImage: values?.backgroundImage, backgroundColor: values?.backgroundColor }} onClick={() => setBgModal0(!bgModal0)}></div>
                                         </div>
@@ -1317,7 +1371,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='3'>
-                                <BorderChange getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
                             </AccordionBody>
                         </AccordionItem>
                     </UncontrolledAccordion>
@@ -1363,7 +1417,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='1'>
-                                <BorderChange getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
                             </AccordionBody>
                         </AccordionItem>
                     </UncontrolledAccordion>
@@ -1421,7 +1475,9 @@ const CustomizationParent = () => {
                                     </div>
                                     <div className='mb-1'>
                                         {getMDToggle({
-                                            label: <>Width: <input value={parseFloat(imgWidth)} type='number' className='form-control' style={{width: "8ch"}} onChange={e => {
+                                            label: <>Width: <input value={parseFloat(imgWidth)} type='number' className='form-control' style={{ width: "8ch" }} onChange={e => {
+                                                arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].isBrandWidth = false
+                                                setcolWise([...arr])
                                                 setValues({ ...values, width: `${parseFloat(e.target.value)}px` })
                                             }} />px</>,
                                             value: `width`
@@ -1435,7 +1491,14 @@ const CustomizationParent = () => {
                                         </div>
                                     </div>
                                     <div className='mb-1'>
-                                        {getMDToggle({ label: `Height: ${imgHeight}`, value: `height` })}
+                                        {getMDToggle({
+                                            label: <>Height: <input value={parseFloat(imgHeight)} type='number' className='form-control' style={{ width: "8ch" }} onChange={e => {
+                                                arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].isBrandHeight = false
+                                                setcolWise([...arr])
+                                                setValues({ ...values, height: `${parseFloat(e.target.value)}px` })
+                                            }} />px</>,
+                                            value: `height`
+                                        })}
                                         <div className="p-0 justify-content-start align-items-center gap-2">
                                             <input value={parseFloat(imgHeight)} onChange={(e) => {
                                                 arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].isBrandHeight = false
@@ -1490,7 +1553,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='1'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Background`, value: `bgType` })}
+                                        {getMDToggle({ label: `Background`, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div className="p-2 border rounded" onClick={() => setBgModal0(!bgModal0)} style={{ backgroundColor: values?.backgroundColor, backgroundImage: values?.backgroundImage }}></div>
                                     </div>
                                 </div>
@@ -1501,7 +1564,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='2'>
-                                <BorderChange getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
                             </AccordionBody>
                         </AccordionItem>
                         {/* <AccordionItem>
@@ -1811,7 +1874,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='11'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Text Color:`, value: `color` })}
+                                        {getMDToggle({ label: `Text Color:`, value: [`color`, "WebkitTextFillColor"] })}
                                         <div className="border rounded" style={{ backgroundImage: `url(${pixels})` }}>
                                             <div className="p-1" style={{ backgroundColor: values.WebkitTextFillColor ? values.WebkitTextFillColor : "#000000" }} onClick={() => { setBgModal5(!bgModal5) }}></div>
 
@@ -1929,7 +1992,7 @@ const CustomizationParent = () => {
                                         </div>
                                     </>)}
                                     {colWise[indexes?.cur].elements[positionIndex]?.element[indexes?.subElem]?.hasLabel && <div className='mb-2'>
-                                        {getMDToggle({ label: `Label and Input gap: ${values?.elemGap ? values?.elemGap : "0px"}`, value: `width` })}
+                                        {getMDToggle({ label: `Label and Input gap: ${values?.elemGap ? values?.elemGap : "0px"}`, value: `elemGap` })}
                                         <div className="d-flex p-0 justify-content-between align-items-center gap-2">
                                             <input value={parseFloat(values?.elemGap ? values?.elemGap : "0px")} type='range' className='w-100' onChange={e => {
                                                 setValues({ ...values, elemGap: `${e.target.value}px` })
@@ -1946,7 +2009,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='3'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Background:`, value: `bgType` })}
+                                        {getMDToggle({ label: `Background:`, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div className="border rounded" style={{ backgroundImage: `url(${pixels})` }}>
                                             <div className="p-1" style={{ backgroundColor: values?.backgroundColor, backgroundImage: values?.backgroundImage, backgroundRepeat: values?.backgroundRepeat, backgroundSize: values?.backgroundSize }} onClick={() => setBgModal0(!bgModal0)}></div>
                                         </div>
@@ -1959,7 +2022,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='4'>
-                                <BorderChange getMDToggle={getMDToggle} setStyles={setValues} styles={values} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} setStyles={setValues} styles={values} />
                             </AccordionBody>
                         </AccordionItem>
                     </UncontrolledAccordion>
@@ -1977,7 +2040,7 @@ const CustomizationParent = () => {
                                         arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].placeholder = e.label
                                         arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].labelText = e.label
                                         setcolWise([...arr])
-                                    }} options={inputTypeList?.filter(item => !draggedTypes?.includes(item?.value))} />
+                                    }} options={inputTypeList?.filter(item => !disableIpDrag?.includes(item?.value))} />
                             </div>
                         </div>
                         <div className='my-2'>
@@ -2010,7 +2073,10 @@ const CustomizationParent = () => {
                         {colWise[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.isRequired && <div className='my-1'>
                             <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Error message:</span>
                             <div className="d-flex p-0 justify-content-between align-items-center gap-2">
-                                <input defaultValue={"Please fill this field"} type="text" name='title' min="0" max="300" className='form-control' />
+                                <input checked={colWise[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.isRequiredText} onChange={e => {
+                                    arr[indexes?.cur].elements[positionIndex].element[indexes?.subElem].isRequiredText = e.target.value
+                                    setcolWise([...arr])
+                                }} defaultValue={"Please fill this field"} type="text" name='title' min="0" max="300" className='form-control' />
                             </div>
                         </div>}
 
@@ -2042,7 +2108,6 @@ const CustomizationParent = () => {
                 </>
             )
         } else if (selectedType === "close") {
-            // console.log(mobileCondition, "mobileCondition")
             styles = (
                 <div className='mx-0 my-1 px-1'>
                     <div className='d-flex p-0 mb-1 justify-content-between align-items-center '>
@@ -2062,7 +2127,7 @@ const CustomizationParent = () => {
                         </div>
                     </div>
                     <div className='p-0 my-1'>
-                        {getMDToggle({ label: "Background Color", value: `backgroundColor` })}
+                        {getMDToggle({ label: "Background Color", value: ["bgType", "backgroundColor", "backgroundImage"] })}
                         {/* <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Background Color</span> */}
                         <div className="rounded border" style={{ backgroundImage: `url(${pixels})` }}>
                             <div className="p-2 12" style={{ backgroundColor: finalObj?.crossButtons?.[`${mobileCondition}main`]?.backgroundColor, backgroundImage: finalObj?.crossButtons?.[`${mobileCondition}main`]?.backgroundImage }} onClick={() => {
@@ -2093,7 +2158,7 @@ const CustomizationParent = () => {
                         </div> */}
                     </div>
                     <div className='p-0 my-1'>
-                        <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>X Color</span>
+                        {getMDToggle({ label: "X Color", value: `color` })}
                         <div className="rounded border" style={{ backgroundImage: `url(${pixels})` }}>
                             <div className="p-2" style={{ backgroundColor: finalObj?.crossButtons?.[`${mobileCondition}main`]?.color }} onClick={() => {
                                 setColorType("color")
@@ -2102,22 +2167,65 @@ const CustomizationParent = () => {
                         </div>
                     </div>
                     <div className='my-1'>
-                        <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Size: {finalObj?.crossButtons[`${pageCondition}`]?.width}</span>
+                        {getMDToggle({
+                            label: <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Size: {finalObj?.crossButtons[`${pageCondition}`]?.width}</span>,
+                            value: [`width`, 'height', 'maxWidth', 'maxHeight']
+                        })}
                         <div className="p-0 justify-content-start align-items-center gap-2">
                             <input value={parseFloat(finalObj?.crossButtons[`${pageCondition}`]?.width)} type='range' className='w-100' name="height" min="5" max="300"
                                 onChange={(e) => {
-                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${pageCondition}`]: { ...finalObj?.crossButtons[`${pageCondition}`], width: `${e.target.value}px`, height: `${e.target.value}px`, maxWidth: `${e.target.value}px`, maxHeight: `${e.target.value}px` } } })
+                                    updatePresent({
+                                        ...finalObj,
+                                        crossButtons:
+                                        {
+                                            ...finalObj?.crossButtons,
+                                            [`${mobileCondition}${pageCondition}`]:
+                                            {
+                                                ...finalObj?.crossButtons[`${mobileCondition}${pageCondition}`],
+                                                width: `${e.target.value}px`,
+                                                height: `${e.target.value}px`,
+                                                maxWidth: `${e.target.value}px`,
+                                                maxHeight: `${e.target.value}px`
+                                            },
+                                            [`${mobileConditionRev}${pageCondition}`]:
+                                            {
+                                                ...finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`],
+                                                width: finalObj?.responsiveStyles?.close.includes("width") ? `${e.target.value}px` : finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`]?.width,
+                                                height: finalObj?.responsiveStyles?.close.includes("height") ? `${e.target.value}px` : finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`]?.height,
+                                                maxWidth: finalObj?.responsiveStyles?.close.includes("maxWidth") ? `${e.target.value}px` : finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`]?.maxWidth,
+                                                maxHeight: finalObj?.responsiveStyles?.close.includes("maxHeight") ? `${e.target.value}px` : finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`]?.maxHeight
+                                            }
+                                        }
+                                    })
                                     // setCrossStyle({ ...crossStyle, width: `${e.target.value}px`, height: `${e.target.value}px`, maxWidth: `${e.target.value}px`, maxHeight: `${e.target.value}px` })
                                 }} />
                         </div>
                     </div>
                     <div className='my-1'>
-                        <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Corner radius: {finalObj?.crossButtons[`${pageCondition}`]?.borderRadius}</span>
+                        {getMDToggle({
+                            label: <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Corner radius {finalObj?.crossButtons[`${pageCondition}`]?.width}</span>,
+                            value: `borderRadius`
+                        })}
                         <div className=" p-0 justify-content-start align-items-center gap-2">
                             <input value={parseFloat(finalObj?.crossButtons[`${pageCondition}`]?.borderRadius)} type='range' className='w-100' name="height" min="0" max="300"
                                 onChange={(e) => {
                                     // const newSize = parseInt(e.target.value)
-                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${pageCondition}`]: { ...finalObj?.crossButtons[`${pageCondition}`], borderRadius: `${e.target.value}px` } } })
+                                    updatePresent({
+                                        ...finalObj,
+                                        crossButtons: {
+                                            ...finalObj?.crossButtons,
+                                            [`${mobileCondition}${pageCondition}`]:
+                                            {
+                                                ...finalObj?.crossButtons[`${mobileCondition}${pageCondition}`],
+                                                borderRadius: `${e.target.value}px`
+                                            },
+                                            [`${mobileConditionRev}${pageCondition}`]:
+                                            {
+                                                ...finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`],
+                                                borderRadius: finalObj?.responsiveStyles?.close.includes("borderRadius") ? `${e.target.value}px` : finalObj?.crossButtons[`${mobileConditionRev}${pageCondition}`]?.borderRadius
+                                            }
+                                        }
+                                    })
                                     // updatePresent({...finalObj, crossButtons: {...finalObj?.crossButtons, borderRadius: `${e.target.value}px`}})
                                     // setCrossStyle({ ...crossStyle, borderRadius: `${e.target.value}px` })
                                 }} />
@@ -2132,8 +2240,7 @@ const CustomizationParent = () => {
                             <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Vertical alignment: {finalObj?.crossButtons[`${pageCondition}`]?.translateY}</span>
                             <div className=" p-0 justify-content-start align-items-center gap-2">
                                 <input value={parseFloat(finalObj?.crossButtons[`${pageCondition}`]?.translateY)} onChange={e => {
-                                    // console.log(e.target.value, "event")
-                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${pageCondition}`]: { ...finalObj?.crossButtons[`${pageCondition}`], translateY: `${e.target.value}px` } } })
+                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${mobileCondition}${pageCondition}`]: { ...finalObj?.crossButtons[`${mobileCondition}${pageCondition}`], translateY: `${e.target.value}px`, transform: `translateX(${finalObj?.crossButtons[`${mobileCondition}${pageCondition}`]?.translateX}) translateY(${e.target.value}px)` } } })
 
                                     // setCrossStyle({ ...crossStyle, translateY: `${e.target.value}px` })
                                 }} type='range' className='w-100' name="height" min={currPage === "button" ? `-${(finalObj?.backgroundStyles[`${mobileCondition}button`][isMobile ? "maxWidth" : "width"]).replace("px", "")}` : `-${(finalObj?.backgroundStyles[`${mobileCondition}main`]?.[isMobile ? "maxWidth" : "width"]).replace("px", "")}`} max={currPage === "button" ? `${(finalObj?.backgroundStyles[`${mobileCondition}button`][isMobile ? "maxWidth" : "width"]).replace("px", "")}` : (finalObj?.backgroundStyles[`${mobileCondition}main`]?.[isMobile ? "maxWidth" : "width"]).replace("px", "")} />
@@ -2143,7 +2250,7 @@ const CustomizationParent = () => {
                             <span className='fw-bolder text-black' style={{ fontSize: "0.75rem" }}>Horizontal alignment: {finalObj?.crossButtons[`${pageCondition}`]?.translateX}</span>
                             <div className="p-0 justify-content-start align-items-center gap-2">
                                 <input value={parseFloat(finalObj?.crossButtons[`${pageCondition}`]?.translateX)} onChange={e => {
-                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${pageCondition}`]: { ...finalObj?.crossButtons[`${pageCondition}`], translateX: `${e.target.value}px` } } })
+                                    updatePresent({ ...finalObj, crossButtons: { ...finalObj?.crossButtons, [`${mobileCondition}${pageCondition}`]: { ...finalObj?.crossButtons[`${mobileCondition}${pageCondition}`], translateX: `${e.target.value}px`, transform: `translateX(${e.target.value}px) translateY(${finalObj?.crossButtons[`${mobileCondition}${pageCondition}`]?.translateY})` } } })
 
                                     // setCrossStyle({ ...crossStyle, translateX: `${e.target.value}px` })
                                 }} type='range' className='w-100' name="height" min={`-${finalObj?.backgroundStyles[`${mobileCondition}main`]?.minHeight.replace("px", "")}`} max={`${finalObj?.backgroundStyles[`${mobileCondition}main`]?.minHeight.replace("px", "")}`} />
@@ -2166,7 +2273,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='1'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className=' p-0 justify-content- align-items-center gap-1'>
-                                        {getMDToggle({ label: `Background:`, value: `bgType` })}
+                                        {getMDToggle({ label: `Background:`, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div className=" rounded border cursor-pointer" style={{ backgroundImage: `url(${pixels})` }}>
                                             <div onClick={() => setBgModal0(!bgModal0)} className="p-2 w-100" style={{ backgroundColor: values?.backgroundColor, backgroundImage: values?.backgroundImage }}></div>
                                         </div>
@@ -2179,7 +2286,7 @@ const CustomizationParent = () => {
                                 <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
                             </AccordionHeader>
                             <AccordionBody accordionId='2'>
-                                <BorderChange getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
+                                <BorderChange pageCondition={pageCondition} getMDToggle={getMDToggle} styles={values} setStyles={setValues} />
                             </AccordionBody>
                         </AccordionItem>
                         <AccordionItem>
@@ -2248,7 +2355,7 @@ const CustomizationParent = () => {
                                             <label htmlFor="redeemUrl" className="form-control-label">Offer Code: {selectedOffer?.Code} </label>
                                             <div className="redeem mt-2">
                                                 <span className='d-block'>Offer Redeem URL:</span>
-                                                <div class="input-group mb-3 d-flex">
+                                                <div class="input-group mb-3 d-none">
                                                     {/* <span class="input-group-text" id="basic-addon3">https://{outletData[0]?.web_url}</span> */}
                                                     <input type="text" class="form-control" id="basic-url" onChange={e => {
                                                         const newObj = { ...finalObj }
@@ -2485,7 +2592,7 @@ const CustomizationParent = () => {
                             <AccordionBody accordionId='2'>
                                 <div className='p-0 mx-0 my-1'>
                                     <div className='p-0 mb-1 justify-content-start align-items-center'>
-                                        {getMDToggle({ label: `Background`, value: `bgType` })}
+                                        {getMDToggle({ label: `Background`, value: ["bgType", "backgroundColor", "backgroundImage"] })}
                                         <div className="border rounded" style={{ backgroundImage: `url(${pixels})` }}>
                                             <div className="p-1" style={{ backgroundColor: values?.backgroundColor, backgroundImage: values?.backgroundImage, backgroundRepeat: values?.backgroundRepeat, backgroundSize: values?.backgroundSize }} onClick={() => setBgModal0(!bgModal0)}></div>
                                         </div>
@@ -2820,9 +2927,21 @@ const CustomizationParent = () => {
                                                 } else {
                                                     setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                 }
-                                                const arr = [...colWise]
+                                                const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                 arr.splice(key, 1)
-                                                setcolWise([...arr])
+                                                // setcolWise([...arr])
+                                                const newObj = { ...finalObj }
+                                                if (currPage === "button") {
+                                                    newObj.button = arr
+                                                    newObj.mobile_button = arrRev
+                                                } else {
+                                                    const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                    const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                    newObj.pages[pageIndex].values = arr
+                                                    newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                }
+                                                updatePresent({ ...newObj })
                                                 setMouseEnterIndex({ cur: false, curElem: false, subElem: false })
                                             }} className='w-100'>
                                             <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
@@ -2918,15 +3037,30 @@ const CustomizationParent = () => {
                                                                     setCurrPosition({ ...currPosition, selectedType: "block" })
                                                                     setIndexes({ cur: key - 1, curElem: "left", subElem: "grandparent" })
                                                                 }
-                                                                const arr = [...colWise]
+                                                                const arr = currPage === "button" ? [...finalObj?.[`button`]] : [...finalObj?.[`pages`][finalObj?.[`pages`]?.findIndex($ => $.id === currPage)].values]
+                                                                const arrRev = currPage === "button" ? [...finalObj?.[`mobile_button`]] : [...finalObj?.[`mobile_pages`][finalObj?.[`mobile_pages`]?.findIndex($ => $.id === currPage)].values]
                                                                 if (curElem?.element?.length <= 1 && cur?.elements?.length <= 1) {
                                                                     arr.splice(key, 1)
+                                                                    arrRev.splice(key, 1)
                                                                 } else if (curElem?.element?.length <= 1 && cur?.elements?.length >= 1) {
                                                                     arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
+                                                                    arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1, { ...commonObj })
                                                                 } else {
                                                                     arr[key].elements[arr[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
+                                                                    arrRev[key].elements[arrRev[key].elements.findIndex($ => $?.positionType === curElem.positionType)].element.splice(j, 1)
                                                                 }
-                                                                setcolWise([...arr])
+                                                                const newObj = { ...finalObj }
+                                                                if (currPage === "button") {
+                                                                    newObj.button = arr
+                                                                    newObj.mobile_button = arrRev
+                                                                } else {
+                                                                    const pageIndex = newObj?.pages?.findIndex($ => $?.id === currPage)
+                                                                    const mobile_pageIndex = newObj?.mobile_pages?.findIndex($ => $?.id === currPage)
+                                                                    newObj.pages[pageIndex].values = arr
+                                                                    newObj.mobile_pages[mobile_pageIndex].values = arrRev
+                                                                }
+                                                                updatePresent({ ...newObj })
+                                                                // setcolWise([...arr])
                                                             }} className='w-100'>
                                                             <div className="d-flex align-items-center" style={{ gap: "0.5rem" }}>
                                                                 <Trash stroke='red' size={"15px"} className='cursor-pointer' /> <span className='fw-bold text-black' style={{ fontSize: "0.75rem" }}>Delete</span>
@@ -2983,13 +3117,15 @@ const CustomizationParent = () => {
 
             if (mousePos.y - (y + (height / 2)) < 0) {
                 dupArray[dragOverIndex?.cur]?.elements[dupArray[dragOverIndex.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
-                mobile_dupArray[dragOverIndex?.cur]?.elements[mobile_dupArray[dragOverIndex.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
+                mobile_dupArray[dragOverIndex?.cur]?.elements[mobile_dupArray[dragOverIndex.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
                 setIndexes({ ...dragOverIndex })
             } else {
                 dupArray[dragOverIndex.cur]?.elements[dupArray[dragOverIndex.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem + 1, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
-                mobile_dupArray[dragOverIndex.cur]?.elements[mobile_dupArray[dragOverIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem + 1, 0, { ...commonObj, type: transferedData, style: elementStyles[transferedData] })
+                mobile_dupArray[dragOverIndex.cur]?.elements[mobile_dupArray[dragOverIndex?.cur]?.elements?.findIndex($ => $?.positionType === dragOverIndex?.curElem)]?.element?.splice(dragOverIndex?.subElem + 1, 0, { ...commonObj, type: transferedData, inputType: inputTypeCondition, placeholder: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, labelText: inputTypeList[inputTypeList?.findIndex($ => $.value === inputTypeCondition)]?.label, style: elementStyles[transferedData] })
                 setIndexes({ cur, curElem, subElem })
             }
+
+
             setValues({ ...elementStyles[transferedData] })
             setcolWise(isMobile ? [...mobile_dupArray] : [...dupArray])
             const newObj = { ...finalObj }
@@ -3238,7 +3374,6 @@ const CustomizationParent = () => {
 
     const updateTextRes = ({ e, arrCondition, mobCondition, key, i, j }) => {
         e.stopPropagation()
-        console.log({ e, arrCondition, mobCondition, key, i, j })
         const newObj = { ...finalObj }
 
         if (currPage === "button") {
@@ -3266,9 +3401,7 @@ const CustomizationParent = () => {
 
     useEffect(() => {
         const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
-        // console.log(currPage, "currPage")
         setBrandStyles({ ...finalObj?.[`${mobileCondition}brandStyles`] })
-        // console.log(colWise, "herecolWise")
         const positionIndex = colWise[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
         if (indexes.subElem === "grandparent") {
             setValues(currPage === "button" ? { ...finalObj?.[`${mobileCondition}button`][indexes.cur]?.style } : { ...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values[indexes.cur]?.style })
@@ -3281,24 +3414,49 @@ const CustomizationParent = () => {
     }, [isMobile, currPage])
 
     useEffect(() => {
-        const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
-        if (colWise.length > 0) {
-            const arr = [...colWise]
-            const positionIndex = colWise[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
+        const newObj = { ...finalObj }
+        const arr = currPage === "button" ? [...newObj?.[`${mobileCondition}button`]] : [...newObj?.[`${mobileCondition}pages`][newObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
+        const rev_arr = currPage === "button" ? [...newObj?.[`${mobileConditionRev}button`]] : [...newObj?.[`${mobileConditionRev}pages`][newObj?.[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)].values]
+        if (arr.length > 0) {
+            const positionIndex = arr[indexes.cur]?.elements?.findIndex($ => $?.positionType === indexes?.curElem)
             if (indexes.subElem === "grandparent") {
                 if (arr[indexes?.cur]?.style) {
                     arr[indexes.cur].style = { ...arr[indexes?.cur]?.style, ...values }
+                    if (arr[indexes?.cur]?.responsiveStyles && Array.isArray(arr[indexes?.cur]?.responsiveStyles)) {
+                        arr[indexes?.cur]?.responsiveStyles?.forEach($ => {
+                            rev_arr[indexes?.cur].style[$] = arr[indexes?.cur].style[$]
+                        })
+                    }
                 }
             } else if (indexes.subElem === "parent") {
                 if (arr[indexes?.cur]?.elements[positionIndex]?.style) {
                     arr[indexes.cur].elements[positionIndex].style = { ...arr[indexes.cur]?.elements[positionIndex]?.style, ...values }
+                    if (arr[indexes.cur].elements[positionIndex]?.responsiveStyles && Array.isArray(arr[indexes.cur].elements[positionIndex]?.responsiveStyles)) {
+                        arr[indexes.cur].elements[positionIndex]?.responsiveStyles?.forEach($ => {
+                            rev_arr[indexes.cur].elements[positionIndex].style[$] = arr[indexes.cur].elements[positionIndex].style[$]
+                        })
+                    }
                 }
             } else {
                 if (arr[indexes?.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style) {
                     arr[indexes.cur].elements[positionIndex].element[indexes.subElem].style = { ...arr[indexes.cur]?.elements[positionIndex]?.element[indexes?.subElem]?.style, ...values }
+                    if (arr[indexes.cur].elements[positionIndex].element[indexes.subElem]?.responsiveStyles && Array.isArray(arr[indexes.cur].elements[positionIndex].element[indexes.subElem]?.responsiveStyles)) {
+                        arr[indexes.cur].elements[positionIndex].element[indexes.subElem]?.responsiveStyles?.forEach($ => {
+                            rev_arr[indexes.cur].elements[positionIndex].element[indexes.subElem].style[$] = arr[indexes.cur].elements[positionIndex].element[indexes.subElem].style[$]
+                        })
+                    }
                 }
             }
-            setcolWise([...arr])
+            // setcolWise([...arr])
+            if (currPage === "button") {
+                newObj[`${mobileCondition}button`] = arr
+                newObj[`${mobileConditionRev}button`] = rev_arr
+            } else {
+                const pageIndex = newObj?.[`${mobileConditionRev}pages`]?.findIndex($ => $.id === currPage)
+                newObj[`${mobileCondition}pages`][pageIndex].values = arr
+                newObj[`${mobileConditionRev}pages`][pageIndex].values = rev_arr
+            }
+            updatePresent({ ...newObj })
         }
     }, [values])
 
@@ -3306,11 +3464,9 @@ const CustomizationParent = () => {
         document.addEventListener("keydown", function (e) {
 
             if (e.ctrlKey && e.key === 'z') {
-                // console.log("zzzz")
                 document.getElementById('xircls_undo').click()
             }
             if (e.ctrlKey && e.key === 'y') {
-                // console.log("yyyy")
                 // redo()
                 document.getElementById('xircls_redo').click()
             }
@@ -3320,7 +3476,6 @@ const CustomizationParent = () => {
     const getEmailSettings = () => {
         getReq('outletsDetails', `?OUTLET_ID=${outletData[0]?.id}&OUTLET_TYPE=SINGLE`)
             .then((resp) => {
-                console.log(resp)
                 // setAboutUs(String(resp.data.data.outlet_detail?.outlet_description).split('.'))
                 setOutletSenderId(resp?.data?.data?.outlet_detail[0]?.outlet_sender_id)
             })
@@ -3331,7 +3486,6 @@ const CustomizationParent = () => {
         fetch(`${SuperLeadzBaseURL}/talks/api/template-placeholders/?app=${userPermission?.appName}`)
             .then((data) => data.json())
             .then((resp) => {
-                console.log(resp, "pfjpsaofjopa")
                 setPlaceholder(resp)
             })
             .catch((error) => {
@@ -3342,16 +3496,14 @@ const CustomizationParent = () => {
         fetch(`${SuperLeadzBaseURL}/api/v1/get_campaign_details/?shop=${outletData[0]?.web_url}&app=${userPermission?.appName}`)
             .then((data) => data.json())
             .then((resp) => {
-                // console.log(resp?.data, "paodapod")
                 const templateData = resp?.data?.map((curElem) => {
                     return { label: curElem[1], value: curElem[0] }
                 })
-                console.log(templateData, "paodapod")
                 // setEmailTemplate([])
                 setEmailTemplate(templateData)
             })
             .catch((error) => {
-                console.log(error, "paodapod")
+                console.log(error)
             })
     }
 
@@ -3360,9 +3512,15 @@ const CustomizationParent = () => {
             <h4 className='m-0'>Verified Email</h4>
         </Col>
         <Col className='d-flex align-items-center justify-content-end' md='4' sm='12'>
+            <a className="btn btn-primary d-flex justify-content-center align-items-center" style={{ gap: '5px' }} onClick={() => {
+                setChangeSenderEmail(false)
+                setVerifyYourEmail(true)
+            }}>
+                <Plus size={17} /> Email
+            </a>
             <Input
                 className='dataTable-filter form-control ms-1'
-                style={{ width: `180px`, height: `2.714rem` }}
+                style={{ width: `130px`, height: `2.714rem` }}
                 type='text'
                 bsSize='sm'
                 id='search-input-1'
@@ -3377,7 +3535,6 @@ const CustomizationParent = () => {
         setIsLoading(true)
         getReq('verifyEmail')
             .then((resp) => {
-                console.log(resp)
                 setdata(resp?.data?.data?.oulet_email)
                 setEmailList(resp?.data?.data?.sender)
                 setIsLoading(false)
@@ -3389,7 +3546,6 @@ const CustomizationParent = () => {
     }
 
     const emailStatusChange = (e, row) => {
-        console.log(row.is_verified, "sanclskac")
         if (row.is_verified) {
             setApiLoader(true)
             const form_data = new FormData()
@@ -3397,7 +3553,6 @@ const CustomizationParent = () => {
             form_data.append('email_to_toggle', row?.email_id)
             form_data.append('activate_status', e.target.checked ? "1" : "0")
             form_data.append('sender_name', row?.sender_name)
-            console.log(e.target.checked)
             postReq('verifyEmail', form_data)
                 .then((resp) => {
                     toast.success(resp.data.message)
@@ -3413,6 +3568,44 @@ const CustomizationParent = () => {
             e.target.checked = !e.target.checked
             toast.error("Please verify your email!")
         }
+    }
+
+    const verifyEmail = () => {
+        setApiLoader(true)
+        if (senderName === "") {
+            setApiLoader(false)
+            toast.error("Please enter sender name")
+            return
+        }
+
+        if (textValue === "") {
+            setApiLoader(false)
+            toast.error("Please enter your email")
+            return
+        }
+
+        setVerifyYourEmail(false)
+        // if (textValue) {
+
+        const form_data = new FormData()
+        form_data.append("email_to_verify", textValue)
+        form_data.append("sender_name", senderName)
+        postReq('verifyEmail', form_data)
+            .then(() => {
+                getData()
+                getEmailSettings()
+                setApiLoader(false)
+                setChangeSenderEmail(true)
+                toast.success(`Verification email has been sent to ${textValue}`)
+                setTextValue("")
+                setSenderName("")
+            })
+            .catch((error) => {
+                console.log(error)
+                setApiLoader(false)
+
+                toast.success("Something went wrong!")
+            })
     }
 
     useEffect(() => {
@@ -3600,12 +3793,26 @@ const CustomizationParent = () => {
     // }, [offerTheme])
 
     useEffect(() => {
+        const draggedTypes = new Array()
+        const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
+        colWise?.forEach(cur => {
+            cur?.elements?.forEach(curElem => {
+                curElem.element?.forEach(subElem => {
+                    if (subElem?.type === "input") {
+                        draggedTypes?.push(subElem?.inputType)
+                    }
+                })
+            })
+        })
+
+        setDisableIpDrag([...draggedTypes])
         const draftIntervalTimer = 30000
         const draftInterval = setInterval(() => {
             if (themeLoc?.pathname?.includes("/merchant/SuperLeadz/new_customization/")) {
                 saveDraft()
             }
         }, draftIntervalTimer)
+
         return () => clearInterval(draftInterval)
     }, [finalObj])
 
@@ -3689,11 +3896,11 @@ const CustomizationParent = () => {
                 </Container>
                 <div className="d-flex justify-content-center align-items-stretch border position-relative" style={{ height: "calc(100vh - 55px)" }}>
                     {/* Component for changing background of the selected element */}
-                    {/* <BgModifier styles={bgStyles} setStyles={setBgStyles} /> */}
+                    {/* <BgModifier pageCondition={pageCondition} mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} styles={bgStyles} setStyles={setBgStyles} /> */}
                     {/* Component for changing background of the selected element */}
 
                     {/* Sidebar */}
-                    <div className="nav-sidebar d-flex flex-column align-items-stretch justify-content-start border-end text-center h-100" style={{ padding: "0.5rem", minWidth: "70px", overflow: "auto", gap: '20px' }}>
+                    <div className="nav-sidebar d-flex flex-column align-items-stretch justify-content-start border-end text-center h-100" style={{ padding: "0.5rem", minWidth: `${sectionWidths.sidebar}px`, overflow: "auto", gap: '20px' }}>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "theme" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "theme" ? "" : "theme")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <svg
@@ -3709,25 +3916,25 @@ const CustomizationParent = () => {
                                     <path d="M181.333 277.312H74.667c-5.888 0-10.667 4.779-10.667 10.667v149.333c0 5.888 4.779 10.667 10.667 10.667h106.667c5.888 0 10.667-4.779 10.667-10.667V287.979c-.001-5.888-4.78-10.667-10.668-10.667zm-10.666 149.333H85.333v-128h85.333v128z" />
                                 </svg>
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Theme</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Theme</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "audience" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "audience" ? "" : "audience")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Target size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Audience</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Audience</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "display" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "display" ? "" : "display")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Monitor size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Display</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Display</span>
                         </div>
                         <div className={`sideNav-items d-none flex-column align-items-center justify-content-center ${sideNav === "trigger" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "trigger" ? "" : "trigger")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Monitor size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Triggers</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Triggers</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${(sideNav === "add-elements" || sideNav === "button") ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => {
                             if (currPage === "button") {
@@ -3739,7 +3946,7 @@ const CustomizationParent = () => {
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <PlusCircle size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Elements</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Elements</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "offers" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => {
                             setSideNav(sideNav === "offers" ? "" : "offers")
@@ -3748,13 +3955,13 @@ const CustomizationParent = () => {
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Tag size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Offers</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Offers</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "criteria" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => setSideNav(sideNav === "criteria" ? "" : "criteria")}>
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Crosshair size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Schedule</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Schedule</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "rules" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => {
                             setSideNav(sideNav === "rules" ? "" : "rules")
@@ -3762,7 +3969,7 @@ const CustomizationParent = () => {
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Mail size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Rules</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Rules</span>
                         </div>
                         <div className={`sideNav-items d-flex flex-column align-items-center justify-content-center ${sideNav === "email" ? "text-black active-item" : ""}`} style={{ gap: "0.5rem", cursor: "pointer", padding: "0.75rem 0px" }} onClick={() => {
                             setSideNav(sideNav === "email" ? "" : "email")
@@ -3770,7 +3977,7 @@ const CustomizationParent = () => {
                             <button className={`btn d-flex align-items-center justify-content-center`} style={{ aspectRatio: "1", padding: "0rem", border: "none", outline: "none", transition: "0.3s ease-in-out" }}>
                                 <Mail size={15} />
                             </button>
-                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase`}>Email</span>
+                            <span style={{ fontSize: "8.5px", fontStyle: "normal", fontWeight: "500", lineHeight: "10px", transition: "0.3s ease-in-out" }} className={`text-uppercase transformSideBar`}>Email</span>
                         </div>
                     </div>
                     {/* Sidebar */}
@@ -3778,13 +3985,13 @@ const CustomizationParent = () => {
                     {/* Preview and Edit Section */}
                     <div className="d-flex align-items-stretch flex-grow-1 h-100">
                         {/* Section Drawer */}
-                        <div className=" border-end bg-white position-relative h-100" style={{ width: (sideNav !== "" && sideNav !== "rules") ? "280px" : "0px", transition: "0.3s ease-in-out", opacity: "1", boxShadow: "10px 2px 5px rgba(0,0,0,0.125)", zIndex: "1" }}>
+                        <div className=" border-end bg-white position-relative h-100" style={{ width: (sideNav !== "" && sideNav !== "rules") ? `${sectionWidths.drawerWidth}px` : "0px", transition: "0.3s ease-in-out", opacity: "1", boxShadow: "10px 2px 5px rgba(0,0,0,0.125)", zIndex: "1" }}>
                             <span onClick={() => setSideNav(sideNav === "" ? prevOpen : "")} className="position-absolute d-flex justify-content-center align-items-center cursor-pointer" style={{ top: "50%", right: "0px", transform: `translateX(100%) translateY(-50%)`, padding: "0.25rem", aspectRatio: "9/30", height: "50px", borderRadius: "0px 10px 10px 0px", backgroundColor: "#ffffff", zIndex: "11111111" }}>
                                 <ChevronRight style={{ rotate: sideNav === "" ? "0deg" : "-540deg", transition: "0.3s ease-in-out" }} size={12.5} color='#000000' />
                             </span>
-                            <div className="overflow-x-hidden h-100 position-relative">
+                            <div className="overflow-x-hidden h-100 position-relative hideScroll">
                                 <div className='w-100' style={{ height: "100%", overflowY: "auto" }}>
-                                    <div style={{ width: "280px", transform: `translateX(${(sideNav !== "" && sideNav !== "rules") ? "0px" : "-280px"})`, transition: "0.3s ease-in-out", position: "absolute", inset: "0px 0px 0px auto" }}>
+                                    <div style={{ width: `${sectionWidths.drawerWidth}px`, transform: `translateX(${(sideNav !== "" && sideNav !== "rules") ? "0px" : `-${sectionWidths.drawerWidth}px`})`, transition: "0.3s ease-in-out", position: "absolute", inset: "0px 0px 0px auto" }}>
                                         {/* Theme Section */}
                                         {sideNav === "theme" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "100%" }}>
                                             <UncontrolledAccordion stayOpen defaultOpen={["1"]}>
@@ -3822,7 +4029,6 @@ const CustomizationParent = () => {
                                                             {/* <div className="d-flex align-items-center justify-content-between gap-1 form-check form-check-success p-0" style={{ marginBottom: '5px' }}>
                                                                 <label style={{ fontSize: "10px" }} className="form-check-label m-0 p-0">Set default</label>
                                                                 <input type='checkbox' className='form-check-input m-0 p-0' onChange={(e) => {
-                                                                    console.log(e)
                                                                 }} />
                                                             </div> */}
                                                             <div className=" rounded border cursor-pointer" style={{ backgroundImage: `url(${pixels})` }}>
@@ -4004,7 +4210,7 @@ const CustomizationParent = () => {
                                                             </div>
                                                         </div>
                                                         <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0px", fontSize: "0.75rem" }}>Border and Shadow</p>
-                                                        {currPage === "button" ? < BorderChange type={`btnStyles`} mainStyle={finalObj} setMainStyle={updatePresent} mobileCondition={mobileCondition} /> : <BorderChange getMDToggle={getMDToggle} type={`bgStyles`} mainStyle={finalObj} setMainStyle={updatePresent} mobileCondition={mobileCondition} />}
+                                                        {currPage === "button" ? <BorderChange pageCondition={pageCondition} type={`btnStyles`} mainStyle={finalObj} setMainStyle={updatePresent} mobileCondition={mobileCondition} /> : <BorderChange pageCondition={pageCondition} type={`bgStyles`} mainStyle={finalObj} setMainStyle={updatePresent} mobileCondition={mobileCondition} />}
                                                     </AccordionBody>
                                                 </AccordionItem>
                                                 <AccordionItem>
@@ -4486,9 +4692,9 @@ const CustomizationParent = () => {
                                         </div>}
                                         {/* Trigger section */}
                                         {/* Elements section */}
-                                        {sideNav === "add-elements" && <div style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "100%" }}>
+                                        {sideNav === "add-elements" && <div className={`px-1`} style={{ transition: "0.3s ease-in-out", overflow: "auto", width: "100%" }}>
                                             <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Basic Elements</p>
-                                            <div className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1" style={{ flexWrap: "wrap" }}>
+                                            <div className="toggleSection d-flex align-items-stretch justify-content-start mb-1" style={{ flexWrap: "wrap" }}>
                                                 {/* {getElementJsx({ draggable: true, dragStartFunc: (e) => handleDragStart(e, "text", "type"), icon: <Type size={17.5} />, label: "Text" })} */}
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
                                                     <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "text", "type")} className="border rounded w-100 d-flex flex-column justify-content-between align-items-center p-1 h-100" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
@@ -4561,9 +4767,9 @@ const CustomizationParent = () => {
                                                 </div>
                                             </div>
                                             <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Input Elements</p>
-                                            <div className="toggleSection border-end d-flex flex-wrap align-items-stretch justify-content-start mb-1">
+                                            <div className="toggleSection d-flex flex-wrap align-items-stretch justify-content-start mb-1">
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
-                                                    <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "firstName")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
+                                                    <div title={!disableIpDrag.includes("firstName") ? 'Drag to add to your pop-up' : 'Cannot drag this element if this already exists on page'} draggable={!disableIpDrag.includes("firstName")} onDragStart={(e) => handleDragStart(e, "input", "firstName")} className={`border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1`} style={{ aspectRatio: "1", cursor: !disableIpDrag.includes("firstName") ? "grab" : "default", gap: "1rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -4606,7 +4812,7 @@ const CustomizationParent = () => {
                                                     </div>
                                                 </div>
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
-                                                    <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "lastName")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
+                                                    <div title={!disableIpDrag.includes("lastName") ? 'Drag to add to your pop-up' : 'Cannot drag this element if this already exists on page'} draggable={!disableIpDrag.includes("lastName")} onDragStart={(e) => handleDragStart(e, "input", "lastName")} className={`border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1`} style={{ aspectRatio: "1", cursor: !disableIpDrag.includes("lastName") ? "grab" : "default", gap: "1rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -4649,7 +4855,7 @@ const CustomizationParent = () => {
                                                     </div>
                                                 </div>
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
-                                                    <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "email")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
+                                                    <div title={!disableIpDrag.includes("email") ? 'Drag to add to your pop-up' : 'Cannot drag this element if this already exists on page'} draggable={!disableIpDrag.includes("email")} onDragStart={(e) => handleDragStart(e, "input", "email")} className={`border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1`} style={{ aspectRatio: "1", cursor: !disableIpDrag.includes("email") ? "grab" : "default", gap: "1rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -4692,7 +4898,7 @@ const CustomizationParent = () => {
                                                     </div>
                                                 </div>
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
-                                                    <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "number")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
+                                                    <div title={!disableIpDrag.includes("number") ? 'Drag to add to your pop-up' : 'Cannot drag this element if this already exists on page'} draggable={!disableIpDrag.includes("number")} onDragStart={(e) => handleDragStart(e, "input", "number")} className={`border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1`} style={{ aspectRatio: "1", cursor: !disableIpDrag.includes("number") ? "grab" : "default", gap: "1rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -4735,7 +4941,7 @@ const CustomizationParent = () => {
                                                     </div>
                                                 </div>
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
-                                                    <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "input", "enter_otp")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "1rem" }}>
+                                                    <div title={!disableIpDrag.includes("enter_otp") ? 'Drag to add to your pop-up' : 'Cannot drag this element if this already exists on page'} draggable={!disableIpDrag.includes("enter_otp")} onDragStart={(e) => handleDragStart(e, "input", "enter_otp")} className={`border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1`} style={{ aspectRatio: "1", cursor: !disableIpDrag.includes("enter_otp") ? "grab" : "default", gap: "1rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -4779,7 +4985,7 @@ const CustomizationParent = () => {
                                                 </div>
                                             </div>
                                             <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Form Elements</p>
-                                            <div className="toggleSection border-end d-flex flex-wrap align-items-stretch justify-content-start mb-1">
+                                            <div className="toggleSection d-flex flex-wrap align-items-stretch justify-content-start mb-1">
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
                                                     <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "tnc")} className="border rounded text-black w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.25rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
@@ -4805,7 +5011,7 @@ const CustomizationParent = () => {
                                                 </div>
                                             </div>
                                             <p className='m-0 fw-bolder text-black text-uppercase' style={{ padding: "0.5rem 0.5rem 0px", fontSize: "0.75rem" }}>Layout Elements</p>
-                                            <div className="toggleSection border-end d-flex align-items-stretch justify-content-start mb-1">
+                                            <div className="toggleSection d-flex align-items-stretch justify-content-start mb-1">
                                                 <div style={{ width: `33.3333%`, padding: "0.35rem", height: "100%" }}>
                                                     <div title='Drag to add to your pop-up' draggable onDragStart={(e) => handleDragStart(e, "col1")} className="border rounded text-dark w-100 d-flex flex-column justify-content-between align-items-center p-1" style={{ aspectRatio: "1", cursor: "grab", gap: "0.25rem" }}>
                                                         <span className="bg-light-secondary d-flex justify-content-center align-items-center rounded" style={{ padding: "0.75rem", aspectRatio: "1" }}>
@@ -4998,14 +5204,14 @@ const CustomizationParent = () => {
                                                     </AccordionHeader>
                                                     <AccordionBody accordionId='1'>
                                                         <div className="py-1">
-                                                            <div className='d-flex justify-content-between align-items-center pb-1'>
-                                                                <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email From</label>
-                                                                <a className="btn btn-sm btn-primary" onClick={() => setChangeSenderEmail(!changeSenderEmail)}>Change</a>
+                                                            <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email From</label>
+                                                            <div className="d-flex justify-content-center align-items-center" style={{ border: '1px solid #d8d6de', borderRadius: '0.357rem', gap: '5px' }}>
+                                                                <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email Template</label>
+                                                                <input type="text" value={outletSenderId ? outletSenderId : "no_reply@xircls.com"} className="form-control" style={{ width: '250px', border: 'none' }} disabled />
+                                                                <a style={{ marginRight: '5px' }} onClick={() => setChangeSenderEmail(!changeSenderEmail)}>
+                                                                    <Edit size={'18px'} />
+                                                                </a>
                                                             </div>
-
-                                                            {
-                                                                outletSenderId ? <input value={outletSenderId} name="email_from" type="text" className="form-control" id="email_from" placeholder="Email From" disabled /> : <a className="btn btn-sm btn-primary" onClick={() => setVerifyYourEmail(!verifyYourEmail)}>Add Sender Email</a>
-                                                            }
 
                                                         </div>
 
@@ -5013,7 +5219,6 @@ const CustomizationParent = () => {
                                                             <label style={{ fontSize: "0.85rem", width: '100%' }} className="form-check-label m-0 p-0">Email Template</label>
 
                                                             <Select onChange={(e) => {
-                                                                console.log(e)
                                                                 const form_data = new FormData()
                                                                 form_data.append("id", e.value)
                                                                 fetch(`${SuperLeadzBaseURL}/api/v1/get_single_camp_details/`, {
@@ -5023,7 +5228,6 @@ const CustomizationParent = () => {
                                                                     .then((data) => data.json())
                                                                     .then((resp) => {
                                                                         if (resp.data) {
-                                                                            console.log(resp.data, "pdkspodfkspa")
                                                                             setFinalObj({ ...finalObj, email_settings: { ...resp.data } })
 
                                                                         }
@@ -5099,12 +5303,12 @@ const CustomizationParent = () => {
                         </div>
                         {/* Section Drawer */}
                         {/* Theme Preview */}
-                        <div className="d-flex flex-column flex-grow-1 align-items-center bg-light-secondary">
+                        <div className="d-flex flex-column align-items-center bg-light-secondary" style={{ width: `calc(100vw - ${sideNav !== "" ? sectionWidths.editSection : "0"}px - ${sectionWidths.drawerWidth}px - ${sectionWidths.sidebar}px)`, transition: "0.3s ease-in-out" }}>
                             {returnRender({ outletData, slPrevBg, bgsettings: finalObj?.overlayStyles, currPage, setCurrPage, currPosition, setCurrPosition, indexes, setIndexes, popPosition: finalObj?.positions?.[`${mobileCondition}${pageCondition}`], bgStyles: finalObj?.backgroundStyles?.[`${mobileCondition}main`], crossStyle: finalObj?.crossButtons[`${mobileCondition}${pageCondition}`], values, setValues, showBrand, handleColDrop, handleDragOver, handleElementDrop, handleLayoutDrop, handleRearrangeElement, mouseEnterIndex, setMouseEnterIndex, mousePos, setMousePos, isEqual, makActive, colWise: currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values], setcolWise, setDragStartIndex, dragOverIndex, setDragOverIndex, isMobile, setIsMobile, finalObj, setFinalObj: updatePresent, mobileCondition, openPage, setOpenPage, brandStyles, gotOffers, setTransfered, sideNav, setSideNav, btnStyles: finalObj?.backgroundStyles[`${mobileCondition}button`], offerTheme: finalObj?.offerTheme, navigate, triggerImage, gotDragOver, setGotDragOver, indicatorPosition, setIndicatorPosition, selectedOffer, setSelectedOffer, renamePage, setRenamePage, pageName, setPageName, undo, updatePresent, openToolbar, setOpenToolbar, updateTextRes })}
                         </div>
                         {/* Theme Preview */}
                         {/* Edit Section */}
-                        <div className="edit-section h-100" style={{ width: currPosition?.selectedType !== "" ? "280px" : "0px", overflow: "auto", transition: "0.3s ease-in-out" }}>
+                        <div className="edit-section h-100" style={{ width: currPosition?.selectedType !== "" ? `${sectionWidths.editSection}px` : "0px", overflow: "auto", transition: "0.3s ease-in-out" }}>
                             {currPosition?.selectedType !== "" && renderElems()}
                         </div>
                         {/* Edit Section */}
@@ -5113,28 +5317,28 @@ const CustomizationParent = () => {
 
                     {/*Modals */}
                     <Modal onClick={() => setBgModal0(!bgModal0)} toggle={() => setBgModal0(!bgModal0)} className='hide-backdrop' isOpen={bgModal0} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <BgModifier closeState={bgModal0} setCloseState={setBgModal0} styles={values} setStyles={setValues} />
+                        <BgModifier pageCondition={pageCondition} mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} closeState={bgModal0} setCloseState={setBgModal0} styles={values} setStyles={setValues} mainStyle={finalObj} setMainStyle={setFinalObj} />
                     </Modal>
                     <Modal onClick={() => setBgModal(!bgModal)} toggle={() => setBgModal(!bgModal)} className='hide-backdrop' isOpen={bgModal} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <BgModifier type="btnSetting" setMainStyle={updatePresent} mainStyle={finalObj} closeState={bgModal} setCloseState={setBgModal} styles={finalObj?.overlayStyles} />
+                        <BgModifier pageCondition={pageCondition} mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} type="btnSetting" setMainStyle={updatePresent} mainStyle={finalObj} closeState={bgModal} setCloseState={setBgModal} styles={finalObj?.overlayStyles} />
                     </Modal>
                     <Modal onClick={() => setBgModal2(!bgModal2)} toggle={() => setBgModal2(!bgModal2)} className='hide-backdrop' isOpen={bgModal2} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <BgModifier type="bgStyles" styles={finalObj?.backgroundStyles?.[`${mobileCondition}main`]} setMainStyle={updatePresent} mainStyle={finalObj} mobileCondition={mobileCondition} closeState={bgModal2} setCloseState={setBgModal2} />
+                        <BgModifier pageCondition={pageCondition} mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} type="bgStyles" styles={finalObj?.backgroundStyles?.[`${mobileCondition}main`]} setMainStyle={updatePresent} mainStyle={finalObj} closeState={bgModal2} setCloseState={setBgModal2} />
                     </Modal>
                     <Modal onClick={() => setBgModal3(!bgModal3)} toggle={() => setBgModal3(!bgModal3)} className='hide-backdrop' isOpen={bgModal3} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <BgModifier type="btnStyles" styles={finalObj?.backgroundStyles?.[`${mobileCondition}button`]} setMainStyle={updatePresent} mainStyle={finalObj} mobileCondition={mobileCondition} colorType={colorType} closeState={bgModal3} setCloseState={setBgModal3} />
+                        <BgModifier pageCondition={pageCondition} mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} type="btnStyles" styles={finalObj?.backgroundStyles?.[`${mobileCondition}button`]} setMainStyle={updatePresent} mainStyle={finalObj} colorType={colorType} closeState={bgModal3} setCloseState={setBgModal3} />
                     </Modal>
                     <Modal onClick={() => setBgModal4(!bgModal4)} toggle={() => setBgModal4(!bgModal4)} className='hide-backdrop' isOpen={bgModal4} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <CustomColorModifier type="offerColors" setMainStyle={updatePresent} mainStyle={finalObj} colorType={currOfferColor} />
+                        <CustomColorModifier mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} type="offerColors" setMainStyle={updatePresent} mainStyle={finalObj} colorType={currOfferColor} />
                     </Modal>
                     <Modal onClick={() => setBgModal5(!bgModal5)} toggle={() => setBgModal5(!bgModal5)} className='hide-backdrop' isOpen={bgModal5} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <CustomColorModifier styles={values} setStyles={setValues} colorType={"WebkitTextFillColor"} />
+                        <CustomColorModifier mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} styles={values} setStyles={setValues} colorType={"WebkitTextFillColor"} />
                     </Modal>
                     <Modal onClick={() => setCustomColorModal(!customColorModal)} toggle={() => setCustomColorModal(!customColorModal)} className='hide-backdrop' isOpen={customColorModal} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <CustomColorModifier type="cross" setMainStyle={updatePresent} mainStyle={finalObj} pageCondition={`${mobileCondition}${pageCondition}`} colorType={colorType} />
+                        <CustomColorModifier mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} type="cross" setMainStyle={updatePresent} mainStyle={finalObj} pageCondition={`${pageCondition}`} colorType={colorType} />
                     </Modal>
                     <Modal onClick={() => setCustomColorModal2(!customColorModal2)} toggle={() => setCustomColorModal2(!customColorModal2)} className='hide-backdrop' isOpen={customColorModal2} style={{ width: "300px", maxWidth: "90%", margin: "0px" }}>
-                        <CustomColorModifier styles={defColors} setStyles={setDefColors} colorType={currColor} />
+                        <CustomColorModifier mobileCondition={mobileCondition} mobileConditionRev={mobileConditionRev} styles={defColors} setStyles={setDefColors} colorType={currColor} />
                     </Modal>
                     <Modal style={{ filter: "drop-shadow(0px 0px 15px rgba(0,0,0,0.75))" }} isOpen={imgModal} toggle={() => setImgModal(!imgModal)} size='xl'>
                         <div className="w-100 p-1 d-flex justify-content-between align-items-center">
@@ -5145,7 +5349,15 @@ const CustomizationParent = () => {
                             {imgLoading && <div className="position-fixed d-flex justify-content-center align-items-center" style={{ inset: "0px", backgroundColor: "rgba(255,255,255,0.5)" }}>
                                 <Spinner />
                             </div>}
-                            <div className="p-1 pt-0 d-flex justify-content-center border-bottom">
+                            <div className="p-1 d-flex gap-1">
+                                <button onClick={() => setImageTab("default")} className={`${imageTab === "default" ? "btn-primary-main" : ""} btn w-50`}>
+                                    Your Images
+                                </button>
+                                <button onClick={() => setImageTab("product")} className={`${imageTab === "product" ? "btn-primary-main" : ""} btn w-50`}>
+                                    Product Images
+                                </button>
+                            </div>
+                            {imageTab !== "product" && <div className="p-1 pt-0 d-flex justify-content-center border-bottom">
                                 <label htmlFor='uploadImg' className="btn btn-dark">Upload an Image <input onChange={e => {
                                     setImgLoading(true)
                                     const form_data = new FormData()
@@ -5167,11 +5379,10 @@ const CustomizationParent = () => {
                                                 toast.error("The image could not be uploaded. Try again later.")
                                             }
                                         })
-
                                 }} type="file" className="d-none" id='uploadImg' accept='image/*' /></label>
-                            </div>
+                            </div>}
                             <div className="p-1 row">
-                                {allImages.length >= 0 ? allImages.map((ele, key) => {
+                                {imageTab === "default" && allImages.length >= 0 ? allImages.map((ele, key) => {
                                     return (
                                         <div key={key} className="col-2 img-array-item" style={{ padding: "0.5rem" }}>
                                             <div style={{ aspectRatio: "1", backgroundImage: `url(${ele?.image})`, backgroundSize: "contain", boxShadow: "0px 5px 7.5px rgba(0,0,0,0.25)", backgroundRepeat: "no-repeat", backgroundPosition: "center" }} className="w-100 h-100 rounded-3 border overflow-hidden">
@@ -5227,7 +5438,66 @@ const CustomizationParent = () => {
                                     )
                                 }) : (
                                     <div className="d-flex justify-content-center align-items-center">
-                                        <span>No images to show. Try uploading more images</span>
+                                        {/* <span>No images to show. Try uploading more images</span> */}
+                                    </div>
+                                )}
+                                {imageTab === "product" && prodImages.length >= 0 ? prodImages.map((ele, key) => {
+                                    return (
+                                        <div key={key} className="col-2 img-array-item" style={{ padding: "0.5rem" }}>
+                                            <div style={{ aspectRatio: "1", backgroundImage: `url(${ele?.image})`, backgroundSize: "contain", boxShadow: "0px 5px 7.5px rgba(0,0,0,0.25)", backgroundRepeat: "no-repeat", backgroundPosition: "center" }} className="w-100 h-100 rounded-3 border overflow-hidden">
+                                                <div className="revealSection w-100 h-100 d-flex flex-column gap-1 justify-content-between align-items-center p-2" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                                                    <div className="p-1 bg-white text-black rounded-3 w-100">{ele?.image?.split("/")?.at("-1")}</div>
+                                                    <button className="btn btn-dark w-100" onClick={() => {
+                                                        if (imageType === "SINGLE") {
+                                                            const colWise = currPage === "button" ? [...finalObj?.[`${mobileCondition}button`]] : [...finalObj?.[`${mobileCondition}pages`][finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $.id === currPage)].values]
+                                                            const arr = [...colWise]
+                                                            if (arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].type) {
+                                                                arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].type = "image"
+                                                            }
+                                                            if (arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].src) {
+                                                                arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].src = ele.image
+                                                            }
+                                                            if (arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].isBrandLogo) {
+                                                                arr[indexes.cur].elements[colWise[indexes.cur].elements.findIndex($ => $?.positionType === indexes.curElem)].element[indexes.subElem].isBrandLogo = false
+                                                            }
+                                                            const newFinalObj = finalObj
+                                                            currPage === "button" ? newFinalObj[`${mobileCondition}button`] = arr : newFinalObj[`${mobileCondition}pages`][finalObj[`${mobileCondition}pages`].findIndex($ => $?.id === currPage)].values = arr
+                                                            updatePresent(newFinalObj)
+                                                            setcolWise(currPage === "button" ? newFinalObj?.[`${mobileCondition}button`] : newFinalObj?.[`${mobileCondition}pages`]?.[finalObj?.[`${mobileCondition}pages`]?.findIndex($ => $?.id === currPage)]?.values)
+                                                            setImgModal(!imgModal)
+
+                                                        } else {
+                                                            const finalData = finalObj
+
+                                                            // const imageList = arr?.filter((curElem) => curElem?.elements).filter((subElem) => subElem?.element).filter((childElem) => childElem.type === "image" ? isBrandLogo)
+                                                            updatePresent({ ...finalData, defaultThemeColors: { ...finalData.defaultThemeColors, brandLogo: ele.image } })
+                                                            setImgModal(!imgModal)
+                                                        }
+                                                    }}>Use Image</button>
+                                                    <Trash2 className='cursor-pointer' fill='#fff' stroke='#000' strokeWidth={"1px"} size={35} onClick={() => {
+                                                        setImgLoading(true)
+                                                        const form_data = new FormData()
+                                                        form_data.append("shop", outletData[0]?.web_url)
+                                                        form_data.append("app", "superleadz")
+                                                        const imgUrl = new URL(`${SuperLeadzBaseURL}/api/v1/delete_bucket_image/?shop=${outletData[0]?.web_url}&app=superleadz&image_id=${ele.id}`)
+                                                        axios({
+                                                            method: "DELETE",
+                                                            url: imgUrl,
+                                                            data: form_data
+                                                        })
+                                                            .then((data) => {
+                                                                if (data.status === 200) {
+                                                                    triggerImage()
+                                                                }
+                                                            })
+                                                    }} color='white' />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                }) : (
+                                    <div className="d-flex justify-content-center align-items-center">
+                                        {/* <span>No images to show. Try uploading more images</span> */}
                                     </div>
                                 )}
                             </div>
@@ -5269,16 +5539,31 @@ const CustomizationParent = () => {
                         <ModalHeader toggle={() => setVerifyYourEmail(!verifyYourEmail)}>Sender Email</ModalHeader>
                         <ModalBody>
                             {/* <VerifyYourEmailQuick /> */}
-                            <VerifyYourEmail isQuick={true} />
+                            <div className='d-flex justify-content-center align-items-end gap-2'>
+                                <div className='w-50'>
+                                    <label>Sender Name</label>
+                                    <input type='text' className='form-control' value={senderName} onChange={(e) => setSenderName(e.target.value)} />
+                                    <p id="sender_name_val" className="text-danger m-0 p-0 vaildMessage"></p>
+                                </div>
+                                <div className='w-50'>
+                                    <label>Email</label>
+                                    <input type='text' className='form-control' value={textValue} onChange={(e) => setTextValue(e.target.value)} />
+                                    <p id="textValue_val" className="text-danger m-0 p-0 vaildMessage"></p>
+                                </div>
+                                {/* <input type='text' className='form-control' value={textValue} onChange={(e) => setTextValue(e.target.value)} /> */}
+                                {/* <a style={{whiteSpace: 'nowrap'}} className='btn btn-primary'> Click to Get Verification mail </a> */}
+                            </div>
+                            {/* <VerifyYourEmail isQuick={true} /> */}
                         </ModalBody>
                         <ModalFooter>
                             <Button outline onClick={() => setVerifyYourEmail(!verifyYourEmail)}>
                                 Cancel
                             </Button>
                             <Button outline onClick={() => {
-                                document.getElementById('verify_btn_here').click()
-                                setVerifyYourEmail(!verifyYourEmail)
-                                getEmailSettings()
+                                verifyEmail()
+                                // setVerifyYourEmail(!verifyYourEmail)
+                                // getEmailSettings()
+                                // getData()
                             }}>
                                 Verify
                             </Button>
@@ -5295,20 +5580,18 @@ const CustomizationParent = () => {
                         <ModalHeader toggle={() => setChangeSenderEmail(!changeSenderEmail)}>Change Sender Email</ModalHeader>
                         <ModalBody>
                             {
-                                data.length > 0 ? <>
-                                    <Row className='mt-2'>
-                                        <ComTable
-                                            // tableName="Verified Email"
-                                            content={defferContent}
-                                            tableCol={columns}
-                                            data={data}
-                                            searchValue={searchValue}
-                                            // handleFilter={handleFilter}
-                                            filteredData={filteredData}
-                                            isLoading={isLoading}
-                                        />
-                                    </Row>
-                                </> : ''
+                                <Row className='mt-2'>
+                                    <ComTable
+                                        // tableName="Verified Email"
+                                        content={defferContent}
+                                        tableCol={columns}
+                                        data={data}
+                                        searchValue={searchValue}
+                                        // handleFilter={handleFilter}
+                                        filteredData={filteredData}
+                                        isLoading={isLoading}
+                                    />
+                                </Row>
                             }
                         </ModalBody>
                         <ModalFooter>
