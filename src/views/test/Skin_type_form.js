@@ -7,69 +7,91 @@ export default function Skin_type_form() {
 
     const formData = [
         {
-            title: "Texture of your skin",
+            title: "How many birthdays have you celebrated?",
             opts: [
-                "Does not Shine",
-                "Is dry and sometimes slight flaking may appear",
-                "Shines on the nose",
-                "Shines all-over"
+                "<18",
+                "18-24",
+                "25-34",
+                "35-44",
+                "45-54",
+                "55-64",
+                "65>"
             ]
         },
         {
-            title: "Appearance of pores on your skin",
+            title: "How would you best describe your skin?",
             opts: [
-                "Normal",
-                "Very fine",
-                "Visible",
-                "Very opened"
+                "Shines all over",
+                "Shine on the nose only",
+                "Dry",
+                "Acne-prone",
+                "Sensitive"
             ]
         },
         {
-            title: "How does your skin look like?",
+            title: "Do you use sunscreen?",
             opts: [
-                "Cool, fresh, and supple",
-                "Thin and lacking moisture",
-                "Shines on the \"T\" zone",
-                "Shines and has a tendency for acne"
+                "Yes, on my face",
+                "Yes, also on my body",
+                "No, I don’t use",
+                "Very occasionally"
             ]
         },
         {
-            title: "How does your skin feel when touched?",
+            title: "Does your skin react to any cosmetics (allergies, skin reaction)?",
             opts: [
-                "Supple",
-                "Dry or very dry",
-                "Oily on the forehead and nose",
-                "Oily all over"
+                "Yes",
+                "No"
             ]
         },
         {
-            title: "How often do you feel tightness around the eyes and mouth area",
+            title: "Does your skin have acne/pimples?",
             opts: [
                 "Very often",
-                "Regularly",
                 "Sometimes",
-                "Never"
-            ]
-        },
-        {
-            title: "How often do you have pimples?",
-            opts: [
                 "Very seldom",
-                "Never",
-                "Sometimes",
-                "Very often"
+                "Don’t have acne, pimples"
             ]
         },
         {
             title: "What happens when your skin is exposed to sun?",
             opts: [
-                "Reddens",
-                "Burns",
-                "Tans",
-                "Tans very well"
+                "Skin becomes red",
+                "Skin becomes tanned",
+                "Skin burns",
+                "No reaction"
+            ]
+        },
+        {
+            title: "Which skin result do you prefer?",
+            opts: [
+                "Dewy finish",
+                "Matte finish",
+                "Overall glow"
+            ]
+        },
+        {
+            title: "Do you prefer tinted sunscreens?",
+            opts: [
+                "Yes",
+                "No"
+            ]
+        },
+        {
+            title: "Which of the following skin descriptions fits you?",
+            opts: [
+                "Marks due to acne",
+                "Brown patches on the face",
+                "Excessive redness on the face"
+            ]
+        },
+        {
+            title: "Do you prefer safe sunscreen during pregnancy?",
+            opts: [
+                "Yes",
+                "No"
             ]
         }
-
     ]
 
     return (

@@ -18,6 +18,18 @@ export const DefaultNav = [
         id: 'Manage',
         title: 'Template',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/template'
+        navLink: '/template/message'
+    },
+    {
+        id: 'optinManage',
+        title: 'Optin Management',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/optinManage'
+    },
+    {
+        id: 'WAbusinessTable',
+        title: 'WA business Table',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/WAbusinessTable'
     }
 ]
