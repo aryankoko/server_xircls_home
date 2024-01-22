@@ -1,4 +1,4 @@
-import Skin_type_form from "../../views/test/Skin_type_form"
+import Skin_type_form from "../../views/test/codeSkin/Skin_type_form"
 import OtpinManage from "../../views/test/Templates/OtpinManage"
 import Template from "../../views/test/Templates/Template"
 import WAbusinessTable from "../../views/test/Templates/components/WAbusinessTable"

@@ -1,7 +1,7 @@
 // ** React Imports
 // import { Outlet } from 'react-router-dom'
 import { Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState, lazy } from 'react'
+import { useEffect, useState } from 'react'
 import "../assets/main.css"
 
 // ** Custom Hooks
@@ -9,9 +9,7 @@ import { useSkin } from '@hooks/useSkin'
 
 // ** Third Party Components
 import classnames from 'classnames'
-import Navbar from '../../views/main/utilities/navbar/Navbar'
-import Navbar_CodeSkin from '../../views/test/Navbar_CodeSkin'
-const Header = lazy(() => import('../../views/XirclsFrontend/base/Header'))
+import Navbar_CodeSkin from '../../views/test/codeSkin/Navbar_CodeSkin'
 
 const NewBlankLayout = () => {
   // ** States

@@ -107,16 +107,39 @@ export default function AllTemp() {
     //     // Add more dummy data as needed
     // ]
 
-    const getData = () => {
+    const getData = (currentPage = 0, currentEntry = 10, searchValue = "", advanceSearchValue = {}) => {
         setIsLoading(true)
-        axios.post('https://254c-2405-201-7-8937-7011-cd56-9600-10f0.ngrok-free.app/getTemplates/')
-            .then(response => {
-                // Handle the successful response here
-                console.log('Response:', response.data)
-                settableData(response.data.data)
-                setIsLoading(false)
-                settotal(response.data.total)
 
+        // Create a new FormData object and append the searchValue
+        const formData = new FormData()
+ 
+        const url = new URL(`https://856c-2405-201-7-8937-653f-f5ac-58e5-c8e0.ngrok-free.app/getTemplates/`)
+        // form_data.append("draw", "1")
+        // form_data.append("length", "10")
+        // form_data.append("start", "1")
+        Object.entries(advanceSearchValue).map(([key, value]) => value && formData.append(key, value))
+        formData.append("slug", "customer_data")
+        // formData.append("table_name", "overAll_finance")
+        formData.append("page", currentPage + 1)
+        formData.append("size", currentEntry)
+        formData.append("searchValue", searchValue)
+
+        fetch('https://856c-2405-201-7-8937-653f-f5ac-58e5-c8e0.ngrok-free.app/getTemplates/', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`)
+                }
+                return response.json()
+            })
+            .then(data => {
+                // Handle the successful response here
+                console.log('Response:', data)
+                settableData(data.data)
+                setIsLoading(false)
+                settotal(data.total)
             })
             .catch(error => {
                 // Handle errors here
@@ -124,34 +147,22 @@ export default function AllTemp() {
                 setIsLoading(false)
             })
     }
-    // const getData = (currentPage = 0, currentEntry = 10, searchValue = "", advanceSearchValue = {}) => {
-    //     setIsLoading(true)
-    //     const form_data = new FormData()
-    //     const url = new URL(`${baseURL}/customers/merchant/all_cust_dashboard/`)
-    //     // form_data.append("draw", "1")
-    //     // form_data.append("length", "10")
-    //     // form_data.append("start", "1")
-    //     Object.entries(advanceSearchValue).map(([key, value]) => value && form_data.append(key, value))
-    //     form_data.append("slug", "customer_data")
-    //     // form_data.append("table_name", "overAll_finance")
-    //     form_data.append("page", currentPage + 1)
-    //     form_data.append("size", currentEntry)
-    //     form_data.append("searchValue", searchValue)
-    
+
+
     //     fetch(url, {
     //       method: "POST",
     //       body: form_data
     //     })
     //       .then((data) => data.json())
     //       .then((resp) => {
-            
+
     //         setIsLoading(false)
     //       })
     //       .catch((error) => {
     //         console.log(error)
     //         setIsLoading(false)
     //       })
-    
+
     //     // console.log("Main TableData", tableData)
     //   }
     return (
