@@ -33,6 +33,12 @@ export const DefaultNav = [
         navLink: '/template/WAbusinessTable'
     },
     {
+        id: 'createTemplate',
+        title: 'Create Template',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/createTemplate'
+    },
+    {
         id: 'EmbededSignup',
         title: 'Embeded     Signup',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,

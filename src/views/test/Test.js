@@ -1,47 +1,17 @@
 import React, { useState } from 'react'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
-function Test() {
-  const [userInput, setUserInput] = useState('')
-  const [modalIsOpen, setModalIsOpen] = useState(false)
+const Test = () => {
+  const [text, setText] = useState('')
 
-  const handleInputChange = (event) => {
-    setUserInput(event.target.value)
-  }
-
-  const openModal = () => {
-    setModalIsOpen(true)
-  }
-
-  const closeModal = () => {
-    setModalIsOpen(false)
-  }
-
-  const handleSubmit = () => {
-    // Perform any additional actions on submit
-    openModal()
+  const handleButtonClick = () => {
+    setText(`${text}{{n}}`)
   }
 
   return (
     <div>
-      <h1>User Input Example</h1>
-      <textarea
-        id="userInput"
-        placeholder="Enter your text"
-        value={userInput}
-        onChange={handleInputChange}
-      />
-      <Button color="primary" onClick={handleSubmit}>Submit</Button>
-
-      <Modal isOpen={modalIsOpen} toggle={closeModal}>
-        <ModalHeader toggle={closeModal}>User Input</ModalHeader>
-        <ModalBody style={{ whiteSpace: 'pre-wrap' }}>
-          <p>User Input: {userInput}</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" onClick={closeModal}>Close</Button>
-        </ModalFooter>
-      </Modal>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} />
+      <br />
+      <button onClick={handleButtonClick}>Add asdad end</button>
     </div>
   )
 }

@@ -412,10 +412,11 @@ export default function Template() {
       }
    ]
    function boldWordsInString(inputString) {
-      // Use regular expression to find words enclosed in single asterisks
-      const boldedString = inputString.replace(/\*(.*?)\*/g, (_, match) => `<span style="font-weight: bolder;">${match}</span>`)
-      // Using dangerouslySetInnerHTML to render HTML tags
-      return <p dangerouslySetInnerHTML={{ __html: boldedString }} />
+      if (inputString) {
+         const boldedString = inputString.replace(/\*(.*?)\*/g, (_, match) => `<span style="font-weight: bolder;">${match}</span>`)
+         return <p dangerouslySetInnerHTML={{ __html: boldedString }} />
+      } else { return null }
+
    }
 
 
@@ -497,11 +498,11 @@ export default function Template() {
 
                                     return (
 
-                                       <Col md="6" xxl="4" >
-                                          <Card className="border-0 p-2 position-relaive  shadow-lg " style={{ background: "#c2c2c2", backgroundImage:`url(${wp_back})`, gap: "5px", maxWidth:"500px" }} >
+                                       <Col md="6"  xxl="4" >
+                                          <Card className="border-0 p-2 position-relaive  shadow-lg pe-5" style={{ background: "#c2c2c2", backgroundImage: `url(${wp_back})`, gap: "5px", maxWidth: "500px" }} >
 
-                                             <Card className="border-1 mb-0 " style={{ minHeight: "200px" }}>
-                                                <CardBody className='p-0' >
+                                             <div className="border-1 rounded-3 mb-0 whatsapp_template_card" style={{ minHeight: "200px" }}>
+                                                <div className='p-0' >
                                                    {
 
                                                       SigleTemplate.components.map((data, index) => {
@@ -515,14 +516,14 @@ export default function Template() {
                                                          if (data.type === "BODY") {
                                                             return (
                                                                <div className='p-1 pe-2' >
-                                                                  <h5 >{boldWordsInString(data.text)} </h5>
+                                                                  <p className='fs-6'>{boldWordsInString(data.text)} </p>
                                                                </div>
                                                             )
                                                          }
                                                          if (data.type === "FOOTER") {
                                                             return (
-                                                               <div className='p-1 pe-2' >
-                                                                  <h6 className='text-secondary'>{data.text} </h6>
+                                                               <div className='pt-1 ps-1 pe-2' >
+                                                                  <p className='text-secondary font-small-3'>{data.text} </p>
                                                                </div>
                                                             )
                                                          }
@@ -531,7 +532,7 @@ export default function Template() {
                                                                if (data.type === "URL") {
                                                                   return (
                                                                      <div className="border-top  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                                                                        <ExternalLink size={17} /><h5 className='m-0 text-primary' >{data.text}</h5>
+                                                                        <ExternalLink size={17} /><h6 className='m-0 text-primary' >{data.text}</h6>
                                                                      </div>
                                                                   )
                                                                }
@@ -542,8 +543,8 @@ export default function Template() {
                                                       })
                                                    }
 
-                                                </CardBody>
-                                             </Card>
+                                                </div>
+                                             </div>
 
                                              {
 
@@ -553,8 +554,8 @@ export default function Template() {
 
                                                          if (data.type === "QUICK_REPLY") {
                                                             return (
-                                                               <div className="border rounded-2 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                                                                  <Phone size={17} /><h5 className='m-0 text-primary' > {data.text}</h5>
+                                                               <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
+                                                                  <Phone size={17} /><h6 className='m-0 text-primary' > {data.text}</h6>
                                                                </div>
                                                             )
                                                          }

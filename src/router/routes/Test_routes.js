@@ -4,6 +4,7 @@ import Template from "../../views/test/Templates/Template"
 import WAbusinessTable from "../../views/test/Templates/components/WAbusinessTable"
 import EmbededSignup from "../../views/test/Templates/EmbededSignup"
 import Test from "../../views/test/Test"
+import CreateTemplate from "../../views/test/Templates/CreateTemplate"
 
 export const Test_routes = [
     {
@@ -29,6 +30,10 @@ export const Test_routes = [
     {
         path: '/template/EmbededSignup',
         element: <EmbededSignup />
+    },
+    {
+        path: '/template/createTemplate',
+        element: <CreateTemplate />
     },
     {
         path: '/test',
