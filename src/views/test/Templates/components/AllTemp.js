@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-import axios from 'axios'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, {  useState } from 'react'
 import { Copy, Edit3, Eye, Trash2 } from 'react-feather'
 import { Card, CardBody } from 'reactstrap'
 import AdvanceServerSide from '../../../Components/DataTable/AdvanceServerSide'
@@ -124,7 +123,7 @@ export default function AllTemp() {
         formData.append("size", currentEntry)
         formData.append("searchValue", searchValue)
 
-        fetch('https://856c-2405-201-7-8937-653f-f5ac-58e5-c8e0.ngrok-free.app/getTemplates/', {
+        fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/getTemplates/', {
             method: 'POST',
             body: formData
         })

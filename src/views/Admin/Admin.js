@@ -69,7 +69,6 @@ const Admin = () => {
                         }
                       }}
                       onChange={(e) => updateData(e)} id="username"  />
-
                 </div>
                 <div className=" p-2">
                     <label htmlFor="password">PASSWORD:</label>

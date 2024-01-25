@@ -31,5 +31,17 @@ export const DefaultNav = [
         title: 'WA business Table',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
         navLink: '/template/WAbusinessTable'
+    },
+    {
+        id: 'EmbededSignup',
+        title: 'Embeded     Signup',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/EmbededSignup'
+    },
+    {
+        id: 'test',
+        title: 'Tessst',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/test'
     }
 ]
