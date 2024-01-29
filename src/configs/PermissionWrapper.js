@@ -39,12 +39,12 @@ const PermissionWrapper = ({children}) => {
     useEffect(() => {
         // let isMounted = true
         if (getToken()) {
-            console.log("Not Mounted", "Route Permission")
+            // console.log("Not Mounted", "Route Permission")
             // if (isMounted) {
                 const currentRoute = Routes?.filter((curRoute) => {
                     return curRoute?.path.toLowerCase() === location?.pathname.toLowerCase()
                 })
-                console.log(currentRoute[0]?.app, "Route Permission")
+                // console.log(currentRoute[0]?.app, "Route Permission")
     
                 if (currentRoute[0]?.app) {
                     if (userPermission?.installedApps?.includes(currentRoute[0]?.app)) {

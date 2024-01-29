@@ -61,7 +61,7 @@ const NavbarUser = ({disableName}) => {
     
   }, [userPermission?.apiKey])
 
-  console.log(campaignData, "campaignData")
+  // console.log(campaignData, "campaignData")
 
   return (
     <div className='d-flex just-content-end align-items-center gap-2'>

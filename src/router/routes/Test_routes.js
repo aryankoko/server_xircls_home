@@ -37,6 +37,9 @@ export const Test_routes = [
     },
     {
         path: '/test',
-        element: <Test />
+        element: <Test />,
+        meta: {
+            publicRoute: true
+        }
     }
 ]
