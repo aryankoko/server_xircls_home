@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
 import { ExternalLink, FileText, Image, MapPin, Phone, PlayCircle, Plus } from 'react-feather'
@@ -30,10 +32,18 @@ export default function CreateTemplate() {
     }
   ]
   const tempCatgList = [
-    { value: 'UTILITY', label: 'UTILITY' },
-    { value: 'MARKETING', label: 'MARKETING' },
-    { value: 'AUTHENTICATION', label: 'AUTHENTICATION' }
+    { value: 'UTILITY', label: 'Utility' },
+    { value: 'MARKETING', label: 'Marketing' },
+    { value: 'AUTHENTICATION', label: 'Authentication' }
   ]
+  const langList = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'fr', label: 'French' },
+    { value: 'de', label: 'German' },
+    { value: 'it', label: 'Italian' }
+  ]
+
 
   const [BasicTemplateData, setBasicTemplateData] = useState({
     templateName: '',
@@ -73,15 +83,11 @@ export default function CreateTemplate() {
         map[param.id] = param.value
         return map
       }, {})
-      // console.log('uniqueIds', uniqueIds)
-      // console.log('existingParametersMap', existingParametersMap)
-
       // Create a new parametersList, preserving existing values
       const newParametersList = uniqueIds.map(id => ({
         id,
         value: existingParametersMap[id] !== undefined ? existingParametersMap[id] : ''
       }))
-      // console.log('newParametersList', newParametersList)
 
       // Set the new parametersList
       setParametersList(newParametersList)
@@ -137,34 +143,48 @@ export default function CreateTemplate() {
   //  handle template message changes
   const handleMsgBodyChange = (value) => {
     const regex = /\{\{(\d+)\}\}/g
+    const matches = value.match(regex)
+  
+    const existarr = parametersList.map(obj => obj.id)
 
-    const matches = value.match(regex) || []
+    let nonexistNumbers = parametersList.length + 2
+    for (let i = 1; i < parametersList.length + 2; i++) {
+      if (!existarr.includes(i)) {
+        nonexistNumbers = i
+        break // Break once we find the first non-existing number
+      }
+    }
+  
+    console.log("existarr.length", existarr.length)
+    console.log("nonexistNumbers", nonexistNumbers)
+  
     const existingIds = new Set()
+  
     const updatedValue = value.replace(regex, (match, n) => {
-      const numericN = parseInt(n, 10)
-
-      // Ensure that the numericN does not exceed the length of matches
-      const maxN = Math.max(matches.length, 1)
-      // console.log(maxN)
-      const adjustedN = Math.min(numericN, maxN)
-
-      if (existingIds.has(adjustedN)) {
-        let newId = adjustedN
-        while (existingIds.has(newId)) {
-          newId++
-        }
-        existingIds.add(newId)
-        return `{{${newId}}}`
+      console.log("n", n)
+      n = parseInt(n)
+      
+      if (n > parametersList.length) {
+        console.log(`${n} > ${parametersList.length}`)
+        existingIds.add(nonexistNumbers)
+        return `{{${nonexistNumbers.toString()}}}`
+      }
+      // Convert n to an integer for comparison
+      if (existingIds.has(n)) {
+        // Replace with the first number in existarr not in existingIds
+        
+        existingIds.add(nonexistNumbers)
+        return `{{${nonexistNumbers.toString()}}}`
       } else {
-        // Add the ID to the set
-        existingIds.add(adjustedN)
+        existingIds.add(n)
         return match
       }
     })
-
+  
     setMsgBody(updatedValue)
     updateParametersList(updatedValue)
   }
+  
 
   useEffect(() => {
     updateParametersList(useMsgBody)
@@ -338,7 +358,7 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">Your template should fall under one of these categories.</p>
                 <Select
                   className=''
-                  isMulti={false}
+
                   options={tempCatgList}
                   closeMenuOnSelect={true}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e })}
@@ -357,8 +377,8 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">You will need to specify the language in which message template is submitted.</p>
                 <Select
                   className=''
-                  isMulti={false}
-                  options={msgTypeList}
+
+                  options={langList}
                   closeMenuOnSelect={true}
 
                   styles={{
@@ -379,7 +399,7 @@ export default function CreateTemplate() {
                   e.g. - app_verification_code</p>
                 <input
                   type="text"
-                  className="form-control form-control-lg"
+                  className="form-control "
                   placeholder='Template Name'
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateName: e.target.value })}
                 />
@@ -390,7 +410,7 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">Your template type should fall under one of these categories.</p>
                 <Select
                   className=''
-                  isMulti={false}
+
                   options={msgTypeList}
                   closeMenuOnSelect={true}
                   onChange={(e) => {
@@ -443,7 +463,7 @@ export default function CreateTemplate() {
                           <div className='w-100'>
                             <input
                               type="text"
-                              className="form-control form-control-lg"
+                              className="form-control "
                               placeholder='Sample value'
                               maxLength={60}
                               value={paramData.value}
@@ -465,7 +485,7 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
                 <input
                   type="text"
-                  className="form-control form-control-lg"
+                  className="form-control "
                   placeholder='Enter Footer text here'
                   maxLength={60}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, footer: e.target.value })}
@@ -575,12 +595,11 @@ export default function CreateTemplate() {
                     {useInteractive.dataList.map((ele, index) => (
                       <Row key={index}>
                         <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
-                        <Col lg="3" className=''>  <Select isMulti={false} options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
+                        <Col lg="3" className=''>  <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
                           styles={{
                             control: (baseStyles) => ({
                               ...baseStyles,
-                              fontSize: '12px',
-                              height: "45px"
+                              fontSize: '12px'
                             })
                           }}
                           onChange={(e) => handleInputChange(index, 'actionType', e.value)}
@@ -589,7 +608,7 @@ export default function CreateTemplate() {
                         <Col lg="3">
                           <input
                             type="text"
-                            className="form-control form-control-lg"
+                            className="form-control "
                             placeholder='Button Title'
                             maxLength={25}
                             value={ele.title}
@@ -599,12 +618,11 @@ export default function CreateTemplate() {
                         {
                           ele.actionType === "phone" &&
                           <Col lg="1">
-                            <Select isMulti={false} options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
+                            <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
                               styles={{
                                 control: (baseStyles) => ({
                                   ...baseStyles,
-                                  fontSize: '12px',
-                                  height: "45px"
+                                  fontSize: '12px'
                                 })
                               }} onChange={(e) => handleInputChange(index, 'code', e.value)}
                               closeMenuOnSelect={true} />
@@ -613,7 +631,7 @@ export default function CreateTemplate() {
                         <Col >
                           <input
                             type="text"
-                            className="form-control form-control-lg"
+                            className="form-control "
                             placeholder='Button Value'
                             value={ele.value}
                             onChange={(e) => handleInputChange(index, 'value', e.target.value)}
@@ -640,7 +658,7 @@ export default function CreateTemplate() {
                           <Col lg="4">
                             <input
                               type="text"
-                              className="form-control form-control-lg"
+                              className="form-control "
                               placeholder='Button Title'
                               maxLength={25}
                               value={ele.title}
@@ -669,7 +687,7 @@ export default function CreateTemplate() {
                               <Col lg="4">
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
                                   value={ele.title}
@@ -688,7 +706,7 @@ export default function CreateTemplate() {
                               <Col lg="3">
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
                                   value={ele.actionType}
@@ -699,7 +717,7 @@ export default function CreateTemplate() {
                               <Col lg="3">
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
                                   value={ele.title}
@@ -709,7 +727,7 @@ export default function CreateTemplate() {
                               <Col >
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Value'
                                   value={ele.value}
                                   onChange={(e) => handleInputChange(index, 'value', e.target.value)}
@@ -729,7 +747,7 @@ export default function CreateTemplate() {
                               <Col lg="3">
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
                                   value={ele.actionType}
@@ -740,7 +758,7 @@ export default function CreateTemplate() {
                               <Col lg="3">
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
                                   value={ele.title}
@@ -748,11 +766,12 @@ export default function CreateTemplate() {
                                 />
                               </Col>
                               <Col lg="1">
-                                <Select isMulti={false} options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
+                                <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
                                   styles={{
                                     control: (baseStyles) => ({
                                       ...baseStyles,
-                                      fontSize: '12px'
+                                      fontSize: '12px',
+                                      height: "30px"
                                     })
                                   }} onChange={(e) => handleInputChange(index, 'code', e.value)}
                                   closeMenuOnSelect={true} />
@@ -760,7 +779,7 @@ export default function CreateTemplate() {
                               <Col >
                                 <input
                                   type="text"
-                                  className="form-control form-control-lg"
+                                  className="form-control "
                                   placeholder='Button Value'
                                   value={ele.value}
                                   onChange={(e) => handleInputChange(index, 'value', e.target.value)}
@@ -775,14 +794,14 @@ export default function CreateTemplate() {
                         }
                       })}
                       <div className='d-flex gap-2'>
-                        <div className={`btn btn-primary d-flex justify-content-center  align-items-center   gap-1 ${useButtons.quick === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("quick")} >
-                          <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "30px", width: "30px" }}><p className="m-0">{useButtons.quick}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.quick === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("quick")} >
+                          <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.quick}</p></div>
                         </div>
-                        <div className={`btn btn-primary d-flex justify-content-center  align-items-center  gap-1 ${useButtons.url === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("url")}>
-                          <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "30px", width: "30px" }}><p className="m-0">{useButtons.url}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.url === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("url")}>
+                          <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.url}</p></div>
                         </div>
-                        <div className={`btn btn-primary d-flex justify-content-center  align-items-center  gap-1 ${useButtons.phone === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("phone")}>
-                          <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "30px", width: "30px" }}><p className="m-0">{useButtons.phone}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.phone === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("phone")}>
+                          <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.phone}</p></div>
                         </div>
                       </div>
                     </div>}

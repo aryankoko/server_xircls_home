@@ -908,28 +908,60 @@ export default WhatsTemp
 
 {
   "name": "header_footer",
-  "category": "MARKETING",
-  "language": "en",
-  "components": [
-    {
-      "type": "HEADER",
-      "format": "TEXT",
-      "text": "You can have your header text here"
-    },
-    {
-      "type": "BODY",
-      "text": "Hello {{1}}, this is a template with header and footer text.",
-      "example": {
-        "body_text": [
-          [
-            "Raj"
-          ]
+    "category": "MARKETING",
+      "language": "en",
+        "components": [
+          {
+            "type": "HEADER",
+            "format": "TEXT",
+            "text": "You can have your header text here"
+          },
+          {
+            "type": "BODY",
+            "text": "Hello {{1}}, this is a template with header and footer text.",
+            "example": {
+              "body_text": [
+                [
+                  "Raj"
+                ]
+              ]
+            }
+          },
+          {
+            "type": "FOOTER",
+            "text": "You can write your footer text here"
+          }
         ]
-      }
-    },
-    {
-      "type": "FOOTER",
-      "text": "You can write your footer text here"
-    }
-  ]
 }
+
+
+
+
+
+const handleMsgBodyChange = (value) => {
+  const regex = /\{\{(\d+)\}\}/g;
+  const matches = value.match(regex);
+  let existarr = [];
+
+  for (let i = 1; i < matches.length + 2; i++) {
+    existarr.push(i);
+  }
+
+  console.log("existarr", existarr);
+
+  const existingIds = new Set();
+  const updatedValue = value.replace(regex, (match, n) => {
+    if (existingIds.has(n)) {
+      // Replace with the first number in existarr not in existingIds
+      const replacementNumber = existarr.find((num) => !existingIds.has(num));
+      existingIds.add(replacementNumber);
+      return {{${ replacementNumber.toString() } };
+    } else {
+      existingIds.add(n);
+      return match;
+    }
+  });
+
+  setMsgBody(updatedValue);
+  updateParametersList(updatedValue);
+};
