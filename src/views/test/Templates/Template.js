@@ -498,7 +498,7 @@ export default function Template() {
 
                                     return (
 
-                                       <Col md="6"  xxl="4" >
+                                       <Col md="6" xxl="4" >
                                           <Card className="border-0 p-2 position-relaive  shadow-lg pe-5" style={{ background: "#c2c2c2", backgroundImage: `url(${wp_back})`, gap: "5px", maxWidth: "500px" }} >
 
                                              <div className="border-1 rounded-3 mb-0 whatsapp_template_card" style={{ minHeight: "200px" }}>
