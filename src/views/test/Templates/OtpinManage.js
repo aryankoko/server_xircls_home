@@ -377,12 +377,12 @@ export default function OtpinManage() {
                                                                         <h4 className="m-0">Caption</h4>
                                                                         <p className="fs-5 m-0 text-secondary">Your message can be up to 4096 characters long.</p>
                                                                         <ResizableTextarea maxLength={4096} initialContent={useOptOutRespConfig?.caption ?? ''} placeholder='Your caption goes here' onChange={(e) => updateState('caption', e.target.value)} />
-                                                                        <input
+                                                                        {/* <input
                                                                             type="file"
                                                                             id="imageInput"
                                                                             accept="image/*"
                                                                             onChange={(e) => console.log(e.target)}
-                                                                        />
+                                                                        /> */}
                                                                     </div>
                                                                     <div>
                                                                         <h4 className="m-0">Media</h4>

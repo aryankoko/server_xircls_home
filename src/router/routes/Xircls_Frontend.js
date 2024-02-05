@@ -314,15 +314,6 @@ const Xircls_Frontend_Routes = [
     }
   },
   {
-    path: '/affiliate/sign-up/',
-    app: appName,
-    element: <AffiliateSignup />,
-    meta: {
-      layout: 'blank',
-      publicRoute: true
-    }
-  },
-  {
     path: '/blog/author/Allie_Hinds/',
     app: appName,
     element: <Allie />,

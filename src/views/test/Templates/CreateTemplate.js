@@ -2,10 +2,11 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import { ExternalLink, FileText, Image, MapPin, Phone, PlayCircle, Plus } from 'react-feather'
+import { CornerDownLeft, ExternalLink, FileText, Image, MapPin, Phone, PlayCircle, Plus } from 'react-feather'
 import toast from 'react-hot-toast'
 import Select from 'react-select'
 import { Card, CardBody, Col, Container, Input, Label, Row } from 'reactstrap'
+import wp_back from './imgs/wp_back.png'
 
 export default function CreateTemplate() {
 
@@ -44,10 +45,28 @@ export default function CreateTemplate() {
     { value: 'it', label: 'Italian' }
   ]
 
+  const addCallOptions = [
+    { value: 'phone', label: "Phone Number" },
+    { value: 'url', label: "URL" }
+  ]
+  const callOptions = () => {
+
+    let opt = addCallOptions.slice() // Make a copy of the options array
+
+    useInteractive.dataList.forEach(item => {
+      opt = opt.filter(option => option.value !== item.actionType)
+    })
+
+    console.log(opt, 'opt')
+    return opt
+  }
+
 
   const [BasicTemplateData, setBasicTemplateData] = useState({
     templateName: '',
     templateCategory: null,
+    language: null,
+    headerText: '',
     msgDataType: {
       value: "None",
       label: "None"
@@ -130,7 +149,6 @@ export default function CreateTemplate() {
         return null
       }
     }
-
   }
 
   //  handle parameter value changes
@@ -143,48 +161,37 @@ export default function CreateTemplate() {
   //  handle template message changes
   const handleMsgBodyChange = (value) => {
     const regex = /\{\{(\d+)\}\}/g
-    const matches = value.match(regex)
-  
-    const existarr = parametersList.map(obj => obj.id)
+    let updatedValue = value
 
-    let nonexistNumbers = parametersList.length + 2
-    for (let i = 1; i < parametersList.length + 2; i++) {
-      if (!existarr.includes(i)) {
-        nonexistNumbers = i
-        break // Break once we find the first non-existing number
-      }
+    const matches = value.match(regex)
+
+    if (matches) {
+      const sortedMatches = matches.sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0])
+        const numB = parseInt(b.match(/\d+/)[0])
+        return numA - numB
+      })
+
+      let sequenceNumber = 1
+      sortedMatches.forEach((match) => {
+        updatedValue = updatedValue.replace(match, `{{${sequenceNumber++}}}`)
+      })
     }
-  
-    console.log("existarr.length", existarr.length)
-    console.log("nonexistNumbers", nonexistNumbers)
-  
-    const existingIds = new Set()
-  
-    const updatedValue = value.replace(regex, (match, n) => {
-      console.log("n", n)
-      n = parseInt(n)
-      
-      if (n > parametersList.length) {
-        console.log(`${n} > ${parametersList.length}`)
-        existingIds.add(nonexistNumbers)
-        return `{{${nonexistNumbers.toString()}}}`
-      }
-      // Convert n to an integer for comparison
-      if (existingIds.has(n)) {
-        // Replace with the first number in existarr not in existingIds
-        
-        existingIds.add(nonexistNumbers)
-        return `{{${nonexistNumbers.toString()}}}`
-      } else {
-        existingIds.add(n)
-        return match
-      }
-    })
-  
-    setMsgBody(updatedValue)
+
+    const uptStr = (input) => {
+      const regex = /\{\{(\d+)\}\}/g
+      let sequenceNumber = 1
+
+      const updatedValue = input.replace(regex, (match) => {
+        return `{{${sequenceNumber++}}}`
+      })
+
+      return updatedValue
+    }
+    setMsgBody(uptStr(updatedValue))
     updateParametersList(updatedValue)
   }
-  
+
 
   useEffect(() => {
     updateParametersList(useMsgBody)
@@ -311,32 +318,89 @@ export default function CreateTemplate() {
     }
   }, [useInteractive])
 
-  // Add interactive add button
-  const payload = {
-    name: BasicTemplateData.templateName,
-    category: BasicTemplateData.templateCategory,
-    language: BasicTemplateData.language
-  }
+
   const handleTemplateSubmit = () => {
+    // Add interactive add button
+// const buttons = useInteractive.dataList.map((item) => )
+const filteredData = useInteractive.dataList.map(item => ({
+  actionType: item.actionType || null,
+  title: item.title || null,
+  value: item.value || null,
+  code: item.code || null
+})).filter(item => item.actionType || item.title || item.value || item.code)
+
+console.log(filteredData)
+    const payload = {
+      name: BasicTemplateData.templateName,
+      category: BasicTemplateData.templateCategory,
+      language: BasicTemplateData.language,
+      components: [
+        // header
+        {
+          type: 'HEADER',
+          format: BasicTemplateData.msgDataType.toUpperCase(),
+          text: BasicTemplateData.msgDataType === 'Text' ? BasicTemplateData.headerText : ''
+        },
+
+        // body
+        {
+          type: 'BODY',
+          text: useMsgBody,
+          example: {
+            body_text: [parametersList.map(item => item.value)]
+          }
+        },
+        {
+          type: 'FOOTER',
+          text: BasicTemplateData.footer
+        },
+        {
+          type:"BUTTONS",
+          buttons:[
+            {
+
+            }
+          ]
+        }
+      ]
+    }
+    const payData = JSON.stringify(payload, null, 2)
+
+    console.log("payData", payData)
+    console.log("useInteractive", useInteractive)
     const pattern = /[^a-z0-9_]/
+
+    return null
+    try {
+      const response = fetch('https://cbf2-2405-201-7-8937-ffc9-96e8-2d2d-fcd5.ngrok-free.app/createTemplate/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payData
+      })
+      if (response.ok) {
+        const res = response.json()
+        console.log(res)
+        console.log('Data submitted successfully!')
+      } else {
+        console.error('Error submitting data:', response)
+      }
+    } catch (error) {
+      console.error('Error:', error.message)
+    }
 
     // Test if the inputString matches the pattern
     if (pattern.test(BasicTemplateData.templateName)) {
       // String contains special characters or whitespace
-      toast.error("Only lower case alphabets, numbers and underscore is allowed for this field")
+      toast.error("Only lower case alphabets, numbers and underscore is allowed for Template Name")
       return false
     }
-    console.log("BasicTemplateData", BasicTemplateData)
-    console.log("parametersList", parametersList)
-    console.log("useMsgBody", useMsgBody)
-    console.log("useInteractive", useInteractive)
-
-    // api connection
-    // const form_data = new FormData()
-    // form_data.append("name", BasicTemplateData.templateName)
-    // form_data.append("category", BasicTemplateData.templateCategory)
-    // // form_data.append("language", BasicTemplateData.language)
-    // form_data.append("components", JSON.stringify(payload.components))
+    // console.log("BasicTemplateData", BasicTemplateData)
+    // console.log("parametersList", parametersList)
+    // console.log("useMsgBody", useMsgBody)
+    // console.log("useInteractive", useInteractive)
+    console.log("payData", payData)
 
   }
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -344,7 +408,7 @@ export default function CreateTemplate() {
     <Container style={{ marginBottom: "200px" }}>
       <Card>
         <CardBody>
-          <h4 className="">New Template Message</h4>
+          <h4 className="">New Template Message   <h1 className='text-danger'>Header text remain</h1></h4>
         </CardBody>
       </Card>
 
@@ -361,11 +425,12 @@ export default function CreateTemplate() {
 
                   options={tempCatgList}
                   closeMenuOnSelect={true}
-                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e })}
+                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
                   styles={{
                     control: (baseStyles) => ({
                       ...baseStyles,
-                      fontSize: '12px'
+                      fontSize: '12px',
+                      minHeight: '0'
                     })
                   }}
                 />
@@ -380,11 +445,14 @@ export default function CreateTemplate() {
 
                   options={langList}
                   closeMenuOnSelect={true}
+                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
 
                   styles={{
                     control: (baseStyles) => ({
                       ...baseStyles,
-                      fontSize: '12px'
+                      fontSize: '12px',
+                      minHeight: '0'
+
                     })
                   }}
                 />
@@ -415,20 +483,34 @@ export default function CreateTemplate() {
                   closeMenuOnSelect={true}
                   onChange={(e) => {
                     if (e && e.value !== BasicTemplateData.msgDataType.value) {
-                      setBasicTemplateData({ ...BasicTemplateData, msgDataType: e })
+                      setBasicTemplateData({ ...BasicTemplateData, msgDataType: e.value })
                       // setOptOutRespConfig(null)
                     }
                   }}
                   styles={{
                     control: (baseStyles) => ({
                       ...baseStyles,
-                      fontSize: '12px'
+                      fontSize: '12px',
+                      minHeight: '0'
+
                     })
                   }}
                 />
               </div>
               <div>
+               {BasicTemplateData.msgDataType === 'Text' &&
 
+                <div className='mt-3'>
+                  <h4 className="">Template Header Text <span className='text-secondary'>(Optional)</span></h4>
+                  <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
+                  <input
+                    type="text"
+                    className="form-control "
+                    placeholder='Enter Header text here'
+                    maxLength={60}
+                    onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerText: e.target.value })}
+                  />
+                </div>}
                 {/* msg body ---------------------------------------------- */}
                 <div className='mt-3'>
                   <div className='mt-3'>
@@ -455,7 +537,7 @@ export default function CreateTemplate() {
                       changed at the time of sending. e.g. - {'{{1}}'}: Mohit, {'{{2}}'}: 5.
                     </p>
                     <div className='d-flex flex-column gap-1'>
-                      {parametersList?.map((paramData) => (
+                      {parametersList?.sort((a, b) => a.id - b.id).map((paramData) => (
                         <div className='d-flex' key={paramData.id}>
                           <div className='w-25 d-flex justify-content-center align-items-center '>
                             <h5>{`{{ ${paramData.id} }}`}</h5>
@@ -496,26 +578,25 @@ export default function CreateTemplate() {
 
             {/* whatsapp ui  -------------------------------------------- */}
             <Col lg="6" className='d-flex align-items-center flex-column   justify-content-center ' >
-              <div className=' d-flex flex-column ' style={{ width: '400px', whiteSpace: 'pre-wrap', gap: "5px" }}>
+              <div className=' d-flex flex-column  px-2 pe-4 py-5 ' style={{ width: '400px', whiteSpace: 'pre-wrap', gap: "5px", backgroundImage: `url(${wp_back})` }}>
 
-                <Card className='rounded-3 shadow-lg  position-relative mb-0 ' >
+                <Card className='rounded-3 shadow-lg  position-relative mb-0 whatsapp_template_card' >
                   <CardBody className='p-2'>
-                    {BasicTemplateData.msgDataType.value === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
+                    {BasicTemplateData.msgDataType === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
                       <Image size={45} color='#faad20' />
                       <PlayCircle size={45} color='#5f66cd' />
                       <FileText size={45} color='#f33d79' />
-
                     </div>}
-                    {BasicTemplateData.msgDataType.value === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
+                    {BasicTemplateData.msgDataType === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
                       <Image size={45} color='#faad20' />
                     </div>}
-                    {BasicTemplateData.msgDataType.value === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
+                    {BasicTemplateData.msgDataType === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
                       <PlayCircle size={45} color='#5f66cd' />
                     </div>}
-                    {BasicTemplateData.msgDataType.value === "File" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
+                    {BasicTemplateData.msgDataType === "File" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
                       <FileText size={45} color='#f33d79' />
                     </div>}
-                    {BasicTemplateData.msgDataType.value === "Location" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffacb5" }}>
+                    {BasicTemplateData.msgDataType === "Location" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffacb5" }}>
                       <MapPin size={45} color='#f70010ff' />
                     </div>}
 
@@ -544,7 +625,7 @@ export default function CreateTemplate() {
                     if (elem.actionType === 'quick' && elem.title !== '') {
                       return (
                         <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                          <h6 className='m-0 text-primary' > {elem.title}</h6>
+                          <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
                         </div>)
                     }
                   })
@@ -595,16 +676,20 @@ export default function CreateTemplate() {
                     {useInteractive.dataList.map((ele, index) => (
                       <Row key={index}>
                         <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
-                        <Col lg="3" className=''>  <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
-                          styles={{
-                            control: (baseStyles) => ({
-                              ...baseStyles,
-                              fontSize: '12px'
-                            })
-                          }}
-                          onChange={(e) => handleInputChange(index, 'actionType', e.value)}
-                          closeMenuOnSelect={true} /></Col>
+                        <Col lg="3" className=''>
+                          <Select options={callOptions()}
+                            styles={{
+                              control: (baseStyles) => ({
+                                ...baseStyles,
+                                fontSize: '12px',
+                                minHeight: '0'
 
+                              })
+                            }}
+                            value={addCallOptions?.find(option => option.value === ele.actionType)}
+                            onChange={(e) => handleInputChange(index, 'actionType', e.value)}
+                            closeMenuOnSelect={true} />
+                        </Col>
                         <Col lg="3">
                           <input
                             type="text"
@@ -618,11 +703,13 @@ export default function CreateTemplate() {
                         {
                           ele.actionType === "phone" &&
                           <Col lg="1">
-                            <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
+                            <Select options={msgTypeList}
                               styles={{
                                 control: (baseStyles) => ({
                                   ...baseStyles,
-                                  fontSize: '12px'
+                                  fontSize: '12px',
+                                  minHeight: '0'
+
                                 })
                               }} onChange={(e) => handleInputChange(index, 'code', e.value)}
                               closeMenuOnSelect={true} />
@@ -643,9 +730,11 @@ export default function CreateTemplate() {
                         </Col>
                       </Row>))}
                     <div>
-                      <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
-                        <Plus size={18} /> <p className='m-0'>Call to Action</p>
-                      </button>
+                      {useInteractive.dataList.length <= 1 &&
+                        <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
+                          <Plus size={18} /> <p className='m-0'>Call to Action</p>
+                        </button>
+                      }
                     </div>
                   </div>}
 
@@ -670,15 +759,20 @@ export default function CreateTemplate() {
                           </Col>
                         </Row>))}
                       <div>
-                        <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
-                          <Plus size={18} /> <p className='m-0'>Quick Reply</p>
-                        </button>
+                        {
+
+                          useInteractive.dataList.length <= 2 &&
+                          <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
+                            <Plus size={18} /> <p className='m-0'>Quick Reply</p>
+                          </button>
+                        }
+
                       </div>
                     </div>}
 
                   {useInteractive.type === 'All' &&
                     <div className='gap-1 d-flex flex-column  '>
-                      {useInteractive.dataList.map((ele, index) => {
+                      {useInteractive.dataList.sort((a, b) => ({ url: 1, phone: 2, quick: 3 }[a.actionType] - { url: 1, phone: 2, quick: 3 }[b.actionType])).map((ele, index) => {
                         if (ele.actionType === 'quick') {
                           return (
                             <Row key={index}>
@@ -771,7 +865,8 @@ export default function CreateTemplate() {
                                     control: (baseStyles) => ({
                                       ...baseStyles,
                                       fontSize: '12px',
-                                      height: "30px"
+                                      minHeight: '0'
+
                                     })
                                   }} onChange={(e) => handleInputChange(index, 'code', e.value)}
                                   closeMenuOnSelect={true} />

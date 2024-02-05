@@ -16,6 +16,12 @@ export const configUrl = {
     login: "/merchant/login/",
     signup: "/merchant/signup/",
     refresh: "/api/token/refresh/",
+    // affilate
+    signupAffiliate:'/affiliate/affiliate_signup/',
+    loginAffiliate:'/affiliate/affiliate_login/',
+    admin_withdrawn_transactions: "/affiliate/admin_withdrawn_trans",
+    admin_withdrawn_request: "/affiliate/admin_withdrawn_req/",
+    
     //Infiniti
     addPartners: "/merchant/xircls/make-a-xircls/",
     remarketing: "/merchant/campaign_setting/action_email_remarketing/",
@@ -197,7 +203,7 @@ axiosInstance.interceptors.response.use(
 
 export const postReq = (path, data, config) => {
     const time = new Date().getTime()
-    if (path === 'login' || path === "signup") {
+    if (path === 'login' || path === "signup" || path === "signupAffiliate" || path === 'loginAffiliate') {
         return axios.post(`${baseURL}${configUrl[`${path}`]}?time=${time}`, data)
     } else {
         return axiosInstance.post(`${configUrl[path]}?time=${time}`, data, config ? config : null)

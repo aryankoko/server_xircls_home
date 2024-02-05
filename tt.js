@@ -965,3 +965,114 @@ const handleMsgBodyChange = (value) => {
   setMsgBody(updatedValue);
   updateParametersList(updatedValue);
 };
+
+// upt with dynamic value reduce when user cut value 
+// err : live not chnaging
+const handleMsgBodyChange = (value) => {
+  const regex = /\{\{(\d+)\}\}/g
+  const matches = value.match(regex)
+
+  const existarr = parametersList.map(obj => obj.id)
+
+  let nonexistNumbers = parametersList.length + 2
+  for (let i = 1; i < parametersList.length + 2; i++) {
+    if (!existarr.includes(i)) {
+      nonexistNumbers = i
+      break // Break once we find the first non-existing number
+    }
+  }
+
+  console.log("existarr.length", existarr.length)
+  console.log("nonexistNumbers", nonexistNumbers)
+
+  const existingIds = new Set()
+
+  const updatedValue = value.replace(regex, (match, n) => {
+    console.log("n", n)
+    n = parseInt(n)
+    
+    if (n > parametersList.length) {
+      console.log(`${n} > ${parametersList.length}`)
+      existingIds.add(nonexistNumbers)
+      return `{{${nonexistNumbers.toString()}}}`
+    }
+    // Convert n to an integer for comparison
+    if (existingIds.has(n)) {
+      // Replace with the first number in existarr not in existingIds
+      
+      existingIds.add(nonexistNumbers)
+      return `{{${nonexistNumbers.toString()}}}`
+    } else {
+      existingIds.add(n)
+      return match
+    }
+  })
+
+  setMsgBody(updatedValue)
+  updateParametersList(updatedValue)
+}
+
+const parametersList = [
+  {
+      "id": 1,
+      "actionType": "quick",
+      "code": "",
+      "title": "",
+      "value": ""
+  },
+  {
+      "id": 1,
+      "actionType": "url",
+      "code": "",
+      "title": "",
+      "value": ""
+  },
+  {
+      "id": 1,
+      "actionType": "phone",
+      "code": "",
+      "title": "",
+      "value": ""
+  },
+  {
+      "id": 1,
+      "actionType": "quick",
+      "code": "",
+      "title": "",
+      "value": ""
+  },
+  {
+      "id": 1,
+      "actionType": "url",
+      "code": "",
+      "title": "",
+      "value": ""
+  }
+]
+
+
+
+const data =  [
+  {
+      "id": 1,
+      "actionType": "phone",
+      "code": "",
+      "title": "",
+      "value": ""
+  }
+]
+
+
+{
+  "type":"BUTTONS",
+  "buttons": [
+    {
+      "type": "QUICK_REPLY",
+      "text": "Unsubscribe from Promos"
+    },
+    {
+      "type":"QUICK_REPLY",
+      "text": "Unsubscribe from All"
+    }
+  ]
+}
