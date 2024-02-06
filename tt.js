@@ -1062,17 +1062,49 @@ const data =  [
   }
 ]
 
-
 {
-  "type":"BUTTONS",
-  "buttons": [
+  "name": "books_list",
+  "category": "TRANSACTIONAL",
+  "language": "en",
+  "components": [
     {
-      "type": "QUICK_REPLY",
-      "text": "Unsubscribe from Promos"
+      "type": "HEADER",
+      "format": "DOCUMENT",
+      "example": {
+        "header_handle": [
+          "https://aisensy-project-media-library-stg.s3.ap-south-1.amazonaws.com/FILE/6245d025fcb7966c46294618/3665271_samplePDF.pdf"
+        ]
+      }
     },
     {
-      "type":"QUICK_REPLY",
-      "text": "Unsubscribe from All"
+      "type": "BODY",
+      "text": "Hello dear Mr. {{1}}, please download the available book list from below:",
+      "example": {
+        "body_text": [
+          [
+            "Virat"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "BUTTONS",
+      "buttons": [
+        {
+          "type": "PHONE_NUMBER",
+          "text": "Contact Us",
+          "phone_number": "917089379345"
+        },
+        {
+          "type": "URL",
+          "text": "Visit Us",
+          "url": "https://yoursite.com"
+        }
+      ]
+    },
+    {
+      "type": "FOOTER",
+      "text": "Reach out to us at 12/1 ABC"
     }
   ]
 }

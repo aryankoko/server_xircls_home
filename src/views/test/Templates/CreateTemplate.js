@@ -46,8 +46,8 @@ export default function CreateTemplate() {
   ]
 
   const addCallOptions = [
-    { value: 'phone', label: "Phone Number" },
-    { value: 'url', label: "URL" }
+    { value: 'PHONE_NUMBER', label: "Phone Number" },
+    { value: 'URL', label: "URL" }
   ]
   const callOptions = () => {
 
@@ -67,10 +67,7 @@ export default function CreateTemplate() {
     templateCategory: null,
     language: null,
     headerText: '',
-    msgDataType: {
-      value: "None",
-      label: "None"
-    },
+    msgDataType: "None",
     footer: ''
   })
 
@@ -83,9 +80,9 @@ export default function CreateTemplate() {
     dataList: []
   })
   const [useButtons, setButtons] = useState({
-    quick: 10,
-    url: 2,
-    phone: 1
+    QUICK_REPLY: 3,
+    URL: 1,
+    PHONE_NUMBER: 1
   })
   const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
   // massgae body function olny ------------------------------------
@@ -212,7 +209,7 @@ export default function CreateTemplate() {
             id: 1,
             actionType: '',
             code: '',
-            title: "",
+            text: "",
             value: ""
           }
         ]
@@ -223,8 +220,8 @@ export default function CreateTemplate() {
         dataList: [
           {
             id: 1,
-            actionType: 'quick',
-            title: ""
+            actionType: 'QUICK_REPLY',
+            text: ""
           }
         ]
       })
@@ -240,9 +237,9 @@ export default function CreateTemplate() {
       })
     }
     setButtons({
-      quick: 10,
-      url: 2,
-      phone: 1
+      QUICK_REPLY: 3,
+      URL: 1,
+      PHONE_NUMBER: 1
     })
   }
 
@@ -276,7 +273,7 @@ export default function CreateTemplate() {
       } else if (prevState.type === 'Quick') {
         newDataList.push({
           id: newIndex,
-          actionType: 'quick',
+          actionType: 'QUICK_REPLY',
           title: ''
         })
       } else if (prevState.type === 'All') {
@@ -298,22 +295,22 @@ export default function CreateTemplate() {
       const { dataList } = useInteractive
 
       const counts = dataList.reduce((acc, ele) => {
-        if (ele.actionType === "quick") {
+        if (ele.actionType === "QUICK_REPLY") {
           acc.quickNum++
         }
-        if (ele.actionType === "url") {
+        if (ele.actionType === "URL") {
           acc.urlNum++
         }
-        if (ele.actionType === "phone") {
+        if (ele.actionType === "PHONE_NUMBER") {
           acc.phoneNum++
         }
         return acc
       }, { quickNum: 0, urlNum: 0, phoneNum: 0 })
 
       setButtons({
-        quick: 10 - counts.quickNum - counts.urlNum - counts.phoneNum,
-        url: 2 - counts.urlNum,
-        phone: 1 - counts.phoneNum
+        QUICK_REPLY: 3 - counts.quickNum - counts.urlNum - counts.phoneNum,
+        URL: 1 - counts.urlNum,
+        PHONE_NUMBER: 1 - counts.phoneNum
       })
     }
   }, [useInteractive])
@@ -321,15 +318,15 @@ export default function CreateTemplate() {
 
   const handleTemplateSubmit = () => {
     // Add interactive add button
-// const buttons = useInteractive.dataList.map((item) => )
-const filteredData = useInteractive.dataList.map(item => ({
-  actionType: item.actionType || null,
-  title: item.title || null,
-  value: item.value || null,
-  code: item.code || null
-})).filter(item => item.actionType || item.title || item.value || item.code)
+    // const buttons = useInteractive.dataList.map((item) => )
+    const filteredData = useInteractive.dataList.map(item => ({
+      actionType: item.actionType || null,
+      title: item.title || null,
+      value: item.value || null,
+      code: item.code || null
+    })).filter(item => item.actionType || item.title || item.value || item.code)
 
-console.log(filteredData)
+    console.log(filteredData)
     const payload = {
       name: BasicTemplateData.templateName,
       category: BasicTemplateData.templateCategory,
@@ -355,8 +352,8 @@ console.log(filteredData)
           text: BasicTemplateData.footer
         },
         {
-          type:"BUTTONS",
-          buttons:[
+          type: "BUTTONS",
+          buttons: [
             {
 
             }
@@ -408,7 +405,7 @@ console.log(filteredData)
     <Container style={{ marginBottom: "200px" }}>
       <Card>
         <CardBody>
-          <h4 className="">New Template Message   <h1 className='text-danger'>Header text remain</h1></h4>
+          <h4 className="">New Template Message  <span className="text-danger fs-1">fix all quick reply btn</span></h4>
         </CardBody>
       </Card>
 
@@ -498,19 +495,19 @@ console.log(filteredData)
                 />
               </div>
               <div>
-               {BasicTemplateData.msgDataType === 'Text' &&
+                {BasicTemplateData.msgDataType === 'Text' &&
 
-                <div className='mt-3'>
-                  <h4 className="">Template Header Text <span className='text-secondary'>(Optional)</span></h4>
-                  <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
-                  <input
-                    type="text"
-                    className="form-control "
-                    placeholder='Enter Header text here'
-                    maxLength={60}
-                    onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerText: e.target.value })}
-                  />
-                </div>}
+                  <div className='mt-3'>
+                    <h4 className="">Template Header Text <span className='text-secondary'>(Optional)</span></h4>
+                    <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
+                    <input
+                      type="text"
+                      className="form-control "
+                      placeholder='Enter Header text here'
+                      maxLength={60}
+                      onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerText: e.target.value })}
+                    />
+                  </div>}
                 {/* msg body ---------------------------------------------- */}
                 <div className='mt-3'>
                   <div className='mt-3'>
@@ -599,7 +596,9 @@ console.log(filteredData)
                     {BasicTemplateData.msgDataType === "Location" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffacb5" }}>
                       <MapPin size={45} color='#f70010ff' />
                     </div>}
-
+                    {
+                      BasicTemplateData.msgDataType === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{BasicTemplateData.headerText}</h6>
+                    }
                     <div className='mt-2'>
                       <h5 dangerouslySetInnerHTML={{ __html: displayedMessage }}></h5>
                     </div>
@@ -610,19 +609,19 @@ console.log(filteredData)
                 </Card>
                 {
                   useInteractive.dataList && useInteractive.dataList.map((elem) => {
-                    if (elem.actionType === 'phone' && elem.title !== '') {
+                    if (elem.actionType === 'PHONE_NUMBER' && elem.title !== '') {
                       return (
                         <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                           <Phone size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
                         </div>)
                     }
-                    if (elem.actionType === 'url' && elem.title !== '') {
+                    if (elem.actionType === 'URL' && elem.title !== '') {
                       return (
                         <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                           <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
                         </div>)
                     }
-                    if (elem.actionType === 'quick' && elem.title !== '') {
+                    if (elem.actionType === 'QUICK_REPLY' && elem.title !== '') {
                       return (
                         <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                           <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
@@ -701,7 +700,7 @@ console.log(filteredData)
                           />
                         </Col>
                         {
-                          ele.actionType === "phone" &&
+                          ele.actionType === "PHONE_NUMBER" &&
                           <Col lg="1">
                             <Select options={msgTypeList}
                               styles={{
@@ -772,8 +771,8 @@ console.log(filteredData)
 
                   {useInteractive.type === 'All' &&
                     <div className='gap-1 d-flex flex-column  '>
-                      {useInteractive.dataList.sort((a, b) => ({ url: 1, phone: 2, quick: 3 }[a.actionType] - { url: 1, phone: 2, quick: 3 }[b.actionType])).map((ele, index) => {
-                        if (ele.actionType === 'quick') {
+                      {useInteractive.dataList.sort((a, b) => ({ URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[a.actionType] - { URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[b.actionType])).map((ele, index) => {
+                        if (ele.actionType === 'QUICK_REPLY') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Quick Reply {index + 1} :</p></Col>
@@ -793,7 +792,7 @@ console.log(filteredData)
                               </Col>
                             </Row>)
                         }
-                        if (ele.actionType === 'url') {
+                        if (ele.actionType === 'URL') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
@@ -834,7 +833,7 @@ console.log(filteredData)
                             </Row>
                           )
                         }
-                        if (ele.actionType === 'phone') {
+                        if (ele.actionType === 'PHONE_NUMBER') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
@@ -860,7 +859,7 @@ console.log(filteredData)
                                 />
                               </Col>
                               <Col lg="1">
-                                <Select options={[{ value: 'phone', label: "Phone Number" }, { value: 'url', label: "URL" }]}
+                                <Select options={[{ value: 'PHONE_NUMBER', label: "Phone Number" }, { value: 'URL', label: "URL" }]}
                                   styles={{
                                     control: (baseStyles) => ({
                                       ...baseStyles,
@@ -889,14 +888,14 @@ console.log(filteredData)
                         }
                       })}
                       <div className='d-flex gap-2'>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.quick === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("quick")} >
-                          <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.quick}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("QUICK_REPLY")} >
+                          <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.QUICK_REPLY}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.url === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("url")}>
-                          <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.url}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.URL === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
+                          <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.phone === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("phone")}>
-                          <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.phone}</p></div>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.PHONE_NUMBER === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
+                          <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
                         </div>
                       </div>
                     </div>}
