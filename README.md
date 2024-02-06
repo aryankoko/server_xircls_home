@@ -4,10 +4,13 @@ home upts
 affilate signup page connection
 
 # whatsapp
-whatsapp template createion
+whatsapp template creation
+validation remain
+img 
+video fix choose and UI
 
 # affilate
-adn affilate dashboard
+adn affiliate dashboard
 login page in homeBase
 
 

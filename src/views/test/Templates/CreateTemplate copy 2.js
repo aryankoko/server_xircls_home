@@ -9,7 +9,6 @@ import { Card, CardBody, Col, Container, Input, Label, Row } from 'reactstrap'
 import wp_back from './imgs/wp_back.png'
 import { forEach } from 'lodash'
 import { selectPhoneList } from '../../../Helper/data'
-import { postReq } from '../../../assets/auth/jwtService'
 
 export default function CreateTemplate() {
 
@@ -23,17 +22,22 @@ export default function CreateTemplate() {
       label: "Image"
     },
     {
-      value: "Document",
-      label: "Document"
+      value: "File",
+      label: "File"
     },
     {
       value: "Video",
       label: "Video"
+    },
+    {
+      value: "Location",
+      label: "Location"
     }
   ]
   const tempCatgList = [
     { value: 'UTILITY', label: 'Utility' },
-    { value: 'MARKETING', label: 'Marketing' }
+    { value: 'MARKETING', label: 'Marketing' },
+    { value: 'AUTHENTICATION', label: 'Authentication' }
   ]
   const langList = [
     { value: 'en', label: 'English' },
@@ -71,7 +75,7 @@ export default function CreateTemplate() {
   })
 
   const [parametersList, setParametersList] = useState([])
-  const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")
+  const [useMsgBody, setMsgBody] = useState(" Hello {{1}}, your code will expire in {{2}} mins.")
 
 
   const [useInteractive, setInteractive] = useState({
@@ -366,8 +370,7 @@ export default function CreateTemplate() {
   const handleTemplateSubmit = () => {
     // Add interactive add button
     // const buttons = useInteractive.dataList.map((item) => )
-    console.log(BasicTemplateData.headerUrl)
-    console.log(JSON.stringify(BasicTemplateData.headerUrl))
+console.log(BasicTemplateData.headerUrl)
 
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.actionType === "PHONE_NUMBER" && item.title !== '') {
@@ -392,27 +395,17 @@ export default function CreateTemplate() {
       }
     })
     const payload = {
+      name: BasicTemplateData.templateName,
+      category: BasicTemplateData.templateCategory,
+      language: BasicTemplateData.language,
       components: [
         // header
-        BasicTemplateData.msgDataType === 'Document' && {
+        BasicTemplateData.headerText !== '' && {
           type: 'HEADER',
           format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Image' && {
-          type: 'HEADER',
-          format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Video' && {
-          type: 'HEADER',
-          format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Text' && {
-          type: 'HEADER',
-          format: 'TEXT',
-          text: BasicTemplateData.headerText
+          ...(BasicTemplateData.msgDataType === 'Image' && {
+            example: { header_handle: [BasicTemplateData.headerUrl] }
+          })
         },
         // body
         {
@@ -426,53 +419,38 @@ export default function CreateTemplate() {
           type: 'FOOTER',
           text: BasicTemplateData.footer
         },
-
-        useInteractive.type !== "None" && {
+        {
           type: "BUTTONS",
           buttons: newInteractiveData
         }
-      ].filter(Boolean)
+      ]
     }
-    // const payData = JSON.stringify(payload, null, 2)
-    const formData = new FormData()
+    const payData = JSON.stringify(payload, null, 2)
 
-    formData.append('name', BasicTemplateData.templateName)
-    formData.append('category', BasicTemplateData.templateCategory)
-    formData.append('language', BasicTemplateData.language)
-    formData.append('components', JSON.stringify(payload.components))
-    formData.append('headerUrl', BasicTemplateData.headerUrl)
-
-    // Now you can use formData for your purpose
-
-    console.log("payload", payload)
+    console.log("payData", payData)
     console.log("useInteractive", useInteractive)
-    console.log(BasicTemplateData)
-    console.log(BasicTemplateData.headerUrl)
-
-    // return null
-    postReq("createTemplate", formData).then((res) => {
-      console.log(res)
-    }).catch((err) => console.log(err))
-
-    // try {
-    //   const response = fetch('https://api.demo.xircls.in/talks/createTemplate/', {
-    //     method: 'POST',
-    //     body: formData
-    //   })
-    //   if (response.ok) {
-    //     const res = response.json()
-    //     console.log(res)
-    //     console.log('Data submitted successfully!')
-    //   } else {
-    //     console.error('Error submitting data:', response)
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error.message)
-    // }
-
-    // Test if the inputString matches the pattern
     const pattern = /[^a-z0-9_]/
 
+    try {
+      const response = fetch('https://5214-2405-201-7-8937-ec58-23b3-2c47-e42d.ngrok-free.app/createTemplate/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payData
+      })
+      if (response.ok) {
+        const res = response.json()
+        console.log(res)
+        console.log('Data submitted successfully!')
+      } else {
+        console.error('Error submitting data:', response)
+      }
+    } catch (error) {
+      console.error('Error:', error.message)
+    }
+
+    // Test if the inputString matches the pattern
     if (pattern.test(BasicTemplateData.templateName)) {
       // String contains special characters or whitespace
       toast.error("Only lower case alphabets, numbers and underscore is allowed for Template Name")
@@ -596,14 +574,22 @@ export default function CreateTemplate() {
                         onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerText: e.target.value })}
                       />
                     </div>}
-                  {(BasicTemplateData.msgDataType === 'Image' || BasicTemplateData.msgDataType === 'Video' || BasicTemplateData.msgDataType === 'Document') &&
+                  {(BasicTemplateData.msgDataType === 'Image' || BasicTemplateData.msgDataType === 'Video') &&
 
                     <div className='mt-3'>
-                      <h4 className="">{BasicTemplateData.msgDataType} Media File</h4>
-                      <p className="fs-5  text-secondary">Choose your media file</p>
+                      <h4 className="">Media Url</h4>
+                      <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
+                      <input
+                        type="text"
+                        className="form-control "
+                        placeholder='Template Name'
+                        // value={BasicTemplateData.headerUrl}
+                        onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerUrl: e.target.value })}
+                      />
                       <div className='d-flex align-items-center gap-1 mt-1'>
-                        <input type="file" className='d-none' name="mediaUrl" id="mediaUrl" onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerUrl: e.target.files[0] })} />
-                        <label htmlFor="mediaUrl" className='d-flex gap-1 btn btn-secondary rounded-2  justify-content-center  align-items-center  border' style={{ width: "300px", padding: "3px 0" }}><Image /> <p className="m-0">Upload from Media Library</p> </label>
+                        <h5 className='m-0'>OR</h5>
+                        <input type="file" name="mediaUrl" id="mediaUrl" onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerUrl: e.target.files[0] })} />
+                        <label for="mediaUrl" className='d-flex gap-1 btn btn-secondary rounded-2  justify-content-center  align-items-center  border' style={{ width: "300px", padding: "3px 0" }}><Image /> <p className="m-0">Upload from Media Library</p> </label>
                       </div>
                     </div>}
                 </div>
@@ -685,40 +671,27 @@ export default function CreateTemplate() {
                       <FileText size={45} color='#f33d79' />
                     </div>}
                     {BasicTemplateData.msgDataType === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
-                      {BasicTemplateData.headerUrl instanceof File || BasicTemplateData.headerUrl instanceof Blob ? (
-                        <img
-                          className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
-                          style={{ minHeight: "170px" }}
-                          src={URL.createObjectURL(BasicTemplateData.headerUrl)}
-                          alt=""
-                        />
-                      ) : (
-                        BasicTemplateData.headerUrl === '' ? (
-                          <Image size={45} color='#faad20' />
-                        ) : (
-                          <img
-                            className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
-                            style={{ minHeight: "170px" }}
-                            src={BasicTemplateData.headerUrl}
-                            alt=""
-                          />
-                        )
-                      )}
+                      {
+                        BasicTemplateData.headerUrl === '' ? <Image size={45} color='#faad20' /> : <img className='img-fluid border-0 rounded-3 w-100 object-fit-cover ' style={{ minHeight: "170px" }} src={BasicTemplateData.headerUrl} alt="" />
+                      }
                     </div>}
                     {BasicTemplateData.msgDataType === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
 
                       {
-                        BasicTemplateData.headerUrl === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className=' object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
+                        BasicTemplateData.headerUrl === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className=' object-fit-cover w-100' controls style={{ height: "200px" }}>
                           <source
-                            src={BasicTemplateData.headerUrl === '' ? '' : URL.createObjectURL(BasicTemplateData.headerUrl)}
+                            src={BasicTemplateData.headerUrl}
                             type="video/mp4"
                           />
                           Video not supported.
                         </video>
                       }
                     </div>}
-                    {BasicTemplateData.msgDataType === "Document" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
+                    {BasicTemplateData.msgDataType === "File" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
                       <FileText size={45} color='#f33d79' />
+                    </div>}
+                    {BasicTemplateData.msgDataType === "Location" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffacb5" }}>
+                      <MapPin size={45} color='#f70010ff' />
                     </div>}
                     {
                       BasicTemplateData.msgDataType === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{BasicTemplateData.headerText}</h6>
@@ -770,24 +743,24 @@ export default function CreateTemplate() {
               <div className=''>
                 <div className='d-flex w-75'>
 
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio1' >
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' for='radio1' >
                     <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={handleTnteractiveRadio} />
                     <p className="m-0">None</p>
                   </Label>
 
 
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio2'  >
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' for='radio2'  >
                     <Input type='radio' id='radio2' style={{ marginLeft: '15px' }} name='radio1' value='Call' onChange={handleTnteractiveRadio} />
                     <p className="m-0">Call to Action</p>
                   </Label>
 
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio3' >
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' for='radio3' >
                     <Input type='radio' id='radio3' style={{ marginLeft: '15px' }} name='radio1' value='Quick' onChange={handleTnteractiveRadio} />
                     <p className="m-0">Quick Replies
                     </p>
                   </Label>
 
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio4' >
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' for='radio4' >
                     <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={handleTnteractiveRadio} />
                     <p className="m-0">All</p>
                   </Label>
