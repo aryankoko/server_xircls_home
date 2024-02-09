@@ -27,7 +27,7 @@ export default function Template() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/getTemplates/', {
+      fetch('https://268e-2405-201-7-88e1-28eb-8d09-a4e3-4008.ngrok-free.app/getTemplates/', {
          method: 'POST',
          body: formData
       })
@@ -419,6 +419,9 @@ export default function Template() {
 
    }
 
+   useEffect(() => {
+   }, [])
+
 
    return (
       <Container fluid className='px-0'>
@@ -494,7 +497,7 @@ export default function Template() {
                            <Row className='match-height'>
                               {
 
-                                 dummydata.map((SigleTemplate) => {
+                                 AllTemplatesData.map((SigleTemplate) => {
 
                                     return (
 
@@ -506,6 +509,7 @@ export default function Template() {
                                                    {
 
                                                       SigleTemplate.components.map((data, index) => {
+
                                                          if (data.format === "IMAGE") {
                                                             return (
                                                                <div className='p-1'  >
@@ -571,6 +575,13 @@ export default function Template() {
                                                                 <ExternalLink size={17} /><h5 className='m-0 text-primary' > Relax, it was me</h5>
                                                             </div> */}
 
+                                             <div className='mt-auto  '>
+                                                <div className='mt-3  rounded-3 d-flex justify-content-evenly  '>
+                                                   <button className=' border-0 px-1 bg-success text-white rounded-2'>Active</button>
+                                                   <button className='btn btn-primary'>Edit</button>
+                                                   <button className='btn btn-primary'>Test</button>
+                                                </div>
+                                             </div>
                                           </Card>
                                        </Col>
                                     )

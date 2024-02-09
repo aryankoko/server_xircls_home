@@ -51,12 +51,12 @@ export default function CreateTemplate() {
     { value: 'tr', label: 'Turkish' },
     { value: 'sv', label: 'Swedish' }
   ]
-  
-
   const addCallOptions = [
     { value: 'PHONE_NUMBER', label: "Phone Number" },
     { value: 'URL', label: "URL" }
   ]
+  
+
   const callOptions = () => {
     let opt = addCallOptions.slice()
     useInteractive.dataList.forEach(item => {
@@ -76,6 +76,7 @@ export default function CreateTemplate() {
     msgDataType: "None",
     footer: ''
   })
+
 
   const [parametersList, setParametersList] = useState([])
   const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")

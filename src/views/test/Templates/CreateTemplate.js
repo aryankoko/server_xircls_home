@@ -51,7 +51,7 @@ export default function CreateTemplate() {
     { value: 'tr', label: 'Turkish' },
     { value: 'sv', label: 'Swedish' }
   ]
-  
+
 
   const addCallOptions = [
     { value: 'PHONE_NUMBER', label: "Phone Number" },
@@ -77,7 +77,39 @@ export default function CreateTemplate() {
     footer: ''
   })
 
-  const [parametersList, setParametersList] = useState([])
+  // headrer
+  const [Header, setHeader] = useState({
+    type: 'None',
+    text: '',
+    file: ''
+  })
+
+  const [Header_Parameters, setHeader_Parameters] = useState([])
+
+
+  const Header_text_change = (e) => {
+    setHeader({ ...Header, text: e.target.value })
+  }
+
+  const addHeaderParam = (e) => {
+    const uptstr = `${Header.text}{{1}}`
+    setHeader({ ...Header, text: uptstr })
+  }
+
+  useEffect(() => {
+    if (Header.text.includes("{{1}}")) {
+      // Update header parameters
+      setHeader_Parameters([{ id: 1, value: '' }])
+    } else {
+      setHeader_Parameters([])
+    }
+
+  }, [Header.text])
+
+  console.log("Header_Parameters", Header_Parameters)
+  // 
+  // 
+  const [Body_Parameters, setBody_Parameters] = useState([])
   const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")
 
 
@@ -92,14 +124,14 @@ export default function CreateTemplate() {
   })
   const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
   // massgae body function olny ------------------------------------
-  //  update parametersList based on the message
+  //  update Body_Parameters based on the message
   const updateParametersList = (message) => {
     const regex = /{{\s*(\d+)\s*}}/g
     const matches = message.match(regex)
 
     if (matches) {
       const uniqueIds = [...new Set(matches.map(match => parseInt(match.match(/\d+/)[0])))]
-      const existingParametersMap = parametersList.reduce((map, param) => {
+      const existingParametersMap = Body_Parameters.reduce((map, param) => {
         map[param.id] = param.value
         return map
       }, {})
@@ -108,9 +140,9 @@ export default function CreateTemplate() {
         value: existingParametersMap[id] !== undefined ? existingParametersMap[id] : ''
       }))
 
-      setParametersList(newParametersList)
+      setBody_Parameters(newParametersList)
     } else {
-      setParametersList([])
+      setBody_Parameters([])
     }
   }
 
@@ -118,7 +150,7 @@ export default function CreateTemplate() {
   const updateDisplayedMessage = () => {
     let updatedMessage = useMsgBody
 
-    parametersList.forEach(param => {
+    Body_Parameters.forEach(param => {
       const regex = new RegExp(`{{\\s*${param.id}\\s*}}`, 'g')
       if (param.value !== '') {
         updatedMessage = updatedMessage.replace(regex, `[${param.value}]`)
@@ -134,8 +166,8 @@ export default function CreateTemplate() {
 
   const addParameterBtn = () => {
 
-    const existingIds = parametersList.map(obj => obj.id)
-    for (let i = 1; i < parametersList.length + 2; i++) {
+    const existingIds = Body_Parameters.map(obj => obj.id)
+    for (let i = 1; i < Body_Parameters.length + 2; i++) {
       if (!existingIds.includes(i)) {
         const prev = `${useMsgBody}{{${i}}}`
         setMsgBody(prev)
@@ -146,7 +178,7 @@ export default function CreateTemplate() {
 
   //  handle parameter value changes
   const handleParameterChange = (id, value) => {
-    setParametersList((prevList) => prevList.map((param) => (param.id === id ? { ...param, value } : param))
+    setBody_Parameters((prevList) => prevList.map((param) => (param.id === id ? { ...param, value } : param))
     )
   }
 
@@ -205,7 +237,7 @@ export default function CreateTemplate() {
 
   useEffect(() => {
     updateDisplayedMessage()
-  }, [parametersList])
+  }, [Body_Parameters])
 
   // interactive change---------------------------------------------------
   const handleTnteractiveRadio = (e) => {
@@ -318,7 +350,7 @@ export default function CreateTemplate() {
 
       setButtons({
         QUICK_REPLY: 3 - counts.quickNum - counts.urlNum - counts.phoneNum,
-        URL:  1 - counts.urlNum,
+        URL: 1 - counts.urlNum,
         PHONE_NUMBER: 1 - counts.phoneNum
       })
     }
@@ -333,7 +365,7 @@ export default function CreateTemplate() {
       language: "Select Template Language"
     }
     // console.log("BasicTemplateData", BasicTemplateData)
-    // console.log("parametersList", parametersList)
+    // console.log("Body_Parameters", Body_Parameters)
     // console.log("useMsgBody", useMsgBody)
     // console.log("useInteractive", useInteractive)
     // const requiredFields = ['templateName', 'templateCategory', 'language']
@@ -359,33 +391,17 @@ export default function CreateTemplate() {
     if (BasicTemplateData.useMsgBody === '') {
       toast.error(errorMsg['useMsgBody'])
       return false
-    } 
+    }
     return true
-    // if (parametersList.length > 0) {
-    //   parametersList.forEach((ele) => {
-    //     if (ele.value === '') {
-    //       toast.error('Enter Parameters Value')
-    //     }
-    //   })
-    //   console.log("Eror Parameters")
-    //   return false
-    // }
-    // if (useInteractive.dataList.length > 0) {
-    //   useInteractive.dataList.forEach((ele) => {
-    //     if (ele.title === '') {
-    //       toast.error('Enter Actions Value')
-    //       console.log("Eror Actions")
-    //       return false
-    //     }
-    //   })
-    // }
+
 
   }
 
   const handleTemplateSubmit = () => {
-    if (!formValidation()) {
-      return false
-    }
+    // if (!formValidation()) {
+    //   return false
+    // }
+
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.title === '') {
         return null // Skip items without a title
@@ -415,36 +431,41 @@ export default function CreateTemplate() {
     }).filter(Boolean) // Remove null entries from the result
 
     const components = [
-      // header
-      BasicTemplateData.msgDataType === 'Document' && {
+      Header.type === 'Document' && {
         type: 'HEADER',
-        format: BasicTemplateData.msgDataType.toUpperCase(),
+        format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      BasicTemplateData.msgDataType === 'Image' && {
+      Header.type === 'Image' && {
         type: 'HEADER',
-        format: BasicTemplateData.msgDataType.toUpperCase(),
+        format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      BasicTemplateData.msgDataType === 'Video' && {
+      Header.type === 'Video' && {
         type: 'HEADER',
-        format: BasicTemplateData.msgDataType.toUpperCase(),
+        format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      BasicTemplateData.msgDataType === 'Text' && {
+      Header.type === 'Text' && {
         type: 'HEADER',
         format: 'TEXT',
-        text: BasicTemplateData.headerText
+        text: Header.text,
+        example: {
+          header_text: [Header_Parameters.map(item => item.value)][0]
+        }
+
       },
-      // body
       {
         type: 'BODY',
         text: useMsgBody,
         example: {
-          body_text: [parametersList.map(item => item.value)]
+          body_text: [Body_Parameters.map(item => item.value)]
         }
+
       },
+
       BasicTemplateData.footer !== '' && {
+
         type: 'FOOTER',
         text: BasicTemplateData.footer
       },
@@ -462,30 +483,34 @@ export default function CreateTemplate() {
     formData.append('category', BasicTemplateData.templateCategory)
     formData.append('language', BasicTemplateData.language)
     formData.append('components', JSON.stringify(components))
-    formData.append('headerUrl', BasicTemplateData.headerUrl)
+    formData.append('headerUrl', Header.file)
 
     // Now you can use formData for your purpose
 
     console.log("payload", components)
     console.log("useInteractive", useInteractive)
     console.log(BasicTemplateData)
-    console.log(BasicTemplateData.headerUrl)
+    console.log(Header.file)
 
     // return null
     postReq("createTemplate", formData).then((res) => {
       console.log(res)
-     if (res.data.code === 100) {
-      toast.error(res.data.error_user_msg)
-     } else {
-      toast.success("Template has been created")
+      if (res.data.code === 100) {
+        toast.error(res.data.error_user_msg)
+      } else {
+        // toast.success("Template has been created")
 
-     }
+      }
+      if (res.id) {
+        toast.success("Template has been created")
+        
+      }
     }).catch((err) => console.log(err))
 
     // Test if the inputString matches the pattern
-  
+
     // console.log("BasicTemplateData", BasicTemplateData)
-    // console.log("parametersList", parametersList)
+    // console.log("Body_Parameters", Body_Parameters)
     // console.log("useMsgBody", useMsgBody)
     // console.log("useInteractive", useInteractive)
     // console.log("payData", payData)
@@ -552,8 +577,8 @@ export default function CreateTemplate() {
                   options={msgTypeList}
                   closeMenuOnSelect={true}
                   onChange={(e) => {
-                    if (e && e.value !== BasicTemplateData.msgDataType.value) {
-                      setBasicTemplateData({ ...BasicTemplateData, msgDataType: e.value })
+                    if (e && e.value !== Header.type.value) {
+                      setHeader({ ...Header, type: e.value })
                       // setOptOutRespConfig(null)
                     }
                   }}
@@ -563,25 +588,36 @@ export default function CreateTemplate() {
               <div>
 
                 <div>
-                  {BasicTemplateData.msgDataType === 'Text' &&
+                  {Header.type === 'Text' &&
                     <div className='mt-3'>
                       <h4 className="">Template Header Text </h4>
                       <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
                       <input
                         type="text"
+                        value={Header.text}
                         className="form-control "
                         placeholder='Enter Header text here'
                         maxLength={60}
-                        onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerText: e.target.value })}
+                        onChange={Header_text_change}
                       />
+                      <button className={`${Header_Parameters.length >= 1 ? 'd-none' : 'd-block'}`} onClick={addHeaderParam}>add parameter</button>
+                      <div>
+                        {
+                          Header_Parameters.map((item) => (
+                            <Select options={paramVals}
+                              onChange={(e) => { setHeader_Parameters([{ id: 1, value: e.value }]) }}
+                              closeMenuOnSelect={true} />
+                          ))
+                        }
+                      </div>
                     </div>}
-                  {(BasicTemplateData.msgDataType === 'Image' || BasicTemplateData.msgDataType === 'Video' || BasicTemplateData.msgDataType === 'Document') &&
+                  {(Header.type === 'Image' || Header.type === 'Video' || Header.type === 'Document') &&
 
                     <div className='mt-3'>
-                      <h4 className="">{BasicTemplateData.msgDataType} Media File</h4>
+                      <h4 className="">{Header.type} Media File</h4>
                       <p className="fs-5  text-secondary">Choose your media file</p>
                       <div className='d-flex align-items-center gap-1 mt-1'>
-                        <input type="file" className='d-none' name="mediaUrl" id="mediaUrl" onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, headerUrl: e.target.files[0] })} />
+                        <input type="file" className='d-none' name="mediaUrl" id="mediaUrl" onChange={(e) => setHeader({ ...Header, file: e.target.files[0] })} />
                         <label htmlFor="mediaUrl" className='d-flex gap-1 btn btn-secondary rounded-2  justify-content-center  align-items-center  border' style={{ width: "300px", padding: "3px 0" }}><Image /> <p className="m-0">Upload from Media Library</p> </label>
                       </div>
                     </div>}
@@ -612,8 +648,8 @@ export default function CreateTemplate() {
                       changed at the time of sending. e.g. - {'{{1}}'}: Mohit, {'{{2}}'}: 5.
                     </p>
                     <div className='d-flex flex-column gap-1'>
-                      {parametersList?.sort((a, b) => a.id - b.id).map((paramData) => {
-                          return (
+                      {Body_Parameters?.sort((a, b) => a.id - b.id).map((paramData) => {
+                        return (
                           <div className='d-flex' key={paramData.id}>
                             <div className='w-25 d-flex justify-content-center align-items-center '>
                               <h5>{`{{ ${paramData.id} }}`}</h5>
@@ -629,7 +665,7 @@ export default function CreateTemplate() {
                               }
                             /> */}
                               <Select options={paramVals}
-                                value={{value:'paramData', label:paramData.value }}
+                                value={{ value: 'paramData', label: paramData.value }}
                                 onChange={(e) => handleParameterChange(paramData.id, e.label)}
                                 closeMenuOnSelect={true} />
 
@@ -665,49 +701,49 @@ export default function CreateTemplate() {
 
                 <Card className='rounded-3 shadow-lg  position-relative mb-0 whatsapp_template_card' >
                   <CardBody className='p-2'>
-                    {BasicTemplateData.msgDataType === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
+                    {Header.type === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
                       <Image size={45} color='#faad20' />
                       <PlayCircle size={45} color='#5f66cd' />
                       <FileText size={45} color='#f33d79' />
                     </div>}
-                    {BasicTemplateData.msgDataType === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
-                      {BasicTemplateData.headerUrl instanceof File || BasicTemplateData.headerUrl instanceof Blob ? (
+                    {Header.type === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
+                      {Header.file instanceof File || Header.file instanceof Blob ? (
                         <img
                           className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
                           style={{ minHeight: "170px" }}
-                          src={URL.createObjectURL(BasicTemplateData.headerUrl)}
+                          src={URL.createObjectURL(Header.file)}
                           alt=""
                         />
                       ) : (
-                        BasicTemplateData.headerUrl === '' ? (
+                        Header.file === '' ? (
                           <Image size={45} color='#faad20' />
                         ) : (
                           <img
                             className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
                             style={{ minHeight: "170px" }}
-                            src={BasicTemplateData.headerUrl}
+                            src={Header.file}
                             alt=""
                           />
                         )
                       )}
                     </div>}
-                    {BasicTemplateData.msgDataType === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
+                    {Header.type === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
 
                       {
-                        BasicTemplateData.headerUrl === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className=' object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
+                        Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className=' object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
                           <source
-                            src={BasicTemplateData.headerUrl === '' ? '' : URL.createObjectURL(BasicTemplateData.headerUrl)}
+                            src={Header.file === '' ? '' : URL.createObjectURL(Header.file)}
                             type="video/mp4"
                           />
                           Video not supported.
                         </video>
                       }
                     </div>}
-                    {BasicTemplateData.msgDataType === "Document" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
+                    {Header.type === "Document" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
                       <FileText size={45} color='#f33d79' />
                     </div>}
                     {
-                      BasicTemplateData.msgDataType === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{BasicTemplateData.headerText}</h6>
+                      Header.type === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ?? '')}</h6>
                     }
                     <div className='mt-2'>
                       <h5 dangerouslySetInnerHTML={{ __html: displayedMessage }}></h5>
@@ -983,7 +1019,7 @@ export default function CreateTemplate() {
                         <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
                           <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${ (useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
                           <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
                         </div>
                       </div>
