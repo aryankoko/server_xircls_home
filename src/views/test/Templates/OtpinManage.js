@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardBody, Col, Container, Input, Label, Row, Button, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup } from 'reactstrap'
@@ -6,6 +7,8 @@ import toast from 'react-hot-toast'
 import Select from 'react-select'
 import { Download, FileText, Image } from 'react-feather'
 import ResizableTextarea from './components/ResizableTextarea'
+import axios from 'axios'
+import { filter, set } from 'lodash'
 
 export default function OtpinManage() {
 
@@ -55,22 +58,29 @@ export default function OtpinManage() {
     const makeToast = (msg = "success") => {
         toast.success(msg)
     }
-    const [inputFields_optOut, setInputFields_optOut] = useState([{ id: 1, value: 'Stop' }])
-    const [inputFields_optIn, setInputFields_optIn] = useState([{ id: 1, value: 'Allow' }])
+    const [optOutKeyWords, setOptOutKeyWords] = useState(['Stop'])
+    const [optInKeyWords, setOptInKeyWords] = useState(['Allow'])
 
     const addInputField = (num) => {
         if (num === 2) {
-            console.log("len", inputFields_optIn.length)
-            if (inputFields_optIn.length < 5) {
-                setInputFields_optIn([...inputFields_optIn, { id: inputFields_optIn.length + 1, value: '' }])
+            // console.log("len", optInKeyWords.length)
+            if (optInKeyWords.length < 5) {
+                setOptInKeyWords([...optInKeyWords, ''])
             }
 
         } else {
-            if (inputFields_optOut.length < 5) {
+            if (optOutKeyWords.length < 5) {
+                setOptOutKeyWords([...optOutKeyWords, ''])
 
-                setInputFields_optOut([...inputFields_optOut, { id: inputFields_optOut.length + 1, value: '' }])
             }
         }
+    }
+
+    const handleKeyWordChange = (index, value) => {
+        const updatedInputs = [...optOutKeyWords]
+        updatedInputs[index] = value
+        setOptOutKeyWords(updatedInputs)
+        // console.log(updatedInputs)   
     }
 
 
@@ -155,6 +165,29 @@ export default function OtpinManage() {
             </Card>
         )
     }
+
+    const submitForm = () => {
+        const newformData = new FormData()
+        console.log(optOutKeyWords)
+
+        const optOutKeyValues = optOutKeyWords.filter(item => item !== "") // Filter out objects with empty values
+    
+        console.log(optOutKeyValues)
+
+        // return null
+        // const valuesOnlyaa = ['please', 'me', 'help']
+        // JSON.stringify(valuesOnlyaa)
+        newformData.append('optOutKeyValues', JSON.stringify(optOutKeyValues))
+
+
+        axios.post("https://d794-2405-201-7-88e1-3322-4051-f3b4-58b6.ngrok-free.app/opt/", newformData).then((resp) => {
+            console.log(resp)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+        
+    }
     return (
         <Container>
             <style>
@@ -203,21 +236,23 @@ export default function OtpinManage() {
                                     on which they should be automatically opted-out
                                 </p>
                                 <Row className='d-flex flex-column  gap-1'>
-                                    {inputFields_optOut.map((field) => (
-                                        <Col key={field.id} md="6">
+                                    {optOutKeyWords.map((field, index) => (
+                                        <Col key={index} md="6">
                                             <input
                                                 type="text"
                                                 className="form-control form-control-lg"
-                                                name={`email_${field.id}`}
-                                                defaultValue={field.value}
+                                                name={`email_${index}`}
+                                                defaultValue={field}
                                                 placeholder='Enter Keywords'
+                                               onChange={(e) => handleKeyWordChange(index, e.target.value)}
                                             />
                                         </Col>
                                     ))}
                                 </Row>
 
                                 <button className={`btn text-success mt-3  `} onClick={addInputField} >+ Add more</button>
-                                <button className='btn btn-success text-white mt-3 ms-1' onClick={() => makeToast("opt-out save")}>Save Setting</button>
+                                {/* <button className='btn btn-success text-white mt-3 ms-1' onClick={() => makeToast("opt-out save")}>Save Setting</button> */}
+                                <button className='btn btn-success text-white mt-3 ms-1' onClick={submitForm}>Save Setting</button>
                             </div>
                         </Col>
                         <Col md="6" >
@@ -253,7 +288,7 @@ export default function OtpinManage() {
                                 <h4 className="">Opt-in Keywords</h4>
                                 <p className="fs-5">The user will have to type exactly one of these messages on which they should be automatically opted-in</p>
                                 <Row className='d-flex flex-column  gap-1'>
-                                    {inputFields_optIn.map((field) => (
+                                    {optInKeyWords.map((field) => (
                                         <Col key={field.id} md="6">
                                             <input
                                                 type="text"

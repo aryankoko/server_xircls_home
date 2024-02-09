@@ -5,6 +5,8 @@ import WAbusinessTable from "../../views/test/Templates/components/WAbusinessTab
 import EmbededSignup from "../../views/test/Templates/EmbededSignup"
 import Test from "../../views/test/Test"
 import CreateTemplate from "../../views/test/Templates/CreateTemplate"
+import CodeUserData from "../../views/test/codeSkin/CodeUserData"
+import CodeUserDetails from "../../views/test/codeSkin/CodeUserDetails"
 
 export const Test_routes = [
     {
@@ -34,6 +36,14 @@ export const Test_routes = [
     {
         path: '/template/createTemplate',
         element: <CreateTemplate />
+    },
+    {
+        path: '/codeskin',
+        element: <CodeUserData />
+    },
+    {
+        path: '/codeskin-user/:id',
+        element: <CodeUserDetails />
     },
     {
         path: '/test',

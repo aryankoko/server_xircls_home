@@ -14,24 +14,26 @@ const WithdrawalTransaction = () => {
   const { state } = useLocation()
   const withdrawalUserID = state && state.withdrawalUserID
 
-  console.log(withdrawalUserID, "lk")
   const [searchFilter, setSearchFilter] = useState("")
   const [isLoading, setIsLoading] = useState(true)  // make it true
   const [tableData, setTableData] = useState([])
   const [selectedAction, setSelectedAction] = useState()
   const navigate = useNavigate()
-
+const getData = () => {
+  getReq(`admin_withdrawn_transactions`, `/?affiliate_id=${withdrawalUserID}`)
+  .then((data) => {
+    console.log("admin_withdrawn_transactions", data?.data?.withdrawn_trans_all)
+    setTableData(data?.data?.withdrawn_trans_all)
+    setIsLoading(false)
+  })
+  .catch((error) => {
+    console.log(error)
+  })
+}
   useEffect(() => {
-    getReq(`admin_withdrawn_transactions`, `/?affiliate_id=${withdrawalUserID}`)
-      .then((data) => {
-        console.log("admin_withdrawn_transactions", data?.data?.withdrawn_trans_all)
-        setTableData(data?.data?.withdrawn_trans_all)
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    getData()
   }, [])
+  const filteredArray = tableData?.filter(cur => (cur.affiliate_person.firstname?.toLowerCase()?.includes(searchFilter.toLowerCase())) || (cur.affiliate_person.lastname?.toLowerCase()?.includes(searchFilter.toLowerCase())) || (cur.created_at?.toLowerCase()?.includes(searchFilter.toLowerCase())) || (cur.remark?.toLowerCase()?.includes(searchFilter.toLowerCase())) || (cur.action?.toLowerCase()?.includes(searchFilter.toLowerCase())))
 
   console.log(selectedAction)
   const options = [
@@ -68,7 +70,7 @@ const WithdrawalTransaction = () => {
       )
     },
     {
-      name: <>Requested<br />on</>,
+      name: <>Completed<br />on</>,
       sortable: true,
       minWidth: '100px',
       selector: row => {
@@ -139,6 +141,7 @@ const WithdrawalTransaction = () => {
                         .then((res) => {
                           console.log(res)
                           toast.success(`Action Change ${row.action} to ${newSelectedAction}`)
+                          getData()
                         })
                         .catch((err) => {
                           console.log(err)
@@ -190,7 +193,7 @@ const WithdrawalTransaction = () => {
                   tableCol={columns}
                   data={tableData}
                   searchValue={searchFilter}
-                  filteredData={tableData}
+                  filteredData={filteredArray}
                   isLoading={isLoading}
                 />
               </CardBody>

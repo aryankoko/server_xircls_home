@@ -1,20 +1,43 @@
-# FRONTEND
-# this project contains
-home upts
-affilate signup page connection
 
-# whatsapp
-whatsapp template creation
-validation remain
-img 
-video fix choose and UI
+# main project 
 
-# affilate
-adn affiliate dashboard
-login page in homeBase
+## #homeBase    #whatsapp  #Affilitae  #codeSkin
+
+## Home
+- add affiliate signup & login connection
+- add affiliate table to admin pannel
+
+## whatsapp
+- pages
+   - template creation 
+        - done api  
+        - remain validation  
+
+   - WA business table
+        - done api  
+
+   - embeded signup
+        - done api  
+        - remain validation  
+
+    - op-in mnmagement 
+        - remain api  
+        - remain validation  
+        - remain img btn 
+
+## Affilitae
+- done api
+- add affiliate table to admin pannel
 
 
+## codeSkin
+- admin table
 
 
-# not done
-affiliate signup country => genry settinh
+```
+  npm run test
+```
+## Authors
+
+- [@aryan]
+

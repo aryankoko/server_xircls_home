@@ -40,9 +40,21 @@ export const DefaultNav = [
     },
     {
         id: 'EmbededSignup',
-        title: 'Embeded     Signup',
+        title: 'Embeded    Signup',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
         navLink: '/template/EmbededSignup'
+    },
+    {
+        id: 'codeskin',
+        title: 'codeskin',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/codeskin'
+    },
+    {
+        id: 'codeskin',
+        title: 'user details',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/codeskin-user/:id'
     },
     {
         id: 'test',

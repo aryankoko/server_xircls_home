@@ -7,11 +7,12 @@ import axios from 'axios'
 
 export default function EmbededSignup() {
   const [Country, setCountry] = useState([])
+  const [state, setState] = useState([])
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     code: '',
-    number: '',
+    phone: '',
     website: '',
     streetAddress1: '',
     city: '',
@@ -24,14 +25,29 @@ export default function EmbededSignup() {
   })
 
   useEffect(() => {
-    axios.post("https://api.demo.xircls.in/country-details/").then((res) => {
-      const countryCodeOptions = res.data.data.countries.map(country => ({
-        value: country.iso2,
-        label: country.name
+    axios.post("https://api.demo.xircls.in/country-details/").then((resp) => {
+      console.log(resp)
+      setCountry(resp.data.data.countries.map((curElem) => {
+          return { value: curElem.id, label: `${curElem.name}` }
       }))
-      setCountry(countryCodeOptions)
-    })
+  })
   }, [])
+
+  useEffect(() => {
+    console.log(formData.country)
+    const form_data = new FormData()
+    form_data.append('country_id', formData.country.value)
+    axios.post("https://api.demo.xircls.in/state-details/", form_data)
+      .then((resp) => {
+        console.log(resp)
+        setState(resp.data.data.states.map((curElem) => {
+          return { value: curElem.id, label: `${curElem.name}` }
+        }))
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [formData.country])
 
 
   const updateformData = (key, value) => {
@@ -40,8 +56,16 @@ export default function EmbededSignup() {
 
   const handleFormSubmit = () => {
     const newformData = new FormData()
-    Object.entries(formData).map(([key, value]) => newformData.append(key, value))
-    fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/fbSignUp/', {
+    console.log("sddfasdasd")
+    Object.entries(formData).map(([key, value]) => {
+      if (key  === 'country' || key === 'state') {
+        console.log("sfsdfsdf")
+        newformData.append(key, value.label)
+      } else {
+        newformData.append(key, value)
+      }
+    })
+    fetch('https://1231-2405-201-7-8937-659e-6bda-7839-62ec.ngrok-free.app/fbSignUp/', {
       method: 'POST',
       body: newformData
     })
@@ -111,17 +135,11 @@ export default function EmbededSignup() {
                         name="phone_code"
                         id="phone_code"
                         onChange={(e) => updateformData('code', e.value)}
-                        styles={{
-                          control: (baseStyles) => ({
-                            ...baseStyles,
-                            height: '33px'
-                          })
-                        }}
                       />
                     </Col>
                     <Col md="8">
 
-                      <input type="tel" onChange={(e) => updateformData('number', e.target.value)} className="form-control" id="phone_number" placeholder="Enter phone number" />
+                      <input type="tel" onChange={(e) => updateformData('phone', e.target.value)} className="form-control" id="phone_number" placeholder="Enter phone number" />
                     </Col>
                   </Row>
                 </div>
@@ -152,23 +170,6 @@ export default function EmbededSignup() {
                   <input type="text" onChange={(e) => updateformData('city', e.target.value)} className="form-control" id="city" placeholder="Enter city" />
                 </div>
               </Col>
-
-              <Col md="4">
-                <div className="mb-1">
-                  <label htmlFor="state" className="form-label">
-                    State
-                  </label>
-                  <input type="text" onChange={(e) => updateformData('state', e.target.value)} className="form-control" id="state" placeholder="Enter state" />
-                </div>
-              </Col>
-              <Col md="4">
-                <div className="mb-1">
-                  <label htmlFor="zipPostal" className="form-label">
-                    ZIP/Postal Code
-                  </label>
-                  <input type="text" onChange={(e) => updateformData('zipPostal', e.target.value)} className="form-control" id="zipPostal" placeholder="Enter ZIP/Postal code" />
-                </div>
-              </Col>
               <Col md="4">
                 <div className="mb-1">
                   <label htmlFor="country" className="form-label">
@@ -179,17 +180,37 @@ export default function EmbededSignup() {
                     closeMenuOnSelect={true}
                     name="country"
                     id="country"
-                    onChange={(e) => updateformData('country', e.value)}
+                    onChange={(e) => updateformData('country', e)}
                     placeholder="Enter country"
-                    styles={{
-                      control: (baseStyles) => ({
-                        ...baseStyles,
-                        height: '33px'
-                      })
-                    }}
+                    
                   />
                 </div>
               </Col>
+              <Col md="4">
+                <div className="mb-1">
+                  <label htmlFor="state" className="form-label">
+                    State
+                  </label>
+                  <Select
+                    className="basic-single"
+                    classNamePrefix="select"
+                    // isSearchable={isSearchable}
+                    name="state"
+                    options={state}
+                    placeholder="Enter state"
+                    onChange={(e) => updateformData('state', e)}
+                  />
+                </div>
+              </Col>
+              <Col md="4">
+                <div className="mb-1">
+                  <label htmlFor="zipPostal" className="form-label">
+                    ZIP/Postal Code
+                  </label>
+                  <input type="text" onChange={(e) => updateformData('zipPostal', e.target.value)} className="form-control" id="zipPostal" placeholder="Enter ZIP/Postal code" />
+                </div>
+              </Col>
+
 
               <Col md="4">
                 <div className="mb-1">

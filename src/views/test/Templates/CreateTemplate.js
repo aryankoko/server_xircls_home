@@ -7,12 +7,11 @@ import toast from 'react-hot-toast'
 import Select from 'react-select'
 import { Card, CardBody, Col, Container, Input, Label, Row } from 'reactstrap'
 import wp_back from './imgs/wp_back.png'
-import { forEach } from 'lodash'
 import { selectPhoneList } from '../../../Helper/data'
 import { postReq } from '../../../assets/auth/jwtService'
 
 export default function CreateTemplate() {
-
+  const paramVals = [{ value: 'First_name', label: "First_name" }, { value: 'Last_name', label: "Last_name" }, { value: 'customer_name', label: "customer_name" }, { value: 'Company_name', label: "Company_name" }, { value: 'Order_ID', label: "Order_ID" }, { value: 'Product_name', label: "Product_name" }]
   const msgTypeList = [
     {
       value: "Text",
@@ -40,22 +39,30 @@ export default function CreateTemplate() {
     { value: 'es', label: 'Spanish' },
     { value: 'fr', label: 'French' },
     { value: 'de', label: 'German' },
-    { value: 'it', label: 'Italian' }
+    { value: 'it', label: 'Italian' },
+    { value: 'ja', label: 'Japanese' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'ar', label: 'Arabic' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'hi', label: 'Hindi' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'nl', label: 'Dutch' },
+    { value: 'tr', label: 'Turkish' },
+    { value: 'sv', label: 'Swedish' }
   ]
+  
 
   const addCallOptions = [
     { value: 'PHONE_NUMBER', label: "Phone Number" },
     { value: 'URL', label: "URL" }
   ]
   const callOptions = () => {
-
-    let opt = addCallOptions.slice() // Make a copy of the options array
-
+    let opt = addCallOptions.slice()
     useInteractive.dataList.forEach(item => {
       opt = opt.filter(option => option.value !== item.actionType)
     })
 
-    // console.log(opt, 'opt')
     return opt
   }
 
@@ -91,23 +98,18 @@ export default function CreateTemplate() {
     const matches = message.match(regex)
 
     if (matches) {
-      // Extract unique parameter ids from the message
       const uniqueIds = [...new Set(matches.map(match => parseInt(match.match(/\d+/)[0])))]
-      // Create a map of existing parameters for efficient lookup
       const existingParametersMap = parametersList.reduce((map, param) => {
         map[param.id] = param.value
         return map
       }, {})
-      // Create a new parametersList, preserving existing values
       const newParametersList = uniqueIds.map(id => ({
         id,
         value: existingParametersMap[id] !== undefined ? existingParametersMap[id] : ''
       }))
 
-      // Set the new parametersList
       setParametersList(newParametersList)
     } else {
-      // If no parameters found, reset the parametersList
       setParametersList([])
     }
   }
@@ -116,7 +118,6 @@ export default function CreateTemplate() {
   const updateDisplayedMessage = () => {
     let updatedMessage = useMsgBody
 
-    // Replace placeholders with parameter values in the message
     parametersList.forEach(param => {
       const regex = new RegExp(`{{\\s*${param.id}\\s*}}`, 'g')
       if (param.value !== '') {
@@ -124,20 +125,16 @@ export default function CreateTemplate() {
       }
     })
 
-    // Replace text enclosed within * * with bold representation
     updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
     updatedMessage = updatedMessage.replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
     updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
 
-
-    // Set the updated message
     setDisplayedMessage(updatedMessage)
   }
 
   const addParameterBtn = () => {
 
     const existingIds = parametersList.map(obj => obj.id)
-    // console.log(existingIds)
     for (let i = 1; i < parametersList.length + 2; i++) {
       if (!existingIds.includes(i)) {
         const prev = `${useMsgBody}{{${i}}}`
@@ -153,9 +150,12 @@ export default function CreateTemplate() {
     )
   }
 
-
   //  handle template message changes
-  const handleMsgBodyChange = (value) => {
+  const handleMsgBodyChange = (event) => {
+    const input = event.target
+    const cursorPosition = input.selectionStart // Get the cursor position
+
+    const value = input.value
     const regex = /\{\{(\d+)\}\}/g
     let updatedValue = value
 
@@ -184,8 +184,18 @@ export default function CreateTemplate() {
 
       return updatedValue
     }
-    setMsgBody(uptStr(updatedValue))
-    updateParametersList(updatedValue)
+
+    const updatedText = uptStr(updatedValue)
+
+    // Set input value preserving cursor position
+    input.value = updatedText
+
+    // Restore cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition)
+
+    // Perform other actions as needed
+    setMsgBody(updatedText)
+    updateParametersList(updatedText)
   }
 
 
@@ -308,7 +318,7 @@ export default function CreateTemplate() {
 
       setButtons({
         QUICK_REPLY: 3 - counts.quickNum - counts.urlNum - counts.phoneNum,
-        URL: 1 - counts.urlNum,
+        URL:  1 - counts.urlNum,
         PHONE_NUMBER: 1 - counts.phoneNum
       })
     }
@@ -322,14 +332,20 @@ export default function CreateTemplate() {
       templateCategory: "Select Template Category",
       language: "Select Template Language"
     }
-    console.log("BasicTemplateData", BasicTemplateData)
-    console.log("parametersList", parametersList)
-    console.log("useMsgBody", useMsgBody)
-    console.log("useInteractive", useInteractive)
+    // console.log("BasicTemplateData", BasicTemplateData)
+    // console.log("parametersList", parametersList)
+    // console.log("useMsgBody", useMsgBody)
+    // console.log("useInteractive", useInteractive)
     // const requiredFields = ['templateName', 'templateCategory', 'language']
 
     if (BasicTemplateData.templateName === '') {
       toast.error(errorMsg['templateName'])
+      return false
+    }
+    const pattern = /[^a-z0-9_]/
+    if (pattern.test(BasicTemplateData.templateName)) {
+      // String contains special characters or whitespace
+      toast.error("Only lower case alphabets, numbers and underscore is allowed for Template Name")
       return false
     }
     if (BasicTemplateData.templateCategory === '') {
@@ -343,108 +359,114 @@ export default function CreateTemplate() {
     if (BasicTemplateData.useMsgBody === '') {
       toast.error(errorMsg['useMsgBody'])
       return false
-    }
-    if (parametersList.length > 0) {
-      parametersList.forEach((ele) => {
-        if (ele.value === '') {
-          toast.error('Enter Parameters Value')
-          // return false
-        }
-      })
-    }
-    if (useInteractive.dataList.length > 0) {
-      useInteractive.dataList.forEach((ele) => {
-        if (ele.title === '') {
-          toast.error('Enter Parameters Value')
-          return false
-        }
-      })
-    }
+    } 
+    return true
+    // if (parametersList.length > 0) {
+    //   parametersList.forEach((ele) => {
+    //     if (ele.value === '') {
+    //       toast.error('Enter Parameters Value')
+    //     }
+    //   })
+    //   console.log("Eror Parameters")
+    //   return false
+    // }
+    // if (useInteractive.dataList.length > 0) {
+    //   useInteractive.dataList.forEach((ele) => {
+    //     if (ele.title === '') {
+    //       toast.error('Enter Actions Value')
+    //       console.log("Eror Actions")
+    //       return false
+    //     }
+    //   })
+    // }
 
   }
 
   const handleTemplateSubmit = () => {
-    // Add interactive add button
-    // const buttons = useInteractive.dataList.map((item) => )
-    console.log(BasicTemplateData.headerUrl)
-    console.log(JSON.stringify(BasicTemplateData.headerUrl))
-
+    if (!formValidation()) {
+      return false
+    }
     const newInteractiveData = useInteractive.dataList.map(item => {
-      if (item.actionType === "PHONE_NUMBER" && item.title !== '') {
+      if (item.title === '') {
+        return null // Skip items without a title
+      }
+
+      if (item.actionType === "PHONE_NUMBER") {
         return {
           type: item.actionType,
           text: item.title,
           phone_number: item.code.replace(/\+/g, '') + item.value
         }
-      }
-      if (item.actionType === "URL" && item.title !== '') {
+      } else if (item.actionType === "URL") {
         return {
           type: item.actionType,
           text: item.title,
           url: item.value
         }
-      }
-      if (item.actionType === "QUICK_REPLY" && item.title !== '') {
+      } else if (item.actionType === "QUICK_REPLY") {
         return {
           type: item.actionType,
           text: item.title
         }
+      } else {
+        // Handle unmatched cases
+        return null
       }
-    })
-    const payload = {
-      components: [
-        // header
-        BasicTemplateData.msgDataType === 'Document' && {
-          type: 'HEADER',
-          format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Image' && {
-          type: 'HEADER',
-          format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Video' && {
-          type: 'HEADER',
-          format: BasicTemplateData.msgDataType.toUpperCase(),
-          example: { header_handle: [''] }
-        },
-        BasicTemplateData.msgDataType === 'Text' && {
-          type: 'HEADER',
-          format: 'TEXT',
-          text: BasicTemplateData.headerText
-        },
-        // body
-        {
-          type: 'BODY',
-          text: useMsgBody,
-          example: {
-            body_text: [parametersList.map(item => item.value)]
-          }
-        },
-        BasicTemplateData.footer !== '' && {
-          type: 'FOOTER',
-          text: BasicTemplateData.footer
-        },
+    }).filter(Boolean) // Remove null entries from the result
 
-        useInteractive.type !== "None" && {
-          type: "BUTTONS",
-          buttons: newInteractiveData
+    const components = [
+      // header
+      BasicTemplateData.msgDataType === 'Document' && {
+        type: 'HEADER',
+        format: BasicTemplateData.msgDataType.toUpperCase(),
+        example: { header_handle: [''] }
+      },
+      BasicTemplateData.msgDataType === 'Image' && {
+        type: 'HEADER',
+        format: BasicTemplateData.msgDataType.toUpperCase(),
+        example: { header_handle: [''] }
+      },
+      BasicTemplateData.msgDataType === 'Video' && {
+        type: 'HEADER',
+        format: BasicTemplateData.msgDataType.toUpperCase(),
+        example: { header_handle: [''] }
+      },
+      BasicTemplateData.msgDataType === 'Text' && {
+        type: 'HEADER',
+        format: 'TEXT',
+        text: BasicTemplateData.headerText
+      },
+      // body
+      {
+        type: 'BODY',
+        text: useMsgBody,
+        example: {
+          body_text: [parametersList.map(item => item.value)]
         }
-      ].filter(Boolean)
-    }
+      },
+      BasicTemplateData.footer !== '' && {
+        type: 'FOOTER',
+        text: BasicTemplateData.footer
+      },
+
+      useInteractive.type !== "None" && {
+        type: "BUTTONS",
+        buttons: newInteractiveData
+      }
+    ].filter(Boolean)
+
     // const payData = JSON.stringify(payload, null, 2)
     const formData = new FormData()
 
     formData.append('name', BasicTemplateData.templateName)
     formData.append('category', BasicTemplateData.templateCategory)
     formData.append('language', BasicTemplateData.language)
-    formData.append('components', JSON.stringify(payload.components))
+    formData.append('components', JSON.stringify(components))
     formData.append('headerUrl', BasicTemplateData.headerUrl)
 
     // Now you can use formData for your purpose
 
-    console.log("payload", payload)
+    console.log("payload", components)
     console.log("useInteractive", useInteractive)
     console.log(BasicTemplateData)
     console.log(BasicTemplateData.headerUrl)
@@ -452,32 +474,16 @@ export default function CreateTemplate() {
     // return null
     postReq("createTemplate", formData).then((res) => {
       console.log(res)
+     if (res.data.code === 100) {
+      toast.error(res.data.error_user_msg)
+     } else {
+      toast.success("Template has been created")
+
+     }
     }).catch((err) => console.log(err))
 
-    // try {
-    //   const response = fetch('https://api.demo.xircls.in/talks/createTemplate/', {
-    //     method: 'POST',
-    //     body: formData
-    //   })
-    //   if (response.ok) {
-    //     const res = response.json()
-    //     console.log(res)
-    //     console.log('Data submitted successfully!')
-    //   } else {
-    //     console.error('Error submitting data:', response)
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error.message)
-    // }
-
     // Test if the inputString matches the pattern
-    const pattern = /[^a-z0-9_]/
-
-    if (pattern.test(BasicTemplateData.templateName)) {
-      // String contains special characters or whitespace
-      toast.error("Only lower case alphabets, numbers and underscore is allowed for Template Name")
-      return false
-    }
+  
     // console.log("BasicTemplateData", BasicTemplateData)
     // console.log("parametersList", parametersList)
     // console.log("useMsgBody", useMsgBody)
@@ -504,17 +510,9 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">Your template should fall under one of these categories.</p>
                 <Select
                   className=''
-
                   options={tempCatgList}
                   closeMenuOnSelect={true}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      fontSize: '12px',
-                      minHeight: '0'
-                    })
-                  }}
                 />
               </div>
             </Col>
@@ -524,19 +522,9 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">You will need to specify the language in which message template is submitted.</p>
                 <Select
                   className=''
-
                   options={langList}
                   closeMenuOnSelect={true}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
-
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      fontSize: '12px',
-                      minHeight: '0'
-
-                    })
-                  }}
                 />
               </div>
             </Col>
@@ -561,7 +549,6 @@ export default function CreateTemplate() {
                 <p className="fs-5  text-secondary">Your template type should fall under one of these categories.</p>
                 <Select
                   className=''
-
                   options={msgTypeList}
                   closeMenuOnSelect={true}
                   onChange={(e) => {
@@ -569,14 +556,6 @@ export default function CreateTemplate() {
                       setBasicTemplateData({ ...BasicTemplateData, msgDataType: e.value })
                       // setOptOutRespConfig(null)
                     }
-                  }}
-                  styles={{
-                    control: (baseStyles) => ({
-                      ...baseStyles,
-                      fontSize: '12px',
-                      minHeight: '0'
-
-                    })
                   }}
                 />
               </div>
@@ -586,7 +565,7 @@ export default function CreateTemplate() {
                 <div>
                   {BasicTemplateData.msgDataType === 'Text' &&
                     <div className='mt-3'>
-                      <h4 className="">Template Header Text <span className='text-secondary'>(Optional)</span></h4>
+                      <h4 className="">Template Header Text </h4>
                       <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
                       <input
                         type="text"
@@ -619,7 +598,7 @@ export default function CreateTemplate() {
                     <textarea
                       className="form-control"
                       value={useMsgBody}
-                      onChange={(e) => handleMsgBodyChange(e.target.value)}
+                      onChange={handleMsgBodyChange}
                       rows="5"
                       maxLength={1024}
                     ></textarea>
@@ -633,13 +612,14 @@ export default function CreateTemplate() {
                       changed at the time of sending. e.g. - {'{{1}}'}: Mohit, {'{{2}}'}: 5.
                     </p>
                     <div className='d-flex flex-column gap-1'>
-                      {parametersList?.sort((a, b) => a.id - b.id).map((paramData) => (
-                        <div className='d-flex' key={paramData.id}>
-                          <div className='w-25 d-flex justify-content-center align-items-center '>
-                            <h5>{`{{ ${paramData.id} }}`}</h5>
-                          </div>
-                          <div className='w-100'>
-                            <input
+                      {parametersList?.sort((a, b) => a.id - b.id).map((paramData) => {
+                          return (
+                          <div className='d-flex' key={paramData.id}>
+                            <div className='w-25 d-flex justify-content-center align-items-center '>
+                              <h5>{`{{ ${paramData.id} }}`}</h5>
+                            </div>
+                            <div className='w-100'>
+                              {/* <input
                               type="text"
                               className="form-control "
                               placeholder='Sample value'
@@ -647,10 +627,16 @@ export default function CreateTemplate() {
                               value={paramData.value}
                               onChange={(e) => handleParameterChange(paramData.id, e.target.value)
                               }
-                            />
+                            /> */}
+                              <Select options={paramVals}
+                                value={{value:'paramData', label:paramData.value }}
+                                onChange={(e) => handleParameterChange(paramData.id, e.label)}
+                                closeMenuOnSelect={true} />
+
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
@@ -801,14 +787,6 @@ export default function CreateTemplate() {
                         <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
                         <Col lg="3" className=''>
                           <Select options={callOptions()}
-                            styles={{
-                              control: (baseStyles) => ({
-                                ...baseStyles,
-                                fontSize: '12px',
-                                minHeight: '0'
-
-                              })
-                            }}
                             value={addCallOptions?.find(option => option.value === ele.actionType)}
                             onChange={(e) => handleInputChange(index, 'actionType', e.value)}
                             closeMenuOnSelect={true} />
@@ -827,14 +805,7 @@ export default function CreateTemplate() {
                           ele.actionType === "PHONE_NUMBER" &&
                           <Col lg="1">
                             <Select options={selectPhoneList}
-                              styles={{
-                                control: (baseStyles) => ({
-                                  ...baseStyles,
-                                  fontSize: '12px',
-                                  minHeight: '0'
-
-                                })
-                              }} onChange={(e) => handleInputChange(index, 'code', e.value)}
+                              onChange={(e) => handleInputChange(index, 'code', e.value)}
                               closeMenuOnSelect={true} />
                           </Col>
                         }
@@ -849,7 +820,7 @@ export default function CreateTemplate() {
                         </Col>
 
                         <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                          <div onClick={() => handleDeleteAction(index)}>X</div>
+                          <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
                         </Col>
                       </Row>))}
                     <div>
@@ -878,7 +849,7 @@ export default function CreateTemplate() {
                             />
                           </Col>
                           <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                            <div onClick={() => handleDeleteAction(index)}>X</div>
+                            <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
                           </Col>
                         </Row>))}
                       <div>
@@ -896,6 +867,7 @@ export default function CreateTemplate() {
                   {useInteractive.type === 'All' &&
                     <div className='gap-1 d-flex flex-column  '>
                       {useInteractive.dataList.sort((a, b) => ({ URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[a.actionType] - { URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[b.actionType])).map((ele, index) => {
+
                         if (ele.actionType === 'QUICK_REPLY') {
                           return (
                             <Row key={index}>
@@ -912,7 +884,7 @@ export default function CreateTemplate() {
                                 />
                               </Col>
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
                               </Col>
                             </Row>)
                         }
@@ -952,7 +924,7 @@ export default function CreateTemplate() {
                               </Col>
 
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
                               </Col>
                             </Row>
                           )
@@ -984,14 +956,7 @@ export default function CreateTemplate() {
                               </Col>
                               <Col lg="1">
                                 <Select options={[{ value: 'PHONE_NUMBER', label: "Phone Number" }, { value: 'URL', label: "URL" }]}
-                                  styles={{
-                                    control: (baseStyles) => ({
-                                      ...baseStyles,
-                                      fontSize: '12px',
-                                      minHeight: '0'
-
-                                    })
-                                  }} onChange={(e) => handleInputChange(index, 'code', e.value)}
+                                  onChange={(e) => handleInputChange(index, 'code', e.value)}
                                   closeMenuOnSelect={true} />
                               </Col>
                               <Col >
@@ -1005,7 +970,7 @@ export default function CreateTemplate() {
                               </Col>
 
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
                               </Col>
                             </Row>
                           )
@@ -1015,10 +980,10 @@ export default function CreateTemplate() {
                         <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("QUICK_REPLY")} >
                           <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.QUICK_REPLY}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.URL === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
                           <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${useButtons.PHONE_NUMBER === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${ (useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
                           <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
                         </div>
                       </div>

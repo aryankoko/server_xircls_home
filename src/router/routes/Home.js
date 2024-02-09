@@ -145,7 +145,7 @@ const Homes_Routes = [
     },
     title: "Semper Fi: Customer loyalty"
   },
-  {
+  { 
     path: '/products/flash-accounts/',
     element: <FlashAccount />,
     meta: {

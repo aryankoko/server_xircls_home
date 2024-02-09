@@ -14,17 +14,7 @@ import FrontBaseLoader from '../../../Components/Loader/Loader'
 
 
 export default function SignupPage() {
-    const countryOptions = [
-        { value: 'usa', label: 'United States' },
-        { value: 'canada', label: 'Canada' },
-        { value: 'uk', label: 'United Kingdom' },
-        { value: 'germany', label: 'Germany' },
-        { value: 'france', label: 'France' },
-        { value: 'australia', label: 'Australia' },
-        { value: 'japan', label: 'Japan' },
-        { value: 'brazil', label: 'Brazil' },
-        { value: 'india', label: 'India' }
-    ]
+ 
     const [apiLoader, setApiLoader] = useState(false)
     const [country, setCountry] = useState([])
     const [state, setState] = useState([])
@@ -75,7 +65,7 @@ export default function SignupPage() {
     const [formErrors, setFormErrors] = useState({})
 
     useEffect(() => {
-        getReq('countries')
+        axios.post("https://api.demo.xircls.in/country-details/")
             .then((resp) => {
                 console.log(resp)
                 setCountry(resp.data.data.countries.map((curElem) => {
@@ -87,15 +77,14 @@ export default function SignupPage() {
             })
     }, [])
     useEffect(() => {
-      
-
-            const form_data = new FormData()
-            form_data.append('country_id', formData.country)
-            postReq('getState', form_data)
+        console.log(formData.country)
+        const form_data = new FormData()
+        form_data.append('country_id', formData.country.value)
+        axios.post("https://api.demo.xircls.in/state-details/", form_data)
             .then((resp) => {
                 console.log(resp)
                 setState(resp.data.data.states.map((curElem) => {
-                    return {value: curElem.id, label: `${curElem.name}`}
+                    return { value: curElem.id, label: `${curElem.name}` }
                 }))
             })
             .catch((error) => {
@@ -154,7 +143,7 @@ export default function SignupPage() {
     const handleInputChange2 = (e, name) => {
         setFormData({
             ...formData,
-            [name]: e.label
+            [name]: e
         })
     }
 
@@ -246,7 +235,12 @@ export default function SignupPage() {
             const newformData = new FormData()
             Object.entries(formData).map(([key, value]) => {
                 if (key !== 'checkPassword') {
-                    newformData.append(key, value)
+                    if (key === 'country' || key === 'state') {
+                        console.log(key, value.label)
+                        newformData.append(key, value.label)
+                    } else {
+                        newformData.append(key, value)
+                    }
                 }
             })
             console.log("form data", newformData)
