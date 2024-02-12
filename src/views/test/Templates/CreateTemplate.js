@@ -99,14 +99,13 @@ export default function CreateTemplate() {
   useEffect(() => {
     if (Header.text.includes("{{1}}")) {
       // Update header parameters
-      setHeader_Parameters([{ id: 1, value: '' }])
+      setHeader_Parameters([{ id: 1, value: null }])
     } else {
       setHeader_Parameters([])
     }
 
   }, [Header.text])
 
-  console.log("Header_Parameters", Header_Parameters)
   // 
   // 
   const [Body_Parameters, setBody_Parameters] = useState([])
@@ -398,9 +397,9 @@ export default function CreateTemplate() {
   }
 
   const handleTemplateSubmit = () => {
-    // if (!formValidation()) {
-    //   return false
-    // }
+    if (!formValidation()) {
+      return false
+    }
 
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.title === '') {
@@ -503,7 +502,7 @@ export default function CreateTemplate() {
       }
       if (res.id) {
         toast.success("Template has been created")
-        
+
       }
     }).catch((err) => console.log(err))
 
@@ -600,13 +599,15 @@ export default function CreateTemplate() {
                         maxLength={60}
                         onChange={Header_text_change}
                       />
-                      <button className={`${Header_Parameters.length >= 1 ? 'd-none' : 'd-block'}`} onClick={addHeaderParam}>add parameter</button>
+                      <button className={`btn btn-primary mt-1 ${Header_Parameters.length >= 1 ? 'd-none' : 'd-block'}`} onClick={addHeaderParam}>add parameter</button>
                       <div>
                         {
                           Header_Parameters.map((item) => (
-                            <Select options={paramVals}
-                              onChange={(e) => { setHeader_Parameters([{ id: 1, value: e.value }]) }}
-                              closeMenuOnSelect={true} />
+                            <div className="mt-1">
+                              <Select options={paramVals}
+                                onChange={(e) => { setHeader_Parameters([{ id: 1, value: e.value }]) }}
+                                closeMenuOnSelect={true} />
+                            </div>
                           ))
                         }
                       </div>
@@ -655,15 +656,6 @@ export default function CreateTemplate() {
                               <h5>{`{{ ${paramData.id} }}`}</h5>
                             </div>
                             <div className='w-100'>
-                              {/* <input
-                              type="text"
-                              className="form-control "
-                              placeholder='Sample value'
-                              maxLength={60}
-                              value={paramData.value}
-                              onChange={(e) => handleParameterChange(paramData.id, e.target.value)
-                              }
-                            /> */}
                               <Select options={paramVals}
                                 value={{ value: 'paramData', label: paramData.value }}
                                 onChange={(e) => handleParameterChange(paramData.id, e.label)}
@@ -730,7 +722,7 @@ export default function CreateTemplate() {
                     {Header.type === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
 
                       {
-                        Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className=' object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
+                        Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className='rounded-3  object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
                           <source
                             src={Header.file === '' ? '' : URL.createObjectURL(Header.file)}
                             type="video/mp4"
@@ -743,30 +735,37 @@ export default function CreateTemplate() {
                       <FileText size={45} color='#f33d79' />
                     </div>}
                     {
-                      Header.type === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ?? '')}</h6>
+                      Header.type === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ? `[${Header_Parameters[0]?.value}]` : '{{1}}')}</h6>
                     }
+                    {/* body */}
                     <div className='mt-2'>
                       <h5 dangerouslySetInnerHTML={{ __html: displayedMessage }}></h5>
                     </div>
+                    {/* footer */}
                     {
                       BasicTemplateData.footer && <h6 className='text-secondary mt-1'>{BasicTemplateData.footer}</h6>
                     }
                   </CardBody>
+                  {
+                    useInteractive.dataList && useInteractive.dataList.map((elem) => {
+                      if (elem.actionType === 'PHONE_NUMBER' && elem.title !== '') {
+                        return (
+                          <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
+                            <Phone size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
+                          </div>)
+                      }
+                      if (elem.actionType === 'URL' && elem.title !== '') {
+                        return (
+                          <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
+                            <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
+                          </div>)
+                      }
+                    })
+                  }
                 </Card>
+                {/* buttons */}
                 {
                   useInteractive.dataList && useInteractive.dataList.map((elem) => {
-                    if (elem.actionType === 'PHONE_NUMBER' && elem.title !== '') {
-                      return (
-                        <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                          <Phone size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
-                        </div>)
-                    }
-                    if (elem.actionType === 'URL' && elem.title !== '') {
-                      return (
-                        <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                          <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
-                        </div>)
-                    }
                     if (elem.actionType === 'QUICK_REPLY' && elem.title !== '') {
                       return (
                         <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
@@ -991,7 +990,7 @@ export default function CreateTemplate() {
                                 />
                               </Col>
                               <Col lg="1">
-                                <Select options={[{ value: 'PHONE_NUMBER', label: "Phone Number" }, { value: 'URL', label: "URL" }]}
+                                <Select options={selectPhoneList}
                                   onChange={(e) => handleInputChange(index, 'code', e.value)}
                                   closeMenuOnSelect={true} />
                               </Col>

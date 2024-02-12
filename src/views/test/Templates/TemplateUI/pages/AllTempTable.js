@@ -3,9 +3,9 @@ import moment from 'moment'
 import React, {  useState } from 'react'
 import { Copy, Edit3, Eye, Trash2 } from 'react-feather'
 import { Card, CardBody } from 'reactstrap'
-import AdvanceServerSide from '../../../Components/DataTable/AdvanceServerSide'
+import AdvanceServerSide from '../../../../Components/DataTable/AdvanceServerSide'
 
-export default function AllTemp() {
+export default function AllTempTable() {
     const [isLoading, setIsLoading] = useState(true)
     const [tableData, settableData] = useState(null)
     const [total, settotal] = useState(0)
@@ -86,25 +86,6 @@ export default function AllTemp() {
         }
     ]
 
-    // const tableData = [
-    //     {
-    //         created_at: '2024-01-19T12:30:00Z',
-    //         name: 'John Doe',
-    //         category: 'First Visitor',
-    //         is_new_letter: 'Text',
-    //         status: 1,
-    //         is_offer: true
-    //     },
-    //     {
-    //         created_at: '2024-01-19T14:45:00Z',
-    //         name: 'Jane Smith',
-    //         category: 'Returning Visitor',
-    //         is_new_letter: 'Text',
-    //         status: 0,
-    //         is_offer: false
-    //     }
-    //     // Add more dummy data as needed
-    // ]
 
     const getData = (currentPage = 0, currentEntry = 10, searchValue = "", advanceSearchValue = {}) => {
         setIsLoading(true)
@@ -148,22 +129,6 @@ export default function AllTemp() {
     }
 
 
-    //     fetch(url, {
-    //       method: "POST",
-    //       body: form_data
-    //     })
-    //       .then((data) => data.json())
-    //       .then((resp) => {
-
-    //         setIsLoading(false)
-    //       })
-    //       .catch((error) => {
-    //         console.log(error)
-    //         setIsLoading(false)
-    //       })
-
-    //     // console.log("Main TableData", tableData)
-    //   }
     return (
         <Card>
             <CardBody>

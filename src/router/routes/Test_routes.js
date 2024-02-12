@@ -1,6 +1,6 @@
 import Skin_type_form from "../../views/test/codeSkin/Skin_type_form"
 import OtpinManage from "../../views/test/Templates/OtpinManage"
-import Template from "../../views/test/Templates/Template"
+import TemplateUI from "../../views/test/Templates/TemplateUI/TemplateUI"
 import WAbusinessTable from "../../views/test/Templates/components/WAbusinessTable"
 import EmbededSignup from "../../views/test/Templates/EmbededSignup"
 import Test from "../../views/test/Test"
@@ -19,7 +19,7 @@ export const Test_routes = [
     },
     {
         path: '/template/message',
-        element: <Template />
+        element: <TemplateUI />
     },
     {
         path: '/template/optinManage',

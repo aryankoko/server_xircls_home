@@ -17,13 +17,15 @@ export const configUrl = {
     signup: "/merchant/signup/",
     refresh: "/api/token/refresh/",
     // whatspp
-    createTemplate:"talks/createTemplate/",
+    getTemplates: "talks/getTemplates/",
+    createTemplate: "talks/createTemplate/",
+    sendMessage: "talks/sendMessage/",
     // affilate
-    signupAffiliate:'/affiliate/affiliate_signup/',
-    loginAffiliate:'/affiliate/affiliate_login/',
+    signupAffiliate: '/affiliate/affiliate_signup/',
+    loginAffiliate: '/affiliate/affiliate_login/',
     admin_withdrawn_transactions: "/affiliate/admin_withdrawn_trans",
     admin_withdrawn_request: "/affiliate/admin_withdrawn_req/",
-    
+
     //Infiniti
     addPartners: "/merchant/xircls/make-a-xircls/",
     remarketing: "/merchant/campaign_setting/action_email_remarketing/",
@@ -35,7 +37,7 @@ export const configUrl = {
     outletType: "/merchant/choose-outlet-type/",
     getCategory: "/merchant/categories/",
     saveOutletDetails: "/merchant/create-outlet/",
-    networkDashboard : "/merchant/xircls/networks-dashboard/",
+    networkDashboard: "/merchant/xircls/networks-dashboard/",
     addPlanDetails: "/merchant/xircls/make-a-xircls/",
     getDashboardData: "/dashboard/add_count_dash/",
     getDashboardCampaginDetails: "/dashboard/current_campaign/",

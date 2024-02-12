@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react'
 import UserDropdown from './UserDropdown'
 import { PermissionProvider } from '../../../../Helper/Context'
 import { getReq } from '../../../../assets/auth/jwtService'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link} from 'react-router-dom'
 import countries from '../../../../views/NewFrontBase/Country'
 import { getToken } from '../../../../assets/auth/auth'
 // import NavbarSearch from './NavbarSearch'
@@ -18,7 +18,7 @@ const NavbarUser = ({disableName}) => {
     return userPermission?.appName === cur.app
   }) : []
   
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const getApps = () => {
     getReq('getApps')
     .then((resp) => {
@@ -32,7 +32,7 @@ const NavbarUser = ({disableName}) => {
       if (resp.data.installed_apps.includes(userPermission?.appName)) {
         name = userPermission?.appName
       } else {
-        navigate('/merchant/apps/')
+        // navigate('/merchant/apps/')
         name = ""
       }
 
@@ -73,7 +73,7 @@ const NavbarUser = ({disableName}) => {
         userPermission?.multipleDomain.length > 1 ? <select className='form-control' style={{appearance: 'auto'}} onChange={(e) => {
           // window.location.reload(false)
           setUserPermission({...userPermission, apiKey : e.target.value})
-          navigate('/merchant/apps/')
+          // navigate('/merchant/apps/')
         }}>
           {
             userPermission?.multipleDomain?.map((cur, i) => {
