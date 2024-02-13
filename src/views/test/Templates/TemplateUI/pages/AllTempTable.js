@@ -93,18 +93,13 @@ export default function AllTempTable() {
         // Create a new FormData object and append the searchValue
         const formData = new FormData()
  
-        const url = new URL(`https://856c-2405-201-7-8937-653f-f5ac-58e5-c8e0.ngrok-free.app/getTemplates/`)
-        // form_data.append("draw", "1")
-        // form_data.append("length", "10")
-        // form_data.append("start", "1")
         Object.entries(advanceSearchValue).map(([key, value]) => value && formData.append(key, value))
         formData.append("slug", "customer_data")
-        // formData.append("table_name", "overAll_finance")
         formData.append("page", currentPage + 1)
         formData.append("size", currentEntry)
         formData.append("searchValue", searchValue)
 
-        fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/getTemplates/', {
+        fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/getTemplates/', {
             method: 'POST',
             body: formData
         })

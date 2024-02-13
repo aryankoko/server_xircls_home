@@ -28,9 +28,9 @@ export default function EmbededSignup() {
     axios.post("https://api.demo.xircls.in/country-details/").then((resp) => {
       console.log(resp)
       setCountry(resp.data.data.countries.map((curElem) => {
-          return { value: curElem.id, label: `${curElem.name}` }
+        return { value: curElem.id, label: `${curElem.name}` }
       }))
-  })
+    })
   }, [])
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function EmbededSignup() {
     const newformData = new FormData()
     console.log("sddfasdasd")
     Object.entries(formData).map(([key, value]) => {
-      if (key  === 'country' || key === 'state') {
+      if (key === 'country' || key === 'state') {
         console.log("sfsdfsdf")
         newformData.append(key, value.label)
       } else {
@@ -182,7 +182,7 @@ export default function EmbededSignup() {
                     id="country"
                     onChange={(e) => updateformData('country', e)}
                     placeholder="Enter country"
-                    
+
                   />
                 </div>
               </Col>

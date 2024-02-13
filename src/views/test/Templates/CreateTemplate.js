@@ -11,7 +11,7 @@ import { selectPhoneList } from '../../../Helper/data'
 import { postReq } from '../../../assets/auth/jwtService'
 
 export default function CreateTemplate() {
-  const paramVals = [{ value: 'First_name', label: "First_name" }, { value: 'Last_name', label: "Last_name" }, { value: 'customer_name', label: "customer_name" }, { value: 'Company_name', label: "Company_name" }, { value: 'Order_ID', label: "Order_ID" }, { value: 'Product_name', label: "Product_name" }]
+  const paramVals = [{ value: 'FirstName', label: "FirstName" }, { value: 'LastName', label: "LastName" }, { value: 'customerName', label: "customerName" }, { value: 'CompanyName', label: "CompanyName" }, { value: 'OrderID', label: "OrderID" }, { value: 'ProductName', label: "ProductName" }]
   const msgTypeList = [
     {
       value: "Text",
@@ -363,11 +363,6 @@ export default function CreateTemplate() {
       templateCategory: "Select Template Category",
       language: "Select Template Language"
     }
-    // console.log("BasicTemplateData", BasicTemplateData)
-    // console.log("Body_Parameters", Body_Parameters)
-    // console.log("useMsgBody", useMsgBody)
-    // console.log("useInteractive", useInteractive)
-    // const requiredFields = ['templateName', 'templateCategory', 'language']
 
     if (BasicTemplateData.templateName === '') {
       toast.error(errorMsg['templateName'])
@@ -428,7 +423,7 @@ export default function CreateTemplate() {
         return null
       }
     }).filter(Boolean) // Remove null entries from the result
-
+    // return null
     const components = [
       Header.type === 'Document' && {
         type: 'HEADER',
@@ -445,26 +440,32 @@ export default function CreateTemplate() {
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'Text' && {
+      Header.type === 'Text' && Header_Parameters.length > 0 && {
         type: 'HEADER',
         format: 'TEXT',
         text: Header.text,
         example: {
           header_text: [Header_Parameters.map(item => item.value)][0]
         }
-
       },
-      {
+      Header.type === 'Text' && Header_Parameters.length === 0  && {
+        type: 'HEADER',
+        format: 'TEXT',
+        text: Header.text
+      },
+      Body_Parameters.length > 0 && {
         type: 'BODY',
         text: useMsgBody,
         example: {
           body_text: [Body_Parameters.map(item => item.value)]
         }
-
+      },
+      Body_Parameters.length === 0 && {
+        type: 'BODY',
+        text: useMsgBody
       },
 
       BasicTemplateData.footer !== '' && {
-
         type: 'FOOTER',
         text: BasicTemplateData.footer
       },
@@ -492,6 +493,26 @@ export default function CreateTemplate() {
     console.log(Header.file)
 
     // return null
+
+    // fetch("https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/createTemplate/", {
+    //   method: 'POST',
+    //   body: formData
+    // }).then((res) => {
+    //   console.log(res)
+    //   if (res.data.code === 100) {
+    //     toast.error(res.data.error_user_msg)
+    //   } else {
+    //     // toast.success("Template has been created")
+
+    //   }
+    //   console.log(res.id)
+    //   if (res.id) {
+    //     toast.success("Template has been created")
+
+    //   }
+    // }).catch((err) => console.log(err))
+
+
     postReq("createTemplate", formData).then((res) => {
       console.log(res)
       if (res.data.code === 100) {
@@ -500,7 +521,8 @@ export default function CreateTemplate() {
         // toast.success("Template has been created")
 
       }
-      if (res.id) {
+      console.log(res)
+      if (res.data.id) {
         toast.success("Template has been created")
 
       }
@@ -760,21 +782,16 @@ export default function CreateTemplate() {
                             <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
                           </div>)
                       }
+                      if (elem.actionType === 'QUICK_REPLY' && elem.title !== '') {
+                        return (
+                          <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
+                            <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
+                          </div>)
+                      }
                     })
                   }
                 </Card>
                 {/* buttons */}
-                {
-                  useInteractive.dataList && useInteractive.dataList.map((elem) => {
-                    if (elem.actionType === 'QUICK_REPLY' && elem.title !== '') {
-                      return (
-                        <div className="border rounded-3 bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                          <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
-                        </div>)
-                    }
-                  })
-                }
-
               </div>
 
               <p className='mt-4' style={{ width: '400px' }}>Disclaimer: This is just a graphical representation of the message that will be delivered. Actual message will consist of media selected and may appear different.</p>
