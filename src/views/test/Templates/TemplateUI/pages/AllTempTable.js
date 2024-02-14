@@ -99,7 +99,7 @@ export default function AllTempTable() {
         formData.append("size", currentEntry)
         formData.append("searchValue", searchValue)
 
-        fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/getTemplates/', {
+        fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplates/', {
             method: 'POST',
             body: formData
         })

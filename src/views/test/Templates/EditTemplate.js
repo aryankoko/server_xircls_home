@@ -9,10 +9,12 @@ import { Card, CardBody, Col, Container, Input, Label, Row } from 'reactstrap'
 import wp_back from './imgs/wp_back.png'
 import { selectPhoneList } from '../../../Helper/data'
 import { postReq } from '../../../assets/auth/jwtService'
-import FrontBaseLoader from '../../Components/Loader/Loader'
+import { useParams } from 'react-router-dom'
 
-export default function CreateTemplate() {
-  const [useLoader, setLoader] = useState(false)
+export default function EditTemplate() {
+  const { templateID } = useParams()
+  const [CurrentTemplate, setCurrentTemplate] = useState()
+
   const paramVals = [{ value: 'FirstName', label: "FirstName" }, { value: 'LastName', label: "LastName" }, { value: 'customerName', label: "customerName" }, { value: 'CompanyName', label: "CompanyName" }, { value: 'OrderID', label: "OrderID" }, { value: 'ProductName', label: "ProductName" }]
   const msgTypeList = [
     {
@@ -70,7 +72,7 @@ export default function CreateTemplate() {
 
 
   const [BasicTemplateData, setBasicTemplateData] = useState({
-    templateName: '',
+    templateName: CurrentTemplate?.name,
     templateCategory: '',
     language: '',
     headerText: '',
@@ -108,8 +110,7 @@ export default function CreateTemplate() {
 
   }, [Header.text])
 
-  // 
-  // 
+
   const [Body_Parameters, setBody_Parameters] = useState([])
   const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")
 
@@ -357,6 +358,35 @@ export default function CreateTemplate() {
     }
   }, [useInteractive])
 
+  useEffect(() => {
+
+    const getCurrentTemplate = (templateId) => {
+      const formData = new FormData()
+      formData.append("templateId", templateId)
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplateById/', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+          }
+          return response.json()
+        })
+        .then(data => {
+          // Handle the successful response here
+          console.log('Response:', data)
+          console.log(data.components[0].format)
+          setCurrentTemplate(data)
+
+        })
+        .catch(error => {
+          // Handle errors here
+          console.error('Error:', error)
+        })
+    }
+    getCurrentTemplate(templateID)
+  }, [])
 
   const formValidation = () => {
 
@@ -397,7 +427,7 @@ export default function CreateTemplate() {
     if (!formValidation()) {
       return false
     }
-    setLoader(true)
+
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.title === '') {
         return null // Skip items without a title
@@ -496,39 +526,39 @@ export default function CreateTemplate() {
 
     // return null
 
-    fetch("https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/createTemplate/", {
-      method: 'POST',
-      body: formData
-    }).then((res) => {
+    // fetch("https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/createTemplate/", {
+    //   method: 'POST',
+    //   body: formData
+    // }).then((res) => {
+    //   console.log(res)
+    //   if (res.data.code === 100) {
+    //     toast.error(res.data.error_user_msg)
+    //   } else {
+    //     // toast.success("Template has been created")
+
+    //   }
+    //   console.log(res.id)
+    //   if (res.id) {
+    //     toast.success("Template has been created")
+
+    //   }
+    // }).catch((err) => console.log(err))
+
+
+    postReq("createTemplate", formData).then((res) => {
       console.log(res)
-      if (res.id) {
-        toast.success("Template has been created")
-      } else if (res.data?.code === 100) {
+      if (res.data.code === 100) {
         toast.error(res.data.error_user_msg)
       } else {
-        toast.error("Something went wrong!")
+        // toast.success("Template has been created")
+
       }
-      setLoader(false)
-    }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
+      console.log(res)
+      if (res.data.id) {
+        toast.success("Template has been created")
 
-
-    //   postReq("createTemplate", formData).then((res) => {
-    //     console.log(res)
-    //     if (res.data.code === 100) {
-    //       toast.error(res.data.error_user_msg)
-    //     } else {
-    //       // toast.success("Template has been created")
-
-    //     }
-    //     console.log(res)
-    //     if (res.data.id) {
-    //       toast.success("Template has been created")
-
-    //     }
-    //   setLoader(false)
-
-
-    // }).catch((err) => { console.log(err); setLoader(false) })
+      }
+    }).catch((err) => console.log(err))
 
     // Test if the inputString matches the pattern
 
@@ -542,13 +572,18 @@ export default function CreateTemplate() {
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   return (
     <Container style={{ marginBottom: "200px" }}>
-      {
-
-        useLoader && <FrontBaseLoader />
-      }
       <Card>
-        <CardBody>
-          <h4 className="">New Template Message </h4>
+        <CardBody className='d-flex justify-content-between '>
+          <h4 className="text-danger m-0">Edit Template Message : {CurrentTemplate?.name ?? 'none'} </h4>
+          {
+            CurrentTemplate?.status === "APPROVED" && <button className=' border-0 px-1 bg-success text-white rounded-2'>Approved</button>
+          }
+          {
+            CurrentTemplate?.status === "REJECTED" && <button className=' border-0 px-1 bg-danger text-white rounded-2'>Rejected</button>
+          }
+          {
+            CurrentTemplate?.status === "PENDING" && <button className=' border-0 px-1 bg-warning text-white rounded-2'>Rejected</button>
+          }
         </CardBody>
       </Card>
 
@@ -557,27 +592,47 @@ export default function CreateTemplate() {
 
           <Row>
             <Col md="6">
+
               <div>
                 <h4 className="">Template Category</h4>
-                <p className="fs-5  text-secondary">Your template should fall under one of these categories.</p>
-                <Select
+                {/* <p className="fs-5  text-secondary">Your template should fall under one of these categories.</p> */}
+
+                {
+                  // eslint-disable-next-line multiline-ternary
+                  CurrentTemplate?.status === "APPROVED" ? <input
+                    type="text"
+                    className="form-control "
+                    value={CurrentTemplate?.category}
+                    disabled
+                  /> :
+                 <Select
                   className=''
                   options={tempCatgList}
                   closeMenuOnSelect={true}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
                 />
+}
               </div>
             </Col>
             <Col md="6">
               <div>
                 <h4 className="">Template Language</h4>
-                <p className="fs-5  text-secondary">You will need to specify the language in which message template is submitted.</p>
+                {/* <p className="fs-5  text-secondary">You will need to specify the language in which message template is submitted.</p> */}
+                {
+                  // eslint-disable-next-line multiline-ternary
+                  CurrentTemplate?.status === "APPROVED" ? <input
+                    type="text"
+                    className="form-control "
+                    value={CurrentTemplate?.language}
+                    disabled
+                  /> :
                 <Select
                   className=''
                   options={langList}
                   closeMenuOnSelect={true}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
                 />
+}
               </div>
             </Col>
           </Row>
@@ -585,13 +640,12 @@ export default function CreateTemplate() {
             <Col md="6">
               <div className='mt-3'>
                 <h4 className="">Template Name</h4>
-                <p className="fs-5  text-secondary">Name can only be in lowercase alphanumeric characters and underscores. Special characters and white-space are not allowed
-                  e.g. - app_verification_code</p>
                 <input
                   type="text"
                   className="form-control "
-                  placeholder='Template Name'
-                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateName: e.target.value })}
+                  value={CurrentTemplate?.name}
+                  disabled
+                // onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateName: e.target.value })}
                 />
 
               </div>
@@ -603,6 +657,7 @@ export default function CreateTemplate() {
                   className=''
                   options={msgTypeList}
                   closeMenuOnSelect={true}
+                  value={BasicTemplateData?.msgDataType ?? ''}
                   onChange={(e) => {
                     if (e && e.value !== Header.type.value) {
                       setHeader({ ...Header, type: e.value })

@@ -21,6 +21,18 @@ export const DefaultNav = [
         navLink: '/template/message'
     },
     {
+        id: 'createTemplate',
+        title: 'Create Template',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/createTemplate'
+    },
+    {
+        id: 'editTemplate',
+        title: 'Edit Template',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/editTemplate/1071586197229808'
+    },
+    {
         id: 'optinManage',
         title: 'Optin Management',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
@@ -31,12 +43,6 @@ export const DefaultNav = [
         title: 'WA business Table',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
         navLink: '/template/WAbusinessTable'
-    },
-    {
-        id: 'createTemplate',
-        title: 'Create Template',
-        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/template/createTemplate'
     },
     {
         id: 'EmbededSignup',

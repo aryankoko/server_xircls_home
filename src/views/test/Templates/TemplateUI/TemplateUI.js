@@ -10,16 +10,17 @@ import {
 } from 'reactstrap'
 import { BsFire } from "react-icons/bs"
 import { CiCloud } from "react-icons/ci"
-import { Activity, List, Edit, Clock, Check, AlertCircle, Home, Star, Phone, ExternalLink, CornerDownLeft } from 'react-feather'
+import { Activity, List, Edit, Clock, Check, AlertCircle, Home, Star, Phone, ExternalLink, CornerDownLeft, FileText } from 'react-feather'
 import AllTempTable from './pages/AllTempTable'
 import wp_back from '../imgs/wp_back.png'
 import { postReq } from '../../../../assets/auth/jwtService'
 import FrontBaseLoader from '../../../Components/Loader/Loader'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function TemplateUI() {
-
+   const nagivate = useNavigate()
    const [useLoader, setLoader] = useState(true)
    const [MainMenu, setMainMenu] = useState(1)
    const [SubMenu, setSubMenu] = useState(1)
@@ -33,75 +34,6 @@ export default function TemplateUI() {
 
 
    const toggle = () => setModal(!modal)
-   const getData = (currentPage = 0, currentEntry = 10, searchValue = "", advanceSearchValue = {}) => {
-      setLoader(true)
-      // Create a new FormData object and append the searchValue
-      const formData = new FormData()
-
-      Object.entries(advanceSearchValue).map(([key, value]) => value && formData.append(key, value))
-      formData.append("slug", "customer_data")
-      formData.append("page", currentPage + 1)
-      formData.append("size", currentEntry)
-      formData.append("searchValue", searchValue)
-
-
-      fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/getTemplates/', {
-         method: 'POST',
-         body: formData
-      })
-         .then(response => {
-            if (!response.ok) {
-               throw new Error(`HTTP error! Status: ${response.status}`)
-            }
-            return response.json()
-         })
-         .then(data => {
-            // Handle the successful response here
-            console.log('Response:', data.data)
-            setAllTemplatesData(data.data)
-            setLoader(false)
-         })
-         .catch(error => {
-            // Handle errors here
-            console.error('Error:', error)
-         })
-   }
-   useEffect(() => {
-      getData()
-   }, [])
-
-   // get current template
-   const getCurrentTemplate = (templateId) => {
-      setBodyParameterList([])
-      setHeaderParameterList(null)
-      const formData = new FormData()
-      formData.append("templateId", templateId)
-
-      fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/getTemplateById/', {
-         method: 'POST',
-         body: formData
-      })
-         .then(response => {
-            if (!response.ok) {
-               throw new Error(`HTTP error! Status: ${response.status}`)
-            }
-            return response.json()
-         })
-         .then(data => {
-            // Handle the successful response here
-            console.log('Response:', data)
-            setCurrentTemplate(data)
-            console.log(data.components[0].format)
-
-
-            setModal(true)
-         })
-         .catch(error => {
-            // Handle errors here
-            console.error('Error:', error)
-         })
-   }
-
    const submenuList = [
       {
          title: "Trending",
@@ -144,6 +76,77 @@ export default function TemplateUI() {
       }
    ]
 
+   // get all data
+   const getData = (currentPage = 0, currentEntry = 10, searchValue = "", advanceSearchValue = {}) => {
+      setLoader(true)
+      // Create a new FormData object and append the searchValue
+      const formData = new FormData()
+
+      Object.entries(advanceSearchValue).map(([key, value]) => value && formData.append(key, value))
+      formData.append("slug", "customer_data")
+      formData.append("page", currentPage + 1)
+      formData.append("size", currentEntry)
+      formData.append("searchValue", searchValue)
+
+
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplates/', {
+         method: 'POST',
+         body: formData
+      })
+         .then(response => {
+            if (!response.ok) {
+               throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            return response.json()
+         })
+         .then(data => {
+            // Handle the successful response here
+            console.log('Response:', data.data)
+            setAllTemplatesData(data.data)
+            setLoader(false)
+         })
+         .catch(error => {
+            // Handle errors here
+            console.error('Error:', error)
+         })
+   }
+   useEffect(() => {
+      getData()
+   }, [])
+
+   // get current template
+   const getCurrentTemplate = (templateId) => {
+      setBodyParameterList([])
+      setHeaderParameterList(null)
+      const formData = new FormData()
+      formData.append("templateId", templateId)
+
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplateById/', {
+         method: 'POST',
+         body: formData
+      })
+         .then(response => {
+            if (!response.ok) {
+               throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            return response.json()
+         })
+         .then(data => {
+            // Handle the successful response here
+            console.log('Response:', data)
+            setCurrentTemplate(data)
+            console.log(data.components[0].format)
+
+
+            setModal(true)
+         })
+         .catch(error => {
+            // Handle errors here
+            console.error('Error:', error)
+         })
+   }
+
+   // all themes diplay ui message
    const updateDisplayedMessage = (inputString, defData) => {
       let updatedMessage = inputString
       updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
@@ -158,6 +161,7 @@ export default function TemplateUI() {
 
       return updatedMessage
    }
+   // modal diplay ui message
    const updateDisplayedMessage2 = (inputString, defData) => {
       let updatedMessage = inputString
       updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
@@ -169,18 +173,22 @@ export default function TemplateUI() {
          const data = defData.example.body_text[0]
          const data2 = HeaderParameterList
          updatedMessage = inputString.replace(/{{(\d+)}}/g, (match, index) => {
-            try {
-               return `[${data2[index - 1]}]`
+            return `[${data[index - 1]}]`
 
-            } catch (error) {
-               return `[${data[index - 1]}]`
+            // try {
+            //    return `[${data2[index - 1]}]`
 
-            }
+            // } catch (error) {
+            //    return `[${data[index - 1]}]`
+
+            // }
          })
       }
 
       return updatedMessage
    }
+
+   // paramInput change
    const parameterInput = (type, value, index) => {
 
       if (type === 'header') {
@@ -195,9 +203,7 @@ export default function TemplateUI() {
 
    }
 
-   useEffect(() => {
-   }, [])
-
+   // send template
    const sendTemplate = () => {
 
       const formData = new FormData()
@@ -212,34 +218,36 @@ export default function TemplateUI() {
          formData.append("header_variables", JSON.stringify(header_variables))
          formData.append("type", "TEXT")
       }
-      if (!HeaderParameterList) {
-         formData.append("type", "BODY")
+      if (BodyParameterList.length > 0) {
+         const body_variables = BodyParameterList.map(text => ({
+            type: "text",
+            text
+         }))
+         formData.append("body_variables", JSON.stringify(body_variables))
       }
-      console.log(CurrentTemplate.components[0].format)
+
+      // console.log(CurrentTemplate.components[0].format)
       if (CurrentTemplate.components[0].format === "IMAGE") {
          formData.append("type", "IMAGE")
          formData.append("link", CurrentTemplate.components[0].example.header_handle[0])
-      }
-      if (CurrentTemplate.components[0].format === "VIDEO") {
+      } else if (CurrentTemplate.components[0].format === "VIDEO") {
          formData.append("type", "VIDEO")
          formData.append("link", CurrentTemplate.components[0].example.header_handle[0])
-      }
-      if (CurrentTemplate.components[0].format === "DOCUMENT") {
+      } else if (CurrentTemplate.components[0].format === "DOCUMENT") {
          formData.append("type", "DOCUMENT")
+         formData.append("filename", "filename_123")
          formData.append("link", CurrentTemplate.components[0].example.header_handle[0])
+      } else {
+         formData.append("type", "TEXT")
       }
 
-      const body_variables = BodyParameterList.map(text => ({
-         type: "text",
-         text
-      }))
+     
       formData.append("language", CurrentTemplate.language)
       formData.append("template_name", CurrentTemplate.name)
       formData.append("phone", testPhone)
-      formData.append("body_variables", JSON.stringify(body_variables))
 
 
-      fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/sendMessage/', {
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/sendMessage/', {
          method: 'POST',
          body: formData
       })
@@ -254,7 +262,7 @@ export default function TemplateUI() {
             console.log('Response:', data)
             if (data.messages[0].message_status === "accepted") {
                toast.success("Message has sent!")
-            } else if (data.code) {
+            } else {
                toast.error("Please try again")
 
             }
@@ -262,13 +270,46 @@ export default function TemplateUI() {
          .catch(error => {
             // Handle errors here
             console.error('Error:', error)
+            toast.error("Please try again")
+
          })
    }
 
+   // delete template
    const delTemplate = (name) => {
+      setLoader(true)
+
       const formData = new FormData()
       formData.append("template_name", name)
-      fetch('https://01a2-2402-e280-3d9c-20d-1639-e98e-78ac-2ab2.ngrok-free.app/deleteTemplate/', {
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/deleteTemplate/', {
+         method: 'POST',
+         body: formData
+      })
+         .then(response => {
+            if (!response.ok) {
+               throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            return response.json()
+         })
+         .then(data => {
+            // Handle the successful response here
+            console.log('Response:', data)
+            toast.error("Template deleted")
+            getData()
+
+         })
+         .catch(error => {
+            // Handle errors here
+            console.error('Error:', error)
+      setLoader(false)
+   })
+   }
+
+    // inactive template
+    const inactiveTemplate = (template_id) => {
+      const formData = new FormData()
+      formData.append("template_id", template_id)
+      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/inactiveTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -328,7 +369,7 @@ export default function TemplateUI() {
                }
             </div>
             <div className='position-absolute  end-0 me-3 mt-1'>
-               <button className='btn btn-primary'>Sync Status</button>
+               <button onClick={getData} className='btn btn-primary'>Sync Status</button>
             </div>
          </Card>
          {
@@ -405,6 +446,13 @@ export default function TemplateUI() {
                                                                </div>
                                                             )
                                                          }
+                                                         if (data.format === "DOCUMENT") {
+                                                            return (
+                                                               <div className='border-bottom  d-flex justify-content-center  align-items-center py-3' style={{ height: "50px" }}>
+                                                                  <FileText size={30} color='#000' />
+                                                               </div>
+                                                            )
+                                                         }
                                                          if (data.type === "BODY") {
                                                             return (
                                                                <div className='p-1 pe-2' >
@@ -455,9 +503,19 @@ export default function TemplateUI() {
 
                                              <div className='mt-auto  '>
                                                 <div className='mt-3  rounded-3 d-flex justify-content-evenly  '>
-                                                   <button className=' border-0 px-1 bg-success text-white rounded-2'>{SigleTemplate.status}</button>
-                                                   <button className='btn btn-primary' >Edit</button>
-                                                   <button className='btn btn-primary' onClick={() => delTemplate(SigleTemplate.name)} >Delete</button>
+                                                   {
+                                                      SigleTemplate.status === "APPROVED" && <button className=' border-0 px-1 bg-success text-white rounded-2'>Approved</button>
+                                                   }
+                                                   {
+                                                      SigleTemplate.status === "REJECTED" && <button className=' border-0 px-1 bg-danger text-white rounded-2'>Rejected</button>
+                                                   }
+                                                   {
+                                                      SigleTemplate.status === "PENDING" && <button className=' border-0 px-1 bg-warning text-white rounded-2'>Rejected</button>
+                                                   }
+                                                   
+                                                   <button className='btn btn-primary' onClick={() => nagivate(`/template/editTemplate/${SigleTemplate.id}`)} >Edit</button>
+                                                   {/* <button className='btn btn-primary' onClick={() => delTemplate(SigleTemplate.name)} >Delete</button> */}
+                                                   {/* <button className='btn btn-primary' onClick={() => inactiveTemplate(SigleTemplate.id)}>Inactive</button> */}
                                                    <button className='btn btn-primary' onClick={() => getCurrentTemplate(SigleTemplate.id)}>Test</button>
                                                 </div>
                                              </div>
@@ -521,23 +579,23 @@ export default function TemplateUI() {
                                  CurrentTemplate && CurrentTemplate.components.map((data, index) => {
                                     if (data.type === "BODY" && data.example) {
                                        return (
-                                       <div>
-                                          <h3 className='mt-3 mb-2 border-bottom'>Body</h3>
-                                          {data.example.body_text[0].map((label, index) => {
-                                             return (
-                                                <div className='mt-1'>
-                                                   <h4 className="">{label}</h4>
+                                          <div>
+                                             <h3 className='mt-3 mb-2 border-bottom'>Body</h3>
+                                             {data.example.body_text[0].map((label, index) => {
+                                                return (
+                                                   <div className='mt-1'>
+                                                      <h4 className="">{label}</h4>
 
-                                                   <input
-                                                      type="text"
-                                                      className="form-control "
-                                                      placeholder={label}
-                                                      onChange={(e) => parameterInput('body', e.target.value, index, data)}
-                                                   />
-                                                </div>
-                                             )
-                                          })}
-                                       </div>)
+                                                      <input
+                                                         type="text"
+                                                         className="form-control "
+                                                         placeholder={label}
+                                                         onChange={(e) => parameterInput('body', e.target.value, index, data)}
+                                                      />
+                                                   </div>
+                                                )
+                                             })}
+                                          </div>)
                                     }
 
                                  })
@@ -590,11 +648,19 @@ export default function TemplateUI() {
                                                 </div>
                                              )
                                           }
+                                          if (data.format === "DOCUMENT") {
+                                             return (
+                                                <div className='border-bottom  d-flex justify-content-center  align-items-center py-3' style={{ height: "50px" }}>
+                                                   <FileText size={30} color='#000' />
+                                                </div>
+                                             )
+                                          }
                                           if (data.type === "BODY") {
 
                                              return (
                                                 <div className='p-1 pe-2' >
                                                    <p className='fs-6' dangerouslySetInnerHTML={{ __html: updateDisplayedMessage2(data.text, data) }}></p>
+                                                   {/* <p className='fs-6' dangerouslySetInnerHTML={{ __html: updateDisplayedMessage2(data.text, data) }}></p> */}
 
                                                 </div>
                                              )

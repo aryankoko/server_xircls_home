@@ -7,6 +7,7 @@ import Test from "../../views/test/Test"
 import CreateTemplate from "../../views/test/Templates/CreateTemplate"
 import CodeUserData from "../../views/test/codeSkin/CodeUserData"
 import CodeUserDetails from "../../views/test/codeSkin/CodeUserDetails"
+import EditTemplate from "../../views/test/Templates/EditTemplate"
 
 export const Test_routes = [
     {
@@ -36,6 +37,10 @@ export const Test_routes = [
     {
         path: '/template/createTemplate',
         element: <CreateTemplate />
+    },
+    {
+        path: '/template/editTemplate/:templateID',
+        element: <EditTemplate />
     },
     {
         path: '/codeskin',
