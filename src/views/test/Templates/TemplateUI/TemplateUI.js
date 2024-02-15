@@ -541,7 +541,7 @@ export default function TemplateUI() {
                   backdrop={'static'}
                   size="lg"
                >
-                  <ModalHeader toggle={toggle} className='border-bottom'>Template : {CurrentTemplate?.name && CurrentTemplate.name}</ModalHeader>
+                  <ModalHeader toggle={toggle} className='border-bottom'>Template Name : {CurrentTemplate?.name && CurrentTemplate.name}</ModalHeader>
                   <ModalBody className='py-2'>
                      <Row className=' justify-content-center  align-items-center '>
                         <Col md="6" className=''>
