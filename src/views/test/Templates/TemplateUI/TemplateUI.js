@@ -89,7 +89,7 @@ export default function TemplateUI() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplates/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplates/', {
          method: 'POST',
          body: formData
       })
@@ -121,7 +121,7 @@ export default function TemplateUI() {
       const formData = new FormData()
       formData.append("templateId", templateId)
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplateById/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplateById/', {
          method: 'POST',
          body: formData
       })
@@ -173,21 +173,22 @@ export default function TemplateUI() {
          const data = defData.example.body_text[0]
          const data2 = HeaderParameterList
          updatedMessage = inputString.replace(/{{(\d+)}}/g, (match, index) => {
-            return `[${data[index - 1]}]`
+            // return `[${data[index - 1]}]`
 
-            // try {
-            //    return `[${data2[index - 1]}]`
+            try {
+               return `[${data2[index - 1]}]`
 
-            // } catch (error) {
-            //    return `[${data[index - 1]}]`
+            } catch (error) {
+               return `[${data[index - 1]}]`
 
-            // }
+            }
          })
       }
 
       return updatedMessage
    }
-
+   useEffect(() => {
+   }, [BodyParameterList])
    // paramInput change
    const parameterInput = (type, value, index) => {
 
@@ -247,7 +248,7 @@ export default function TemplateUI() {
       formData.append("phone", testPhone)
 
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/sendMessage/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/sendMessage/', {
          method: 'POST',
          body: formData
       })
@@ -281,7 +282,7 @@ export default function TemplateUI() {
 
       const formData = new FormData()
       formData.append("template_name", name)
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/deleteTemplate/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/deleteTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -309,7 +310,7 @@ export default function TemplateUI() {
     const inactiveTemplate = (template_id) => {
       const formData = new FormData()
       formData.append("template_id", template_id)
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/inactiveTemplate/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/inactiveTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -429,7 +430,7 @@ export default function TemplateUI() {
                                                          if (data.format === "IMAGE") {
                                                             return (
                                                                <div className='p-1'  >
-                                                                  <img className='rounded-3 img-fluid border-0 rounded w-100 object-fit-cover ' src={data.example.header_handle[0] ?? ""} alt="" />
+                                                                  <img className='rounded-3 img-fluid border-0 rounded w-100 object-fit-cover ' src={data?.example?.header_handle[0] ?? ""} alt="" />
                                                                </div>
                                                             )
                                                          }
@@ -631,7 +632,7 @@ export default function TemplateUI() {
                                           if (data.format === "IMAGE") {
                                              return (
                                                 <div className='p-1'  >
-                                                   <img className=' img-fluid border-0 rounded w-100 object-fit-cover ' src={data.example.header_handle[0] ?? ""} alt="" />
+                                                   <img className=' img-fluid border-0 rounded w-100 object-fit-cover ' src={data.example?.header_handle[0] ?? ""} alt="" />
                                                 </div>
                                              )
                                           }

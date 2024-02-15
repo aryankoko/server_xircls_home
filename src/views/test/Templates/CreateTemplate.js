@@ -30,6 +30,10 @@ export default function CreateTemplate() {
     {
       value: "Video",
       label: "Video"
+    },
+    {
+      value: "None",
+      label: "None"
     }
   ]
   const tempCatgList = [
@@ -496,15 +500,21 @@ export default function CreateTemplate() {
 
     // return null
 
-    fetch("https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/createTemplate/", {
+    fetch("https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/createTemplate/", {
       method: 'POST',
       body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+      return response.json()
     }).then((res) => {
       console.log(res)
       if (res.id) {
         toast.success("Template has been created")
-      } else if (res.data?.code === 100) {
-        toast.error(res.data.error_user_msg)
+      } else if (res.code === 100) {
+        toast.error(res.error_user_msg)
       } else {
         toast.error("Something went wrong!")
       }

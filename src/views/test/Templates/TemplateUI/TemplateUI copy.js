@@ -45,7 +45,7 @@ export default function TemplateUI() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplates/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplates/', {
          method: 'POST',
          body: formData
       })
@@ -77,7 +77,7 @@ export default function TemplateUI() {
       const formData = new FormData()
       formData.append("templateId", templateId)
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplateById/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplateById/', {
          method: 'POST',
          body: formData
       })
@@ -239,7 +239,7 @@ export default function TemplateUI() {
       formData.append("body_variables", JSON.stringify(body_variables))
 
 
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/sendMessage/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/sendMessage/', {
          method: 'POST',
          body: formData
       })
@@ -268,7 +268,7 @@ export default function TemplateUI() {
    const delTemplate = (name) => {
       const formData = new FormData()
       formData.append("template_name", name)
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/deleteTemplate/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/deleteTemplate/', {
          method: 'POST',
          body: formData
       })

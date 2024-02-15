@@ -10,6 +10,7 @@ import wp_back from './imgs/wp_back.png'
 import { selectPhoneList } from '../../../Helper/data'
 import { postReq } from '../../../assets/auth/jwtService'
 import { useParams } from 'react-router-dom'
+import { forEach } from 'lodash'
 
 export default function EditTemplate() {
   const { templateID } = useParams()
@@ -112,7 +113,7 @@ export default function EditTemplate() {
 
 
   const [Body_Parameters, setBody_Parameters] = useState([])
-  const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")
+  const [useMsgBody, setMsgBody] = useState("CurrentTemplate")
 
 
   const [useInteractive, setInteractive] = useState({
@@ -363,7 +364,7 @@ export default function EditTemplate() {
     const getCurrentTemplate = (templateId) => {
       const formData = new FormData()
       formData.append("templateId", templateId)
-      fetch('https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/getTemplateById/', {
+      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplateById/', {
         method: 'POST',
         body: formData
       })
@@ -376,9 +377,32 @@ export default function EditTemplate() {
         .then(data => {
           // Handle the successful response here
           console.log('Response:', data)
+          const formatType = data.components[0]
           console.log(data.components[0].format)
+          console.log(data.components[0])
           setCurrentTemplate(data)
-
+          if (["TEXT", "IMAGE", "VIDEO", "DOCUMENT"].includes(formatType.format)) {
+            if (formatType.format === "TEXT") {
+              setHeader({ ...Header, type: formatType.format, text: formatType.text })
+            } else {
+              setHeader({ ...Header, type: formatType.format, file: formatType.example.header_handle[0] })
+            }
+            // alert(formatType)
+          }
+          data.components.forEach((elm) => {
+            if (elm.type === "BODY") {
+              setMsgBody(elm.text)
+              const Paralist = []
+              if (elm.example.body_text) {
+                elm.example.body_text.forEach((para) => {
+                  // console.log(para)
+                  Paralist.push({id:1, value: para})
+                })
+              }
+              setBody_Parameters(Paralist)
+              // updateDisplayedMessage()
+            }
+          })
         })
         .catch(error => {
           // Handle errors here
@@ -424,9 +448,9 @@ export default function EditTemplate() {
   }
 
   const handleTemplateSubmit = () => {
-    if (!formValidation()) {
-      return false
-    }
+    // if (!formValidation()) {
+    //   return false
+    // }
 
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.title === '') {
@@ -457,22 +481,22 @@ export default function EditTemplate() {
     }).filter(Boolean) // Remove null entries from the result
     // return null
     const components = [
-      Header.type === 'Document' && {
+      Header.type === 'DOCUMENT' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'Image' && {
+      Header.type === 'IMAGE' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'Video' && {
+      Header.type === 'VIDEO' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'Text' && Header_Parameters.length > 0 && {
+      Header.type === 'TEXT' && Header_Parameters.length > 0 && {
         type: 'HEADER',
         format: 'TEXT',
         text: Header.text,
@@ -480,7 +504,7 @@ export default function EditTemplate() {
           header_text: [Header_Parameters.map(item => item.value)][0]
         }
       },
-      Header.type === 'Text' && Header_Parameters.length === 0 && {
+      Header.type === 'TEXT' && Header_Parameters.length === 0 && {
         type: 'HEADER',
         format: 'TEXT',
         text: Header.text
@@ -522,11 +546,11 @@ export default function EditTemplate() {
     console.log("payload", components)
     console.log("useInteractive", useInteractive)
     console.log(BasicTemplateData)
-    console.log(Header.file)
+    console.log(Header)
 
-    // return null
+    return null
 
-    // fetch("https://8855-2402-e280-3d9c-20d-cf6e-626b-8cb3-5e9.ngrok-free.app/createTemplate/", {
+    // fetch("https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/createTemplate/", {
     //   method: 'POST',
     //   body: formData
     // }).then((res) => {
@@ -605,13 +629,13 @@ export default function EditTemplate() {
                     value={CurrentTemplate?.category}
                     disabled
                   /> :
-                 <Select
-                  className=''
-                  options={tempCatgList}
-                  closeMenuOnSelect={true}
-                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
-                />
-}
+                    <Select
+                      className=''
+                      options={tempCatgList}
+                      closeMenuOnSelect={true}
+                      onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
+                    />
+                }
               </div>
             </Col>
             <Col md="6">
@@ -626,13 +650,13 @@ export default function EditTemplate() {
                     value={CurrentTemplate?.language}
                     disabled
                   /> :
-                <Select
-                  className=''
-                  options={langList}
-                  closeMenuOnSelect={true}
-                  onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
-                />
-}
+                    <Select
+                      className=''
+                      options={langList}
+                      closeMenuOnSelect={true}
+                      onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
+                    />
+                }
               </div>
             </Col>
           </Row>
@@ -657,7 +681,7 @@ export default function EditTemplate() {
                   className=''
                   options={msgTypeList}
                   closeMenuOnSelect={true}
-                  value={BasicTemplateData?.msgDataType ?? ''}
+                  value={{ value: Header.type, label: Header.type }}
                   onChange={(e) => {
                     if (e && e.value !== Header.type.value) {
                       setHeader({ ...Header, type: e.value })
@@ -670,7 +694,7 @@ export default function EditTemplate() {
               <div>
 
                 <div>
-                  {Header.type === 'Text' &&
+                  {Header.type === 'TEXT' &&
                     <div className='mt-3'>
                       <h4 className="">Template Header Text </h4>
                       <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
@@ -695,7 +719,7 @@ export default function EditTemplate() {
                         }
                       </div>
                     </div>}
-                  {(Header.type === 'Image' || Header.type === 'Video' || Header.type === 'Document') &&
+                  {(Header.type === 'IMAGE' || Header.type === 'VIDEO' || Header.type === 'DOCUMENT') &&
 
                     <div className='mt-3'>
                       <h4 className="">{Header.type} Media File</h4>
@@ -781,7 +805,7 @@ export default function EditTemplate() {
                       <PlayCircle size={45} color='#5f66cd' />
                       <FileText size={45} color='#f33d79' />
                     </div>}
-                    {Header.type === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
+                    {Header.type === "IMAGE" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
                       {Header.file instanceof File || Header.file instanceof Blob ? (
                         <img
                           className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
@@ -802,23 +826,23 @@ export default function EditTemplate() {
                         )
                       )}
                     </div>}
-                    {Header.type === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
+                    {Header.type === "VIDEO" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
 
                       {
                         Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className='rounded-3  object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
                           <source
-                            src={Header.file === '' ? '' : URL.createObjectURL(Header.file)}
+                            // src={Header.file === '' ? '' : URL.createObjectURL(Header.file)}
                             type="video/mp4"
                           />
                           Video not supported.
                         </video>
                       }
                     </div>}
-                    {Header.type === "Document" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
+                    {Header.type === "DOCUMENT" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
                       <FileText size={45} color='#f33d79' />
                     </div>}
                     {
-                      Header.type === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ? `[${Header_Parameters[0]?.value}]` : '{{1}}')}</h6>
+                      Header.type === "TEXT" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ? `[${Header_Parameters[0]?.value}]` : '{{1}}')}</h6>
                     }
                     {/* body */}
                     <div className='mt-2'>
