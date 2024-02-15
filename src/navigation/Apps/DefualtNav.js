@@ -39,6 +39,12 @@ export const DefaultNav = [
         navLink: '/template/optinManage'
     },
     {
+        id: 'createGroup',
+        title: 'Create Group',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/create-group'
+    },
+    {
         id: 'WAbusinessTable',
         title: 'WA business Table',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,

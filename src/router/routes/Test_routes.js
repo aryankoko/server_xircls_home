@@ -8,6 +8,7 @@ import CreateTemplate from "../../views/test/Templates/CreateTemplate"
 import CodeUserData from "../../views/test/codeSkin/CodeUserData"
 import CodeUserDetails from "../../views/test/codeSkin/CodeUserDetails"
 import EditTemplate from "../../views/test/Templates/EditTemplate"
+import CreateGroup from "../../views/test/Templates/group/CreateGroup"
 
 export const Test_routes = [
     {
@@ -49,6 +50,10 @@ export const Test_routes = [
     {
         path: '/codeskin-user/:id',
         element: <CodeUserDetails />
+    },
+    {
+        path: '/template/create-group',
+        element: <CreateGroup />
     },
     {
         path: '/test',
