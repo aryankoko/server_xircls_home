@@ -9,6 +9,9 @@ import CodeUserData from "../../views/test/codeSkin/CodeUserData"
 import CodeUserDetails from "../../views/test/codeSkin/CodeUserDetails"
 import EditTemplate from "../../views/test/Templates/EditTemplate"
 import CreateGroup from "../../views/test/Templates/group/CreateGroup"
+import Settings from "../../views/test/code_from_prasad/Settings/BusinessCreation"
+import Project from "../../views/test/code_from_prasad/Settings/Project"
+import SettingsTable from "../../views/test/code_from_prasad/Settings/SettingsTable"
 
 export const Test_routes = [
     {
@@ -54,6 +57,18 @@ export const Test_routes = [
     {
         path: '/template/create-group',
         element: <CreateGroup />
+    },
+    {
+        path: '/template/business-creation',
+        element: <Settings />
+    },
+    {
+        path: '/template/setting',
+        element: <SettingsTable />
+    },
+    {
+        path: '/template/project',
+        element: <Project />
     },
     {
         path: '/test',

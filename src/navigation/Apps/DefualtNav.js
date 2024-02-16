@@ -57,6 +57,24 @@ export const DefaultNav = [
         navLink: '/template/EmbededSignup'
     },
     {
+        id: 'business-creation',
+        title: 'business-creation',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/business-creation'
+    },
+    {
+        id: 'setting',
+        title: 'setting',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/setting'
+    },
+    {
+        id: 'project',
+        title: 'project',
+        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+        navLink: '/template/project'
+    },
+    {
         id: 'codeskin',
         title: 'codeskin',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,

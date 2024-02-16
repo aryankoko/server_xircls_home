@@ -25,6 +25,18 @@
         - remain validation  
         - remain img btn 
 
+     - Create group
+        - add rules  
+
+    - pages from prasad 
+        - buysiness creation
+        - project 
+        - settingsTable
+        
+           
+     
+
+
 ## Affilitae
 - done api
 - add affiliate table to admin pannel
