@@ -65,7 +65,7 @@ export default function CreateTemplate() {
   ]
   const callOptions = () => {
     let opt = addCallOptions.slice()
-    useInteractive.forEach(item => {
+    useInteractive.dataList.forEach(item => {
       opt = opt.filter(option => option.value !== item.actionType)
     })
 
@@ -77,8 +77,6 @@ export default function CreateTemplate() {
     templateName: '',
     templateCategory: '',
     language: '',
-    headerText: '',
-    headerUrl: '',
     msgDataType: "None",
     footer: ''
   })
@@ -112,111 +110,254 @@ export default function CreateTemplate() {
 
   }, [Header.text])
 
-  // body data structure ---------------------
+  // 
+  // 
   const [Body_Parameters, setBody_Parameters] = useState([])
-  const [useMsgBody, setMsgBody] = useState("Hello {{3}}, your code will expire in {{4}} mins.")
-  const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
-
-  const handleBodyDisplay = (message, parameters) => {
-    let uptDiplayMsg = message.replace(/{{\s*(\d+)\s*}}/g, (_, n) => {
-      const replacement = parameters[n - 1] // n starts from 1
-      return (replacement === '' || replacement === undefined) ? `{{${n}}}` : `[${replacement}]`
-    })
-    uptDiplayMsg = uptDiplayMsg.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`).replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`).replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
-    setDisplayedMessage(uptDiplayMsg)
-  }
-
-  const handleMsgBodyChange = () => {
-    try {
-      let str = useMsgBody
-      let sequenceCount = (str.match(/{{\s*(\d+)\s*}}/g) || []).length
-      let sequence = Array.from({ length: sequenceCount }, (_, i) => 1 + i)
-
-      // Update Body_Parameters and useMsgBody simultaneously
-      let newParam = sequence.map((_, i) => Body_Parameters[i] || '')
-      let replacedString = str.replace(/{{\s*(\d+)\s*}}/g, () => `{{${sequence.shift()}}}`)
-
-      setBody_Parameters(newParam)
-      setMsgBody(replacedString)
-      handleBodyDisplay(replacedString, newParam)
-    } catch (error) {
-      console.error(error)
-      setBody_Parameters([])
-      setMsgBody(useMsgBody)
-    }
-  }
-
-  const handleParameterChange = (index, value) => {
-    let updatedParameters = [...Body_Parameters]
-    updatedParameters[index] = value
-    handleBodyDisplay(useMsgBody, updatedParameters)
-    setBody_Parameters(updatedParameters)
-  }
-
-  useEffect(() => {
-    handleMsgBodyChange()
-  }, [useMsgBody])
-
-  // body xxxxxxxxxxxxxxxxxxx ---------------------
+  const [useMsgBody, setMsgBody] = useState("Hello {{1}}, your code will expire in {{2}} mins.")
 
 
-  const [useInteractive, setInteractive] = useState([])
+  const [useInteractive, setInteractive] = useState({
+    type: 'None',
+    dataList: []
+  })
   const [useButtons, setButtons] = useState({
     QUICK_REPLY: 3,
     URL: 1,
     PHONE_NUMBER: 1
   })
+  const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
+  // massgae body function olny ------------------------------------
+  //  update Body_Parameters based on the message
+  const updateParametersList = (message) => {
+    const regex = /{{\s*(\d+)\s*}}/g
+    const matches = message.match(regex)
 
+    if (matches) {
+      const uniqueIds = [...new Set(matches.map(match => parseInt(match.match(/\d+/)[0])))]
+      const existingParametersMap = Body_Parameters.reduce((map, param) => {
+        map[param.id] = param.value
+        return map
+      }, {})
+      const newParametersList = uniqueIds.map(id => ({
+        id,
+        value: existingParametersMap[id] !== undefined ? existingParametersMap[id] : ''
+      }))
 
-  // 
-
-  // interactive change---------------------------------------------------
-  const addInteractiveBtn = (type) => {
-    const oldData = useInteractive
-    if (type === 'QUICK_REPLY') {
-      setInteractive([
-        ...oldData,
-        {
-          actionType: 'QUICK_REPLY',
-          title: ""
-        }
-      ])
-    } else if (type === 'URL') {
-      setInteractive([
-        ...oldData,
-        {
-          actionType: 'URL',
-          title: "",
-          value: ""
-        }
-      ])
-    } else if (type === 'PHONE_NUMBER') {
-      setInteractive([
-        ...oldData,
-        {
-          actionType: 'PHONE_NUMBER',
-          code: '',
-          title: "",
-          value: ""
-        }
-      ])
+      setBody_Parameters(newParametersList)
     } else {
-      setInteractive([])
+      setBody_Parameters([])
     }
   }
 
+  //  update displayedMessage with replaced parameter values
+  const updateDisplayedMessage = () => {
+    let updatedMessage = useMsgBody
+
+    Body_Parameters.forEach(param => {
+      const regex = new RegExp(`{{\\s*${param.id}\\s*}}`, 'g')
+      if (param.value !== '') {
+        updatedMessage = updatedMessage.replace(regex, `[${param.value}]`)
+      }
+    })
+
+    updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
+    updatedMessage = updatedMessage.replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
+    updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
+
+    setDisplayedMessage(updatedMessage)
+  }
+
+  const addParameterBtn = () => {
+
+    const existingIds = Body_Parameters.map(obj => obj.id)
+    for (let i = 1; i < Body_Parameters.length + 2; i++) {
+      if (!existingIds.includes(i)) {
+        const prev = `${useMsgBody}{{${i}}}`
+        setMsgBody(prev)
+        return null
+      }
+    }
+  }
+
+  //  handle parameter value changes
+  const handleParameterChange = (id, value) => {
+    setBody_Parameters((prevList) => prevList.map((param) => (param.id === id ? { ...param, value } : param))
+    )
+  }
+
+  //  handle template message changes
+  const handleMsgBodyChange = (event) => {
+    const input = event.target
+    const cursorPosition = input.selectionStart // Get the cursor position
+
+    const value = input.value
+    const regex = /\{\{(\d+)\}\}/g
+    let updatedValue = value
+
+    const matches = value.match(regex)
+
+    if (matches) {
+      const sortedMatches = matches.sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0])
+        const numB = parseInt(b.match(/\d+/)[0])
+        return numA - numB
+      })
+
+      let sequenceNumber = 1
+      sortedMatches.forEach((match) => {
+        updatedValue = updatedValue.replace(match, `{{${sequenceNumber++}}}`)
+      })
+    }
+
+    const uptStr = (input) => {
+      const regex = /\{\{(\d+)\}\}/g
+      let sequenceNumber = 1
+
+      const updatedValue = input.replace(regex, (match) => {
+        return `{{${sequenceNumber++}}}`
+      })
+
+      return updatedValue
+    }
+
+    const updatedText = uptStr(updatedValue)
+
+    // Set input value preserving cursor position
+    input.value = updatedText
+
+    // Restore cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition)
+
+    // Perform other actions as needed
+    setMsgBody(updatedText)
+    updateParametersList(updatedText)
+  }
+
+
+  useEffect(() => {
+    updateParametersList(useMsgBody)
+  }, [useMsgBody])
+
+  useEffect(() => {
+    updateDisplayedMessage()
+  }, [Body_Parameters])
+
+  // interactive change---------------------------------------------------
+  const handleTnteractiveRadio = (e) => {
+    const type = e.target.value
+    if (type === 'Call') {
+      setInteractive({
+        type: 'Call',
+        dataList: [
+          {
+            id: 1,
+            actionType: '',
+            code: '',
+            title: "",
+            value: ""
+          }
+        ]
+      })
+    } else if (type === 'Quick') {
+      setInteractive({
+        type: 'Quick',
+        dataList: [
+          {
+            id: 1,
+            actionType: 'QUICK_REPLY',
+            title: ""
+          }
+        ]
+      })
+    } else if (type === 'All') {
+      setInteractive({
+        type: 'All',
+        dataList: []
+      })
+    } else {
+      setInteractive({
+        type: 'None',
+        dataList: []
+      })
+    }
+    setButtons({
+      QUICK_REPLY: 3,
+      URL: 1,
+      PHONE_NUMBER: 1
+    })
+  }
 
   const handleInputChange = (index, field, value) => {
-    const oldData = [...useInteractive]
-    oldData[index][field] = value
-    setInteractive(oldData)
+    setInteractive((prevState) => {
+      const newDataList = [...prevState.dataList]
+      newDataList[index][field] = value
+      return { ...prevState, dataList: newDataList }
+    })
   }
 
   const handleDeleteAction = (index) => {
-    let oldData = [...useInteractive]
-    oldData = oldData.splice(index, 1)
-    setInteractive(oldData)
+    setInteractive((prevState) => {
+      const newDataList = [...prevState.dataList]
+      newDataList.splice(index, 1)
+      return { ...prevState, dataList: newDataList }
+    })
   }
+  const handleAddAction = (allType) => {
+    setInteractive((prevState) => {
+      const newDataList = [...prevState.dataList]
+      const newIndex = newDataList.length + 1
+
+      if (prevState.type === 'Call') {
+        newDataList.push({
+          id: newIndex,
+          actionType: '',
+          title: '',
+          value: ''
+        })
+      } else if (prevState.type === 'Quick') {
+        newDataList.push({
+          id: newIndex,
+          actionType: 'QUICK_REPLY',
+          title: ''
+        })
+      } else if (prevState.type === 'All') {
+        newDataList.push({
+          id: 1,
+          actionType: allType,
+          code: '',
+          title: "",
+          value: ""
+        })
+      }
+
+      return { ...prevState, dataList: newDataList }
+    })
+  }
+
+  useEffect(() => {
+    if (useInteractive.type === "All") {
+      const { dataList } = useInteractive
+
+      const counts = dataList.reduce((acc, ele) => {
+        if (ele.actionType === "QUICK_REPLY") {
+          acc.quickNum++
+        }
+        if (ele.actionType === "URL") {
+          acc.urlNum++
+        }
+        if (ele.actionType === "PHONE_NUMBER") {
+          acc.phoneNum++
+        }
+        return acc
+      }, { quickNum: 0, urlNum: 0, phoneNum: 0 })
+
+      setButtons({
+        QUICK_REPLY: 3 - counts.quickNum - counts.urlNum - counts.phoneNum,
+        URL: 1 - counts.urlNum,
+        PHONE_NUMBER: 1 - counts.phoneNum
+      })
+    }
+  }, [useInteractive])
 
 
   const formValidation = () => {
@@ -255,17 +396,9 @@ export default function CreateTemplate() {
   }
 
   const handleTemplateSubmit = () => {
-    console.log("------------------------------------------------")
-    console.log("Body_Parameters :   ", Body_Parameters)
-    console.log("useMsgBody :  ", useMsgBody)
-    console.log("Header :  ", Header)
-    console.log("Header_Parameters :  ", Header_Parameters)
-    console.log("BasicTemplateData :  ", BasicTemplateData)
-    console.log("useInteractive :  ", useInteractive)
-    return null
-    // if (!formValidation()) {
-    //   return false
-    // }
+    if (!formValidation()) {
+      return false
+    }
     setLoader(true)
     const newInteractiveData = useInteractive.dataList.map(item => {
       if (item.title === '') {
@@ -369,22 +502,22 @@ export default function CreateTemplate() {
       method: 'POST',
       body: formData
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
-        }
-        return response.json()
-      }).then((res) => {
-        console.log(res)
-        if (res.id) {
-          toast.success("Template has been created")
-        } else if (res.code === 100) {
-          toast.error(res.error_user_msg)
-        } else {
-          toast.error("Something went wrong!")
-        }
-        setLoader(false)
-      }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+      return response.json()
+    }).then((res) => {
+      console.log(res)
+      if (res.id) {
+        toast.success("Template has been created")
+      } else if (res.code === 100) {
+        toast.error(res.error_user_msg)
+      } else {
+        toast.error("Something went wrong!")
+      }
+      setLoader(false)
+    }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
 
     //   postReq("createTemplate", formData).then((res) => {
@@ -538,11 +671,11 @@ export default function CreateTemplate() {
                     <textarea
                       className="form-control"
                       value={useMsgBody}
-                      onChange={(e) => setMsgBody(e.target.value)}
+                      onChange={handleMsgBodyChange}
                       rows="5"
                       maxLength={1024}
                     ></textarea>
-                    <button className='btn btn-primary mt-1' onClick={() => setMsgBody((prev) => `${prev}{{${Body_Parameters.length + 1}}}`)} >Add parameter</button>
+                    <button className='btn btn-primary mt-1' onClick={addParameterBtn}>Add parameter</button>
                   </div>
                   {/* Sample values for parameters input */}
                   <div className='mt-3'>
@@ -552,16 +685,16 @@ export default function CreateTemplate() {
                       changed at the time of sending. e.g. - {'{{1}}'}: Mohit, {'{{2}}'}: 5.
                     </p>
                     <div className='d-flex flex-column gap-1'>
-                      {Body_Parameters?.map((paramData, index) => {
+                      {Body_Parameters?.sort((a, b) => a.id - b.id).map((paramData) => {
                         return (
-                          <div className='d-flex' key={index + 1}>
+                          <div className='d-flex' key={paramData.id}>
                             <div className='w-25 d-flex justify-content-center align-items-center '>
-                              <h5>{`{{ ${index + 1} }}`}</h5>
+                              <h5>{`{{ ${paramData.id} }}`}</h5>
                             </div>
                             <div className='w-100'>
                               <Select options={paramVals}
-                                value={{ value: paramData, label: paramData }}
-                                onChange={(e) => handleParameterChange(index, e.label)}
+                                value={{ value: 'paramData', label: paramData.value }}
+                                onChange={(e) => handleParameterChange(paramData.id, e.label)}
                                 closeMenuOnSelect={true} />
 
                             </div>
@@ -650,7 +783,7 @@ export default function CreateTemplate() {
                     }
                   </CardBody>
                   {
-                    useInteractive && useInteractive.map((elem) => {
+                    useInteractive.dataList && useInteractive.dataList.map((elem) => {
                       if (elem.actionType === 'PHONE_NUMBER' && elem.title !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
@@ -672,7 +805,7 @@ export default function CreateTemplate() {
                     })
                   }
                 </Card>
-                {/* Buttons */}
+                {/* buttons */}
               </div>
 
               <p className='mt-4' style={{ width: '400px' }}>Disclaimer: This is just a graphical representation of the message that will be delivered. Actual message will consist of media selected and may appear different.</p>
@@ -690,21 +823,116 @@ export default function CreateTemplate() {
                 <div className='d-flex w-75'>
 
                   <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio1' >
-                    <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={() => addInteractiveBtn("none")} />
+                    <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={handleTnteractiveRadio} />
                     <p className="m-0">None</p>
                   </Label>
 
+
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio2'  >
+                    <Input type='radio' id='radio2' style={{ marginLeft: '15px' }} name='radio1' value='Call' onChange={handleTnteractiveRadio} />
+                    <p className="m-0">Call to Action</p>
+                  </Label>
+
+                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio3' >
+                    <Input type='radio' id='radio3' style={{ marginLeft: '15px' }} name='radio1' value='Quick' onChange={handleTnteractiveRadio} />
+                    <p className="m-0">Quick Replies
+                    </p>
+                  </Label>
+
                   <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio4' >
-                    <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={() => addInteractiveBtn("QUICK_REPLY")} />
-                    <p className="m-0">Add Interactive Actions</p>
+                    <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={handleTnteractiveRadio} />
+                    <p className="m-0">All</p>
                   </Label>
                 </div>
 
                 {/* UI Interactive */}
                 <div className='mt-3 px-lg-1'>
-                  {useInteractive?.length > 0 &&
+                  {useInteractive.type === 'Call' && <div className='gap-1 d-flex flex-column  '>
+                    {useInteractive.dataList.map((ele, index) => (
+                      <Row key={index}>
+                        <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
+                        <Col lg="3" className=''>
+                          <Select options={callOptions()}
+                            value={addCallOptions?.find(option => option.value === ele.actionType)}
+                            onChange={(e) => handleInputChange(index, 'actionType', e.value)}
+                            closeMenuOnSelect={true} />
+                        </Col>
+                        <Col lg="3">
+                          <input
+                            type="text"
+                            className="form-control "
+                            placeholder='Button Title'
+                            maxLength={25}
+                            value={ele.title}
+                            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                          />
+                        </Col>
+                        {
+                          ele.actionType === "PHONE_NUMBER" &&
+                          <Col lg="1">
+                            <Select options={selectPhoneList}
+                              onChange={(e) => handleInputChange(index, 'code', e.value)}
+                              closeMenuOnSelect={true} />
+                          </Col>
+                        }
+                        <Col >
+                          <input
+                            type="text"
+                            className="form-control "
+                            placeholder='Button Value'
+                            value={ele.value}
+                            onChange={(e) => handleInputChange(index, 'value', e.target.value)}
+                          />
+                        </Col>
+
+                        <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
+                          <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
+                        </Col>
+                      </Row>))}
+                    <div>
+                      {useInteractive.dataList.length <= 1 &&
+                        <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
+                          <Plus size={18} /> <p className='m-0'>Call to Action</p>
+                        </button>
+                      }
+                    </div>
+                  </div>}
+
+                  {useInteractive.type === 'Quick' &&
                     <div className='gap-1 d-flex flex-column  '>
-                      {useInteractive.map((ele, index) => {
+                      {useInteractive.dataList.map((ele, index) => (
+                        <Row key={index}>
+                          <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Quick Reply {index + 1} :</p></Col>
+
+                          <Col lg="4">
+                            <input
+                              type="text"
+                              className="form-control "
+                              placeholder='Button Title'
+                              maxLength={25}
+                              value={ele.title}
+                              onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                            />
+                          </Col>
+                          <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
+                            <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
+                          </Col>
+                        </Row>))}
+                      <div>
+                        {
+
+                          useInteractive.dataList.length <= 2 &&
+                          <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
+                            <Plus size={18} /> <p className='m-0'>Quick Reply</p>
+                          </button>
+                        }
+
+                      </div>
+                    </div>}
+
+                  {useInteractive.type === 'All' &&
+                    <div className='gap-1 d-flex flex-column  '>
+                      {useInteractive.dataList.sort((a, b) => ({ URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[a.actionType] - { URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[b.actionType])).map((ele, index) => {
 
                         if (ele.actionType === 'QUICK_REPLY') {
                           return (
@@ -815,13 +1043,13 @@ export default function CreateTemplate() {
                         }
                       })}
                       <div className='d-flex gap-2'>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("QUICK_REPLY")} >
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("QUICK_REPLY")} >
                           <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.QUICK_REPLY}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("URL")}>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
                           <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
                         </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("PHONE_NUMBER")}>
+                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
                           <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
                         </div>
                       </div>

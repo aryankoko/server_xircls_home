@@ -1,8 +1,8 @@
 // ** React Imports
-import { Navigate } from 'react-router-dom'
+// import { Navigate } from 'react-router-dom'
 import { Suspense } from 'react'
 // import { TOKEN_KEY, getToken } from '../../../assets/auth/auth'
-import toast from 'react-hot-toast'
+// import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 // import Cookies from 'js-cookie'
 
@@ -12,7 +12,7 @@ import Cookies from 'js-cookie'
 const PrivateRoute = ({ children, route }) => {
   // ** Hooks & Vars
   // const ability = useContext(AbilityContext)
-  const user = Cookies.get("xircls_user_token")
+  // const user = Cookies.get("xircls_user_token")
 
   if (route) {
     // let action = null
@@ -24,10 +24,10 @@ const PrivateRoute = ({ children, route }) => {
     //   resource = route.meta.resource
     //   restrictedRoute = route.meta.restricted
     // }
-    if (!user) {
-      toast.error("Session expired. Please login")
-      return <Navigate to='/merchant/login/' />
-    }
+    // if (!user) {
+    //   toast.error("Session expired. Please login")
+    //   return <Navigate to='/merchant/login/' />
+    // }
     // if (user && restrictedRoute) {
     //   return <Navigate to='/' />
     // }

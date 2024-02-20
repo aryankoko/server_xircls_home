@@ -120,14 +120,15 @@
     "swiper": "^9.2.4",
     "tabler-icons-react": "^1.56.0",
     "universal-cookie": "^4.0.4",
+    "win-node-env": "^0.6.1",
     "wnumb": "1.2.0",
     "xlsx": "0.17.3",
     "yarn": "1.21.1",
     "yup": "0.32.8"
   },
   "scripts": {
-    "start": "NODE_OPTIONS=--max_old_space_size=4096 craco start",
-    "build": "NODE_OPTIONS=--max_old_space_size=4096 craco build",
+    "start": " NODE_OPTIONS=--max_old_space_size=4096 craco start",
+    "build": " NODE_OPTIONS=--max_old_space_size=4096 craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.js\"",
@@ -144,7 +145,8 @@
     "eslint-plugin-import": "2.22.0",
     "eslint-plugin-react": "7.20.6",
     "prettier": "2.5.1",
-    "sass-loader": "8.0.2"
+    "sass-loader": "8.0.2",
+    "webpack": "^4.44.0"
   },
   "browserslist": {
     "production": [
