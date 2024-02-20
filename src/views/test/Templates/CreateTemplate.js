@@ -59,20 +59,6 @@ export default function CreateTemplate() {
   ]
 
 
-  const addCallOptions = [
-    { value: 'PHONE_NUMBER', label: "Phone Number" },
-    { value: 'URL', label: "URL" }
-  ]
-  const callOptions = () => {
-    let opt = addCallOptions.slice()
-    useInteractive.forEach(item => {
-      opt = opt.filter(option => option.value !== item.actionType)
-    })
-
-    return opt
-  }
-
-
   const [BasicTemplateData, setBasicTemplateData] = useState({
     templateName: '',
     templateCategory: '',
