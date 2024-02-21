@@ -30,7 +30,7 @@ export const DefaultNav = [
         id: 'editTemplate',
         title: 'Edit Template',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/template/editTemplate/1071586197229808'
+        navLink: '/template/editTemplate/1184725859177517'
     },
     {
         id: 'optinManage',

@@ -27,11 +27,16 @@ export default function TemplateUI() {
    const [AllTemplatesData, setAllTemplatesData] = useState([])
    const [modal, setModal] = useState(false)
    const [CurrentTemplate, setCurrentTemplate] = useState()
-   const [CurrentTemplate_UI, setCurrentTemplate_UI] = useState()
+   const [HeaderParameterList, setHeaderParameterList] = useState([])
    const [BodyParameterList, setBodyParameterList] = useState([])
-   const [HeaderParameterList, setHeaderParameterList] = useState(null)
    const [testPhone, settestPhone] = useState('')
+   const [msgBody, setMsgBody] = useState('')
+   const [oldBodyPara, setoldBodyPara] = useState([])
+   const [useDisplayBody, setDisplayBody] = useState('')
 
+   const [msgHeader, setMsgHeader] = useState('')
+   const [oldHeaderPara, setoldHeaderPara] = useState([])
+   const [useDisplayHeader, setDisplayHeader] = useState('')
 
    const toggle = () => setModal(!modal)
    const submenuList = [
@@ -89,7 +94,7 @@ export default function TemplateUI() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplates/', {
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplates/', {
          method: 'POST',
          body: formData
       })
@@ -114,38 +119,6 @@ export default function TemplateUI() {
       getData()
    }, [])
 
-   // get current template
-   const getCurrentTemplate = (templateId) => {
-      setBodyParameterList([])
-      setHeaderParameterList(null)
-      const formData = new FormData()
-      formData.append("templateId", templateId)
-
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplateById/', {
-         method: 'POST',
-         body: formData
-      })
-         .then(response => {
-            if (!response.ok) {
-               throw new Error(`HTTP error! Status: ${response.status}`)
-            }
-            return response.json()
-         })
-         .then(data => {
-            // Handle the successful response here
-            console.log('Response:', data)
-            setCurrentTemplate(data)
-            console.log(data.components[0].format)
-
-
-            setModal(true)
-         })
-         .catch(error => {
-            // Handle errors here
-            console.error('Error:', error)
-         })
-   }
-
    // all themes diplay ui message
    const updateDisplayedMessage = (inputString, defData) => {
       let updatedMessage = inputString
@@ -154,7 +127,7 @@ export default function TemplateUI() {
       updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
       if (defData.example) {
          const data = defData.example.body_text[0]
-         updatedMessage = inputString.replace(/{{(\d+)}}/g, (match, index) => {
+         updatedMessage = updatedMessage.replace(/{{(\d+)}}/g, (_match, index) => {
             return `[${data[index - 1]}]`
          })
       }
@@ -162,30 +135,47 @@ export default function TemplateUI() {
       return updatedMessage
    }
    // modal diplay ui message
-   const updateDisplayedMessage2 = (inputString, defData) => {
+   const updateDisplayedMessage2 = (inputString, apiPara) => {
       let updatedMessage = inputString
       updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
       updatedMessage = updatedMessage.replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
       updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
 
-      if (defData.example) {
+      if (apiPara) {
 
-         const data = defData.example.body_text[0]
-         const data2 = HeaderParameterList
-         updatedMessage = inputString.replace(/{{(\d+)}}/g, (match, index) => {
-            // return `[${data[index - 1]}]`
-
-            try {
+         const data = apiPara
+         const data2 = BodyParameterList
+         console.log("data", data)
+         console.log("BodyParameterList", data2)
+         updatedMessage = updatedMessage.replace(/{{(\d+)}}/g, (_, index) => {
+            if (data2[index - 1] && data2[index - 1] !== undefined) {
                return `[${data2[index - 1]}]`
-
-            } catch (error) {
+            } else {
                return `[${data[index - 1]}]`
-
             }
          })
       }
+      setDisplayBody(updatedMessage)
+      // return updatedMessage
+   }
+   const updateHeaderDisplayedMessage = (inputString, apiPara) => {
+      let updatedMessage = inputString
+      if (apiPara) {
 
-      return updatedMessage
+         const data = apiPara
+         const data2 = HeaderParameterList
+         console.log("data", data)
+         console.log("BodyParameterList", data2)
+         updatedMessage = updatedMessage.replace(`{{1}}`, () => {
+            if (data2[0] && data2[0] !== undefined) {
+               return `[${data2[0]}]`
+            } else {
+               return `[${data[0]}]`
+            }
+         })
+      }
+      setDisplayHeader(updatedMessage)
+      // return updatedMessage
    }
    useEffect(() => {
    }, [BodyParameterList])
@@ -193,13 +183,16 @@ export default function TemplateUI() {
    const parameterInput = (type, value, index) => {
 
       if (type === 'header') {
-         setHeaderParameterList(value)
+         setHeaderParameterList([value])
          console.log(value)
+         updateHeaderDisplayedMessage(msgHeader, oldHeaderPara)
+
       } else {
+
          const oldpr = BodyParameterList
          oldpr[index] = value
-
          setBodyParameterList(oldpr)
+         updateDisplayedMessage2(msgBody, oldBodyPara)
       }
 
    }
@@ -209,11 +202,11 @@ export default function TemplateUI() {
 
       const formData = new FormData()
 
-      if (HeaderParameterList) {
+      if (HeaderParameterList.length > 0) {
          const header_variables = [
             {
                type: "text",
-               text: HeaderParameterList
+               text: HeaderParameterList[0]
             }
          ]
          formData.append("header_variables", JSON.stringify(header_variables))
@@ -242,13 +235,14 @@ export default function TemplateUI() {
          formData.append("type", "TEXT")
       }
 
-     
+
       formData.append("language", CurrentTemplate.language)
       formData.append("template_name", CurrentTemplate.name)
+      formData.append("template_id", CurrentTemplate.id)
       formData.append("phone", testPhone)
 
 
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/sendMessage/', {
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/sendMessage/', {
          method: 'POST',
          body: formData
       })
@@ -282,7 +276,7 @@ export default function TemplateUI() {
 
       const formData = new FormData()
       formData.append("template_name", name)
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/deleteTemplate/', {
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/deleteTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -302,15 +296,15 @@ export default function TemplateUI() {
          .catch(error => {
             // Handle errors here
             console.error('Error:', error)
-      setLoader(false)
-   })
+            setLoader(false)
+         })
    }
 
-    // inactive template
-    const inactiveTemplate = (template_id) => {
+   // inactive template
+   const inactiveTemplate = (template_id) => {
       const formData = new FormData()
       formData.append("template_id", template_id)
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/inactiveTemplate/', {
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/inactiveTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -325,6 +319,50 @@ export default function TemplateUI() {
             console.log('Response:', data)
             toast.error("Template deleted")
             getData()
+         })
+         .catch(error => {
+            // Handle errors here
+            console.error('Error:', error)
+         })
+   }
+
+   // get current template
+   const getCurrentTemplate = (templateId) => {
+      setBodyParameterList([])
+      setHeaderParameterList([])
+      const formData = new FormData()
+      formData.append("templateId", templateId)
+
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplateById/', {
+         method: 'POST',
+         body: formData
+      })
+         .then(response => {
+            if (!response.ok) {
+               throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            return response.json()
+         })
+         .then(data => {
+            // Handle the successful response here
+            console.log('Response:', data)
+            setCurrentTemplate(data)
+            console.log(data.components[0].format)
+            data.components.map((elm) => {
+               if (elm.type === "HEADER" && elm.format === "TEXT") {
+                  setMsgHeader(elm.text)
+                  setoldHeaderPara(elm.example?.header_text)
+                  updateHeaderDisplayedMessage(elm.text, elm.example?.header_text)
+                  // console.log(elm.example?.header_text)
+               }
+               if (elm.type === "BODY") {
+                  setMsgBody(elm.text)
+                  setoldBodyPara(elm.example?.body_text[0])
+                  updateDisplayedMessage2(elm.text, elm.example?.body_text[0])
+               }
+            })
+
+            setModal(true)
          })
          .catch(error => {
             // Handle errors here
@@ -419,7 +457,7 @@ export default function TemplateUI() {
                                                 <div className='p-0' >
                                                    {
 
-                                                      SigleTemplate.components.map((data, index) => {
+                                                      SigleTemplate.components.map((data) => {
                                                          if (data.format === "TEXT") {
                                                             return (
                                                                <div className='p-1 pb-0'  >
@@ -470,7 +508,7 @@ export default function TemplateUI() {
                                                             )
                                                          }
                                                          if (data.type === "BUTTONS") {
-                                                            return data.buttons.map((data, index) => {
+                                                            return data.buttons.map((data) => {
                                                                if (data.type === "URL") {
                                                                   return (
                                                                      <div className="border-top  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
@@ -511,9 +549,9 @@ export default function TemplateUI() {
                                                       SigleTemplate.status === "REJECTED" && <button className=' border-0 px-1 bg-danger text-white rounded-2'>Rejected</button>
                                                    }
                                                    {
-                                                      SigleTemplate.status === "PENDING" && <button className=' border-0 px-1 bg-warning text-white rounded-2'>Rejected</button>
+                                                      SigleTemplate.status === "PENDING" && <button className=' border-0 px-1 bg-warning text-white rounded-2'>Pending</button>
                                                    }
-                                                   
+
                                                    <button className='btn btn-primary' onClick={() => nagivate(`/template/editTemplate/${SigleTemplate.id}`)} >Edit</button>
                                                    {/* <button className='btn btn-primary' onClick={() => delTemplate(SigleTemplate.name)} >Delete</button> */}
                                                    {/* <button className='btn btn-primary' onClick={() => inactiveTemplate(SigleTemplate.id)}>Inactive</button> */}
@@ -548,7 +586,7 @@ export default function TemplateUI() {
                            <div className='px-3'>
 
                               {
-                                 CurrentTemplate && CurrentTemplate.components.map((data, index) => {
+                                 CurrentTemplate && CurrentTemplate.components.map((data) => {
                                     if (data.type === "HEADER" && data.format === "TEXT" && data.example) {
                                        // console.log(data.example.header_text)
                                        return (
@@ -577,11 +615,11 @@ export default function TemplateUI() {
 
 
                               {
-                                 CurrentTemplate && CurrentTemplate.components.map((data, index) => {
+                                 CurrentTemplate && CurrentTemplate.components.map((data) => {
                                     if (data.type === "BODY" && data.example) {
                                        return (
                                           <div>
-                                             <h3 className='mt-3 mb-2 border-bottom'>Body</h3>
+                                             <h3 className='mt-3 mb-2 border-bottom '>Body</h3>
                                              {data.example.body_text[0].map((label, index) => {
                                                 return (
                                                    <div className='mt-1'>
@@ -605,7 +643,7 @@ export default function TemplateUI() {
                                  <h4 className=" mt-3">Send to </h4>
 
                                  <input
-                                    type="text"
+                                    type="number"
                                     className="form-control "
                                     placeholder="95438xxxxx"
                                     onChange={(e) => settestPhone(e.target.value)}
@@ -620,12 +658,13 @@ export default function TemplateUI() {
                               <div className="border-1 rounded-3 mb-0 whatsapp_template_card" >
                                  <div className='p-0' >
                                     {
-                                       CurrentTemplate && CurrentTemplate.components.map((data, index) => {
+                                       CurrentTemplate && CurrentTemplate.components.map((data) => {
 
                                           if (data.format === "TEXT") {
                                              return (
                                                 <div className='p-1'  >
-                                                   <h6 className='fs-4 text-black bolder mb-1 '>{data.text}</h6>
+                                                   {/* <h6 className='fs-4 text-black bolder mb-1 '>{data.text}</h6> */}
+                                                   <h6 className='fs-4 text-black bolder mb-1 '>{useDisplayHeader}</h6>
                                                 </div>
                                              )
                                           }
@@ -660,8 +699,8 @@ export default function TemplateUI() {
 
                                              return (
                                                 <div className='p-1 pe-2' >
-                                                   <p className='fs-6' dangerouslySetInnerHTML={{ __html: updateDisplayedMessage2(data.text, data) }}></p>
                                                    {/* <p className='fs-6' dangerouslySetInnerHTML={{ __html: updateDisplayedMessage2(data.text, data) }}></p> */}
+                                                   <p className='fs-6' dangerouslySetInnerHTML={{ __html: useDisplayBody }}></p>
 
                                                 </div>
                                              )
@@ -674,7 +713,7 @@ export default function TemplateUI() {
                                              )
                                           }
                                           if (data.type === "BUTTONS") {
-                                             return data.buttons.map((data, index) => {
+                                             return data.buttons.map((data) => {
                                                 if (data.type === "URL") {
                                                    return (
                                                       <div className="border-top  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
@@ -728,11 +767,11 @@ export default function TemplateUI() {
                      </Row>
                   </ModalBody>
                   <ModalFooter>
-                     <Button color="primary" onClick={sendTemplate}>
-                        Send
-                     </Button>{' '}
                      <Button color="secondary" onClick={toggle}>
                         Cancel
+                     </Button>
+                     <Button color="primary" onClick={sendTemplate}>
+                        Send
                      </Button>
                   </ModalFooter>
                </Modal>

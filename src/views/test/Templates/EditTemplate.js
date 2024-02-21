@@ -9,13 +9,14 @@ import { Card, CardBody, Col, Container, Input, Label, Row } from 'reactstrap'
 import wp_back from './imgs/wp_back.png'
 import { selectPhoneList } from '../../../Helper/data'
 import { postReq } from '../../../assets/auth/jwtService'
+import FrontBaseLoader from '../../Components/Loader/Loader'
 import { useParams } from 'react-router-dom'
-import { forEach } from 'lodash'
 
 export default function EditTemplate() {
   const { templateID } = useParams()
-  const [CurrentTemplate, setCurrentTemplate] = useState()
 
+  const [CurrentTemplate, setCurrentTemplate] = useState()
+  const [useLoader, setLoader] = useState(false)
   const paramVals = [{ value: 'FirstName', label: "FirstName" }, { value: 'LastName', label: "LastName" }, { value: 'customerName', label: "customerName" }, { value: 'CompanyName', label: "CompanyName" }, { value: 'OrderID', label: "OrderID" }, { value: 'ProductName', label: "ProductName" }]
   const msgTypeList = [
     {
@@ -33,6 +34,10 @@ export default function EditTemplate() {
     {
       value: "Video",
       label: "Video"
+    },
+    {
+      value: "None",
+      label: "None"
     }
   ]
   const tempCatgList = [
@@ -57,34 +62,16 @@ export default function EditTemplate() {
     { value: 'sv', label: 'Swedish' }
   ]
 
-
-  const addCallOptions = [
-    { value: 'PHONE_NUMBER', label: "Phone Number" },
-    { value: 'URL', label: "URL" }
-  ]
-  const callOptions = () => {
-    let opt = addCallOptions.slice()
-    useInteractive.dataList.forEach(item => {
-      opt = opt.filter(option => option.value !== item.actionType)
-    })
-
-    return opt
-  }
-
-
   const [BasicTemplateData, setBasicTemplateData] = useState({
-    templateName: CurrentTemplate?.name,
+    templateName: '',
     templateCategory: '',
     language: '',
-    headerText: '',
-    headerUrl: '',
-    msgDataType: "None",
     footer: ''
   })
 
   // headrer
   const [Header, setHeader] = useState({
-    type: 'None',
+    type: '',
     text: '',
     file: ''
   })
@@ -102,318 +89,165 @@ export default function EditTemplate() {
   }
 
   useEffect(() => {
+    // alert("sdfsdf")
     if (Header.text.includes("{{1}}")) {
       // Update header parameters
-      setHeader_Parameters([{ id: 1, value: null }])
+      if (Header_Parameters.length !== 1) {
+        setHeader_Parameters([''])
+      }
     } else {
       setHeader_Parameters([])
     }
 
   }, [Header.text])
 
-
+  // body data structure ---------------------
   const [Body_Parameters, setBody_Parameters] = useState([])
-  const [useMsgBody, setMsgBody] = useState("CurrentTemplate")
+  const [useMsgBody, setMsgBody] = useState("Hello {{3}}, your code will expire in {{4}} mins.")
+  const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
+
+  const handleBodyDisplay = (message, parameters) => {
+    let uptDiplayMsg = message.replace(/{{\s*(\d+)\s*}}/g, (_, n) => {
+      const replacement = parameters[n - 1] // n starts from 1
+      return (replacement === '' || replacement === undefined) ? `{{${n}}}` : `[${replacement}]`
+    })
+    uptDiplayMsg = uptDiplayMsg.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`).replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`).replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
+    setDisplayedMessage(uptDiplayMsg)
+  }
+
+  const handleMsgBodyChange = () => {
+    try {
+      let str = useMsgBody
+      let sequenceCount = (str.match(/{{\s*(\d+)\s*}}/g) || []).length
+      let sequence = Array.from({ length: sequenceCount }, (_, i) => 1 + i)
+
+      // Update Body_Parameters and useMsgBody simultaneously
+      let newParam = sequence.map((_, i) => Body_Parameters[i] || '')
+      let replacedString = str.replace(/{{\s*(\d+)\s*}}/g, () => `{{${sequence.shift()}}}`)
+
+      setBody_Parameters(newParam)
+      setMsgBody(replacedString)
+      handleBodyDisplay(replacedString, newParam)
+    } catch (error) {
+      console.error(error)
+      setBody_Parameters([])
+      setMsgBody(useMsgBody)
+    }
+  }
+
+  const handleParameterChange = (index, value) => {
+    let updatedParameters = [...Body_Parameters]
+    updatedParameters[index] = value
+    handleBodyDisplay(useMsgBody, updatedParameters)
+    setBody_Parameters(updatedParameters)
+  }
+
+  useEffect(() => {
+    handleMsgBodyChange()
+  }, [useMsgBody])
+
+  // body xxxxxxxxxxxxxxxxxxx ---------------------
 
 
-  const [useInteractive, setInteractive] = useState({
-    type: 'None',
-    dataList: []
-  })
+  const [useInteractive, setInteractive] = useState([])
   const [useButtons, setButtons] = useState({
     QUICK_REPLY: 3,
     URL: 1,
     PHONE_NUMBER: 1
   })
-  const [displayedMessage, setDisplayedMessage] = useState(useMsgBody)
-  // massgae body function olny ------------------------------------
-  //  update Body_Parameters based on the message
-  const updateParametersList = (message) => {
-    const regex = /{{\s*(\d+)\s*}}/g
-    const matches = message.match(regex)
-
-    if (matches) {
-      const uniqueIds = [...new Set(matches.map(match => parseInt(match.match(/\d+/)[0])))]
-      const existingParametersMap = Body_Parameters.reduce((map, param) => {
-        map[param.id] = param.value
-        return map
-      }, {})
-      const newParametersList = uniqueIds.map(id => ({
-        id,
-        value: existingParametersMap[id] !== undefined ? existingParametersMap[id] : ''
-      }))
-
-      setBody_Parameters(newParametersList)
-    } else {
-      setBody_Parameters([])
-    }
-  }
-
-  //  update displayedMessage with replaced parameter values
-  const updateDisplayedMessage = () => {
-    let updatedMessage = useMsgBody
-
-    Body_Parameters.forEach(param => {
-      const regex = new RegExp(`{{\\s*${param.id}\\s*}}`, 'g')
-      if (param.value !== '') {
-        updatedMessage = updatedMessage.replace(regex, `[${param.value}]`)
-      }
-    })
-
-    updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
-    updatedMessage = updatedMessage.replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
-    updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
-
-    setDisplayedMessage(updatedMessage)
-  }
-
-  const addParameterBtn = () => {
-
-    const existingIds = Body_Parameters.map(obj => obj.id)
-    for (let i = 1; i < Body_Parameters.length + 2; i++) {
-      if (!existingIds.includes(i)) {
-        const prev = `${useMsgBody}{{${i}}}`
-        setMsgBody(prev)
-        return null
-      }
-    }
-  }
-
-  //  handle parameter value changes
-  const handleParameterChange = (id, value) => {
-    setBody_Parameters((prevList) => prevList.map((param) => (param.id === id ? { ...param, value } : param))
-    )
-  }
-
-  //  handle template message changes
-  const handleMsgBodyChange = (event) => {
-    const input = event.target
-    const cursorPosition = input.selectionStart // Get the cursor position
-
-    const value = input.value
-    const regex = /\{\{(\d+)\}\}/g
-    let updatedValue = value
-
-    const matches = value.match(regex)
-
-    if (matches) {
-      const sortedMatches = matches.sort((a, b) => {
-        const numA = parseInt(a.match(/\d+/)[0])
-        const numB = parseInt(b.match(/\d+/)[0])
-        return numA - numB
-      })
-
-      let sequenceNumber = 1
-      sortedMatches.forEach((match) => {
-        updatedValue = updatedValue.replace(match, `{{${sequenceNumber++}}}`)
-      })
-    }
-
-    const uptStr = (input) => {
-      const regex = /\{\{(\d+)\}\}/g
-      let sequenceNumber = 1
-
-      const updatedValue = input.replace(regex, (match) => {
-        return `{{${sequenceNumber++}}}`
-      })
-
-      return updatedValue
-    }
-
-    const updatedText = uptStr(updatedValue)
-
-    // Set input value preserving cursor position
-    input.value = updatedText
-
-    // Restore cursor position
-    input.setSelectionRange(cursorPosition, cursorPosition)
-
-    // Perform other actions as needed
-    setMsgBody(updatedText)
-    updateParametersList(updatedText)
-  }
-
-
-  useEffect(() => {
-    updateParametersList(useMsgBody)
-  }, [useMsgBody])
-
-  useEffect(() => {
-    updateDisplayedMessage()
-  }, [Body_Parameters])
 
   // interactive change---------------------------------------------------
-  const handleTnteractiveRadio = (e) => {
-    const type = e.target.value
-    if (type === 'Call') {
-      setInteractive({
-        type: 'Call',
-        dataList: [
-          {
-            id: 1,
-            actionType: '',
-            code: '',
-            title: "",
-            value: ""
-          }
-        ]
-      })
-    } else if (type === 'Quick') {
-      setInteractive({
-        type: 'Quick',
-        dataList: [
-          {
-            id: 1,
-            actionType: 'QUICK_REPLY',
-            title: ""
-          }
-        ]
-      })
-    } else if (type === 'All') {
-      setInteractive({
-        type: 'All',
-        dataList: []
-      })
-    } else {
-      setInteractive({
-        type: 'None',
-        dataList: []
-      })
-    }
-    setButtons({
-      QUICK_REPLY: 3,
-      URL: 1,
-      PHONE_NUMBER: 1
-    })
-  }
+  const addInteractiveBtn = (type) => {
+    const oldData = [...useInteractive]
+    let newData
 
-  const handleInputChange = (index, field, value) => {
-    setInteractive((prevState) => {
-      const newDataList = [...prevState.dataList]
-      newDataList[index][field] = value
-      return { ...prevState, dataList: newDataList }
-    })
-  }
-
-  const handleDeleteAction = (index) => {
-    setInteractive((prevState) => {
-      const newDataList = [...prevState.dataList]
-      newDataList.splice(index, 1)
-      return { ...prevState, dataList: newDataList }
-    })
-  }
-  const handleAddAction = (allType) => {
-    setInteractive((prevState) => {
-      const newDataList = [...prevState.dataList]
-      const newIndex = newDataList.length + 1
-
-      if (prevState.type === 'Call') {
-        newDataList.push({
-          id: newIndex,
-          actionType: '',
-          title: '',
-          value: ''
-        })
-      } else if (prevState.type === 'Quick') {
-        newDataList.push({
-          id: newIndex,
-          actionType: 'QUICK_REPLY',
-          title: ''
-        })
-      } else if (prevState.type === 'All') {
-        newDataList.push({
-          id: 1,
-          actionType: allType,
-          code: '',
-          title: "",
-          value: ""
-        })
+    if (type === 'QUICK_REPLY') {
+      newData = {
+        type: 'QUICK_REPLY',
+        text: ""
       }
+    } else if (type === 'URL') {
+      newData = {
+        type: 'URL',
+        text: "",
+        url: ""
+      }
+    } else if (type === 'PHONE_NUMBER') {
+      newData = {
+        type: 'PHONE_NUMBER',
+        code: '',
+        text: "",
+        value: ""
+      }
+    } else {
+      setInteractive([])
+      uptInteractiveBtnDisplay(oldData)
+      console.log(oldData)
+      return // No need to proceed further if type is not recognized
+    }
 
-      return { ...prevState, dataList: newDataList }
-    })
+    setInteractive([...oldData, newData])
+    uptInteractiveBtnDisplay([...oldData, newData])
   }
 
-  useEffect(() => {
-    if (useInteractive.type === "All") {
-      const { dataList } = useInteractive
 
-      const counts = dataList.reduce((acc, ele) => {
-        if (ele.actionType === "QUICK_REPLY") {
-          acc.quickNum++
-        }
-        if (ele.actionType === "URL") {
-          acc.urlNum++
-        }
-        if (ele.actionType === "PHONE_NUMBER") {
-          acc.phoneNum++
-        }
-        return acc
-      }, { quickNum: 0, urlNum: 0, phoneNum: 0 })
-
+  const uptInteractiveBtnDisplay = (data) => {
+    let btnList = [...data]
+    let btnData = useButtons
+    if (btnList.length >= 3) {
       setButtons({
-        QUICK_REPLY: 3 - counts.quickNum - counts.urlNum - counts.phoneNum,
-        URL: 1 - counts.urlNum,
-        PHONE_NUMBER: 1 - counts.phoneNum
+        QUICK_REPLY: 0,
+        URL: 0,
+        PHONE_NUMBER: 0
       })
-    }
-  }, [useInteractive])
 
+    } else {
+
+      btnList.map((ele) => {
+        btnData[ele.type] -= 1
+      })
+      setButtons(btnData)
+    }
+  }
   useEffect(() => {
-
-    const getCurrentTemplate = (templateId) => {
-      const formData = new FormData()
-      formData.append("templateId", templateId)
-      fetch('https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/getTemplateById/', {
-        method: 'POST',
-        body: formData
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`)
-          }
-          return response.json()
-        })
-        .then(data => {
-          // Handle the successful response here
-          console.log('Response:', data)
-          const formatType = data.components[0]
-          console.log(data.components[0].format)
-          console.log(data.components[0])
-          setCurrentTemplate(data)
-          if (["TEXT", "IMAGE", "VIDEO", "DOCUMENT"].includes(formatType.format)) {
-            if (formatType.format === "TEXT") {
-              setHeader({ ...Header, type: formatType.format, text: formatType.text })
-            } else {
-              setHeader({ ...Header, type: formatType.format, file: formatType.example.header_handle[0] })
-            }
-            // alert(formatType)
-          }
-          data.components.forEach((elm) => {
-            if (elm.type === "BODY") {
-              setMsgBody(elm.text)
-              const Paralist = []
-              if (elm.example.body_text) {
-                elm.example.body_text.forEach((para) => {
-                  // console.log(para)
-                  Paralist.push({id:1, value: para})
-                })
-              }
-              setBody_Parameters(Paralist)
-              // updateDisplayedMessage()
-            }
-          })
-        })
-        .catch(error => {
-          // Handle errors here
-          console.error('Error:', error)
-        })
-    }
-    getCurrentTemplate(templateID)
+    uptInteractiveBtnDisplay(useInteractive)
   }, [])
 
-  const formValidation = () => {
+  const handleInputChange = (index, field, value) => {
+    let oldData = [...useInteractive]
+    oldData[index][field] = value
+    setInteractive(oldData)
+  }
 
+  const handleDeleteAction = (index, type) => {
+    let oldData = [...useInteractive]
+    oldData.splice(index, 1)
+    setInteractive(oldData)
+
+    // deleted numbers
+    const oldBtns = useButtons
+    console.log(oldData.length)
+    if (oldData.length === 0) {
+      setButtons({
+        QUICK_REPLY: 3,
+        URL: 1,
+        PHONE_NUMBER: 1
+      })
+
+    } else {
+      if (type === 'QUICK_REPLY') {
+        oldBtns[type] += 1
+
+      } else {
+        oldBtns['QUICK_REPLY'] += 1
+        oldBtns[type] += 1
+        setButtons(oldBtns)
+      }
+
+    }
+  }
+
+  const formValidation = () => {
     const errorMsg = {
       templateName: "Enter Template Name",
       templateCategory: "Select Template Category",
@@ -446,32 +280,98 @@ export default function EditTemplate() {
 
 
   }
+  useEffect(() => {
 
+    const getCurrentTemplate = (templateId) => {
+      const formData = new FormData()
+      formData.append("templateId", templateId)
+      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplateById/', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+          }
+          return response.json()
+        })
+        .then(data => {
+          // Handle the successful response here
+          console.log('Response:', data)
+          let footer = ''
+
+          const formatType = data.components[0]
+          setCurrentTemplate(data)
+          if (["TEXT", "IMAGE", "VIDEO", "DOCUMENT"].includes(formatType.format)) {
+            if (formatType.format === "TEXT") {
+              setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), text: formatType.text })
+              console.log(formatType?.example?.header_text)
+              if (formatType?.example?.header_text.length > 0) {
+                setHeader_Parameters(formatType?.example?.header_text)
+              }
+            } else {
+              setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), file: formatType.example.header_handle[0] })
+            }
+            // alert(formatType)
+          }
+          data.components.forEach((elm) => {
+            if (elm.type === "BODY") {
+              setMsgBody(elm.text)
+              setBody_Parameters(elm.example.body_text[0])
+            }
+            if (elm.type === "FOOTER") {
+              footer = elm.text
+            }
+          })
+
+          setBasicTemplateData({
+            templateName: data.name,
+            templateCategory: data.category,
+            language: data.language,
+            footer
+          })
+        })
+        .catch(error => {
+          // Handle errors here
+          console.error('Error:', error)
+        })
+    }
+    getCurrentTemplate(templateID)
+  }, [])
   const handleTemplateSubmit = () => {
+    console.log("------------------------------------------------")
+    console.log("Body_Parameters :   ", Body_Parameters)
+    console.log("useMsgBody :  ", useMsgBody)
+    console.log("Header :  ", Header)
+    console.log("Header_Parameters :  ", Header_Parameters)
+    console.log("BasicTemplateData :  ", BasicTemplateData)
+    console.log("useInteractive :  ", useInteractive)
+    console.log("useButtons :  ", useButtons)
+    // return null
     // if (!formValidation()) {
     //   return false
     // }
-
-    const newInteractiveData = useInteractive.dataList.map(item => {
+    setLoader(true)
+    const newInteractiveData = useInteractive.map(item => {
       if (item.title === '') {
         return null // Skip items without a title
       }
 
-      if (item.actionType === "PHONE_NUMBER") {
+      if (item.type === "PHONE_NUMBER") {
         return {
-          type: item.actionType,
+          type: item.type,
           text: item.title,
           phone_number: item.code.replace(/\+/g, '') + item.value
         }
-      } else if (item.actionType === "URL") {
+      } else if (item.type === "URL") {
         return {
-          type: item.actionType,
+          type: item.type,
           text: item.title,
           url: item.value
         }
-      } else if (item.actionType === "QUICK_REPLY") {
+      } else if (item.type === "QUICK_REPLY") {
         return {
-          type: item.actionType,
+          type: item.type,
           text: item.title
         }
       } else {
@@ -481,30 +381,30 @@ export default function EditTemplate() {
     }).filter(Boolean) // Remove null entries from the result
     // return null
     const components = [
-      Header.type === 'DOCUMENT' && {
+      Header.type === 'Document' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'IMAGE' && {
+      Header.type === 'Image' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'VIDEO' && {
+      Header.type === 'Video' && {
         type: 'HEADER',
         format: Header.type.toUpperCase(),
         example: { header_handle: [''] }
       },
-      Header.type === 'TEXT' && Header_Parameters.length > 0 && {
+      Header.type === 'Text' && Header_Parameters.length > 0 && {
         type: 'HEADER',
         format: 'TEXT',
         text: Header.text,
         example: {
-          header_text: [Header_Parameters.map(item => item.value)][0]
+          header_text: Header_Parameters
         }
       },
-      Header.type === 'TEXT' && Header_Parameters.length === 0 && {
+      Header.type === 'Text' && Header_Parameters.length === 0 && {
         type: 'HEADER',
         format: 'TEXT',
         text: Header.text
@@ -513,7 +413,8 @@ export default function EditTemplate() {
         type: 'BODY',
         text: useMsgBody,
         example: {
-          body_text: [Body_Parameters.map(item => item.value)]
+          body_text:
+            [Body_Parameters]
         }
       },
       Body_Parameters.length === 0 && {
@@ -526,7 +427,7 @@ export default function EditTemplate() {
         text: BasicTemplateData.footer
       },
 
-      useInteractive.type !== "None" && {
+      useInteractive.length !== 0 && {
         type: "BUTTONS",
         buttons: newInteractiveData
       }
@@ -546,43 +447,49 @@ export default function EditTemplate() {
     console.log("payload", components)
     console.log("useInteractive", useInteractive)
     console.log(BasicTemplateData)
-    console.log(Header)
+    console.log(Header.file)
 
-    return null
+    // return null
 
-    // fetch("https://1ee1-2402-e280-3d9c-20d-71f0-ef99-c5cd-49b4.ngrok-free.app/createTemplate/", {
-    //   method: 'POST',
-    //   body: formData
-    // }).then((res) => {
-    //   console.log(res)
-    //   if (res.data.code === 100) {
-    //     toast.error(res.data.error_user_msg)
-    //   } else {
-    //     // toast.success("Template has been created")
+    fetch("https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/createTemplate/", {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        return response.json()
+      }).then((res) => {
+        console.log(res)
+        if (res.id) {
+          toast.success("Template has been created")
+        } else if (res.code === 100) {
+          toast.error(res.error_user_msg ?? res.message)
+        } else {
+          toast.error("Something went wrong!")
+        }
+        setLoader(false)
+      }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
-    //   }
-    //   console.log(res.id)
-    //   if (res.id) {
-    //     toast.success("Template has been created")
 
-    //   }
-    // }).catch((err) => console.log(err))
+    //   postReq("createTemplate", formData).then((res) => {
+    //     console.log(res)
+    //     if (res.data.code === 100) {
+    //       toast.error(res.data.error_user_msg)
+    //     } else {
+    //       // toast.success("Template has been created")
+
+    //     }
+    //     console.log(res)
+    //     if (res.data.id) {
+    //       toast.success("Template has been created")
+
+    //     }
+    //   setLoader(false)
 
 
-    postReq("createTemplate", formData).then((res) => {
-      console.log(res)
-      if (res.data.code === 100) {
-        toast.error(res.data.error_user_msg)
-      } else {
-        // toast.success("Template has been created")
-
-      }
-      console.log(res)
-      if (res.data.id) {
-        toast.success("Template has been created")
-
-      }
-    }).catch((err) => console.log(err))
+    // }).catch((err) => { console.log(err); setLoader(false) })
 
     // Test if the inputString matches the pattern
 
@@ -596,18 +503,13 @@ export default function EditTemplate() {
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   return (
     <Container style={{ marginBottom: "200px" }}>
+      {
+
+        useLoader && <FrontBaseLoader />
+      }
       <Card>
-        <CardBody className='d-flex justify-content-between '>
-          <h4 className="text-danger m-0">Edit Template Message : {CurrentTemplate?.name ?? 'none'} </h4>
-          {
-            CurrentTemplate?.status === "APPROVED" && <button className=' border-0 px-1 bg-success text-white rounded-2'>Approved</button>
-          }
-          {
-            CurrentTemplate?.status === "REJECTED" && <button className=' border-0 px-1 bg-danger text-white rounded-2'>Rejected</button>
-          }
-          {
-            CurrentTemplate?.status === "PENDING" && <button className=' border-0 px-1 bg-warning text-white rounded-2'>Rejected</button>
-          }
+        <CardBody>
+          <h4 className="text-danger">Edit Template Name : {BasicTemplateData.templateName ?? ''} </h4>
         </CardBody>
       </Card>
 
@@ -616,47 +518,25 @@ export default function EditTemplate() {
 
           <Row>
             <Col md="6">
-
               <div>
                 <h4 className="">Template Category</h4>
-                {/* <p className="fs-5  text-secondary">Your template should fall under one of these categories.</p> */}
-
-                {
-                  // eslint-disable-next-line multiline-ternary
-                  CurrentTemplate?.status === "APPROVED" ? <input
-                    type="text"
-                    className="form-control "
-                    value={CurrentTemplate?.category}
-                    disabled
-                  /> :
-                    <Select
-                      className=''
-                      options={tempCatgList}
-                      closeMenuOnSelect={true}
-                      onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateCategory: e.value })}
-                    />
-                }
+                <input
+                  type="text"
+                  disabled
+                  className="form-control "
+                  value={CurrentTemplate?.category ?? 'none'}
+                />
               </div>
             </Col>
             <Col md="6">
               <div>
                 <h4 className="">Template Language</h4>
-                {/* <p className="fs-5  text-secondary">You will need to specify the language in which message template is submitted.</p> */}
-                {
-                  // eslint-disable-next-line multiline-ternary
-                  CurrentTemplate?.status === "APPROVED" ? <input
-                    type="text"
-                    className="form-control "
-                    value={CurrentTemplate?.language}
-                    disabled
-                  /> :
-                    <Select
-                      className=''
-                      options={langList}
-                      closeMenuOnSelect={true}
-                      onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, language: e.value })}
-                    />
-                }
+                <input
+                  type="text"
+                  disabled
+                  className="form-control "
+                  value={CurrentTemplate?.language ?? 'none'}
+                />
               </div>
             </Col>
           </Row>
@@ -666,12 +546,10 @@ export default function EditTemplate() {
                 <h4 className="">Template Name</h4>
                 <input
                   type="text"
-                  className="form-control "
-                  value={CurrentTemplate?.name}
                   disabled
-                // onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, templateName: e.target.value })}
+                  className="form-control "
+                  value={CurrentTemplate?.name ?? 'none'}
                 />
-
               </div>
 
               <div className='mt-3'>
@@ -684,7 +562,8 @@ export default function EditTemplate() {
                   value={{ value: Header.type, label: Header.type }}
                   onChange={(e) => {
                     if (e && e.value !== Header.type.value) {
-                      setHeader({ ...Header, type: e.value })
+                      setHeader({ ...Header, type: e.value, file: '' })
+
                       // setOptOutRespConfig(null)
                     }
                   }}
@@ -694,7 +573,7 @@ export default function EditTemplate() {
               <div>
 
                 <div>
-                  {Header.type === 'TEXT' &&
+                  {Header.type === 'Text' &&
                     <div className='mt-3'>
                       <h4 className="">Template Header Text </h4>
                       <p className="fs-5  text-secondary">Your message content. Upto 60 characters are allowed.</p>
@@ -712,14 +591,15 @@ export default function EditTemplate() {
                           Header_Parameters.map((item) => (
                             <div className="mt-1">
                               <Select options={paramVals}
-                                onChange={(e) => { setHeader_Parameters([{ id: 1, value: e.value }]) }}
+                                value={{ value: item, label: item }}
+                                onChange={(e) => { setHeader_Parameters([e.value]) }}
                                 closeMenuOnSelect={true} />
                             </div>
                           ))
                         }
                       </div>
                     </div>}
-                  {(Header.type === 'IMAGE' || Header.type === 'VIDEO' || Header.type === 'DOCUMENT') &&
+                  {(Header.type === 'Image' || Header.type === 'Video' || Header.type === 'Document') &&
 
                     <div className='mt-3'>
                       <h4 className="">{Header.type} Media File</h4>
@@ -742,11 +622,11 @@ export default function EditTemplate() {
                     <textarea
                       className="form-control"
                       value={useMsgBody}
-                      onChange={handleMsgBodyChange}
+                      onChange={(e) => setMsgBody(e.target.value)}
                       rows="5"
                       maxLength={1024}
                     ></textarea>
-                    <button className='btn btn-primary mt-1' onClick={addParameterBtn}>Add parameter</button>
+                    <button className='btn btn-primary mt-1' onClick={() => setMsgBody((prev) => `${prev}{{${Body_Parameters.length + 1}}}`)} >Add parameter</button>
                   </div>
                   {/* Sample values for parameters input */}
                   <div className='mt-3'>
@@ -756,16 +636,16 @@ export default function EditTemplate() {
                       changed at the time of sending. e.g. - {'{{1}}'}: Mohit, {'{{2}}'}: 5.
                     </p>
                     <div className='d-flex flex-column gap-1'>
-                      {Body_Parameters?.sort((a, b) => a.id - b.id).map((paramData) => {
+                      {Body_Parameters?.map((paramData, index) => {
                         return (
-                          <div className='d-flex' key={paramData.id}>
+                          <div className='d-flex' key={index + 1}>
                             <div className='w-25 d-flex justify-content-center align-items-center '>
-                              <h5>{`{{ ${paramData.id} }}`}</h5>
+                              <h5>{`{{ ${index + 1} }}`}</h5>
                             </div>
                             <div className='w-100'>
                               <Select options={paramVals}
-                                value={{ value: 'paramData', label: paramData.value }}
-                                onChange={(e) => handleParameterChange(paramData.id, e.label)}
+                                value={{ value: paramData, label: paramData }}
+                                onChange={(e) => handleParameterChange(index, e.label)}
                                 closeMenuOnSelect={true} />
 
                             </div>
@@ -788,6 +668,7 @@ export default function EditTemplate() {
                   className="form-control "
                   placeholder='Enter Footer text here'
                   maxLength={60}
+                  value={BasicTemplateData.footer ?? ''}
                   onChange={(e) => setBasicTemplateData({ ...BasicTemplateData, footer: e.target.value })}
                 />
               </div>
@@ -800,49 +681,42 @@ export default function EditTemplate() {
 
                 <Card className='rounded-3 shadow-lg  position-relative mb-0 whatsapp_template_card' >
                   <CardBody className='p-2'>
-                    {Header.type === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
+                    {/* {Header.type === "None" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffddb0" }}>
                       <Image size={45} color='#faad20' />
                       <PlayCircle size={45} color='#5f66cd' />
                       <FileText size={45} color='#f33d79' />
-                    </div>}
-                    {Header.type === "IMAGE" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
-                      {Header.file instanceof File || Header.file instanceof Blob ? (
-                        <img
+                    </div>} */}
+                    {Header.type === "Image" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ minHeight: "170px", background: "#ffddb0" }}>
+                      {
+                        Header.file === '' ? <Image size={45} color='#faad20' /> : <img
                           className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
                           style={{ minHeight: "170px" }}
-                          src={URL.createObjectURL(Header.file)}
+                          // src={URL.createObjectURL(Header.file) ?? '' }
+                          src={Header.file === '' ? '' : Header.file}
+
                           alt=""
                         />
-                      ) : (
-                        Header.file === '' ? (
-                          <Image size={45} color='#faad20' />
-                        ) : (
-                          <img
-                            className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
-                            style={{ minHeight: "170px" }}
-                            src={Header.file}
-                            alt=""
-                          />
-                        )
-                      )}
+
+                      }
                     </div>}
-                    {Header.type === "VIDEO" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
+
+                    {Header.type === "Video" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#bbc7ff" }}>
 
                       {
                         Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className='rounded-3  object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
                           <source
-                            // src={Header.file === '' ? '' : URL.createObjectURL(Header.file)}
+                            src={Header.file === '' ? '' : Header.file}
                             type="video/mp4"
                           />
                           Video not supported.
                         </video>
                       }
                     </div>}
-                    {Header.type === "DOCUMENT" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
+                    {Header.type === "Document" && <div className='border rounded-3 d-flex justify-content-center  align-items-center ' style={{ height: "170px", background: "#ffb8cf" }}>
                       <FileText size={45} color='#f33d79' />
                     </div>}
                     {
-                      Header.type === "TEXT" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0]?.value ? `[${Header_Parameters[0]?.value}]` : '{{1}}')}</h6>
+                      Header.type === "Text" && <h6 className='fs-4 text-black bolder mb-1 '>{Header.text.replace(/\{\{1\}\}/g, Header_Parameters[0] === '' ? '{{1}}' : `[${Header_Parameters[0]}]`)}</h6>
                     }
                     {/* body */}
                     <div className='mt-2'>
@@ -854,20 +728,20 @@ export default function EditTemplate() {
                     }
                   </CardBody>
                   {
-                    useInteractive.dataList && useInteractive.dataList.map((elem) => {
-                      if (elem.actionType === 'PHONE_NUMBER' && elem.title !== '') {
+                    useInteractive && useInteractive.map((elem) => {
+                      if (elem.type === 'PHONE_NUMBER' && elem.title !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                             <Phone size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
                           </div>)
                       }
-                      if (elem.actionType === 'URL' && elem.title !== '') {
+                      if (elem.type === 'URL' && elem.title !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                             <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
                           </div>)
                       }
-                      if (elem.actionType === 'QUICK_REPLY' && elem.title !== '') {
+                      if (elem.type === 'QUICK_REPLY' && elem.title !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
                             <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
@@ -876,7 +750,7 @@ export default function EditTemplate() {
                     })
                   }
                 </Card>
-                {/* buttons */}
+                {/* Buttons */}
               </div>
 
               <p className='mt-4' style={{ width: '400px' }}>Disclaimer: This is just a graphical representation of the message that will be delivered. Actual message will consist of media selected and may appear different.</p>
@@ -891,121 +765,24 @@ export default function EditTemplate() {
                 Maximum 25 characters are allowed in CTA button title & Quick Replies.
               </p>
               <div className=''>
-                <div className='d-flex w-75'>
-
+                {/* <div className='d-flex w-75'>
                   <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio1' >
-                    <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={handleTnteractiveRadio} />
+                    <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={() => addInteractiveBtn("none")} />
                     <p className="m-0">None</p>
                   </Label>
-
-
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio2'  >
-                    <Input type='radio' id='radio2' style={{ marginLeft: '15px' }} name='radio1' value='Call' onChange={handleTnteractiveRadio} />
-                    <p className="m-0">Call to Action</p>
-                  </Label>
-
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio3' >
-                    <Input type='radio' id='radio3' style={{ marginLeft: '15px' }} name='radio1' value='Quick' onChange={handleTnteractiveRadio} />
-                    <p className="m-0">Quick Replies
-                    </p>
-                  </Label>
-
                   <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio4' >
-                    <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={handleTnteractiveRadio} />
-                    <p className="m-0">All</p>
+                    <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={() => addInteractiveBtn("QUICK_REPLY")} />
+                    <p className="m-0">Add Interactive Actions</p>
                   </Label>
-                </div>
+                </div> */}
 
                 {/* UI Interactive */}
-                <div className='mt-3 px-lg-1'>
-                  {useInteractive.type === 'Call' && <div className='gap-1 d-flex flex-column  '>
-                    {useInteractive.dataList.map((ele, index) => (
-                      <Row key={index}>
-                        <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
-                        <Col lg="3" className=''>
-                          <Select options={callOptions()}
-                            value={addCallOptions?.find(option => option.value === ele.actionType)}
-                            onChange={(e) => handleInputChange(index, 'actionType', e.value)}
-                            closeMenuOnSelect={true} />
-                        </Col>
-                        <Col lg="3">
-                          <input
-                            type="text"
-                            className="form-control "
-                            placeholder='Button Title'
-                            maxLength={25}
-                            value={ele.title}
-                            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
-                          />
-                        </Col>
-                        {
-                          ele.actionType === "PHONE_NUMBER" &&
-                          <Col lg="1">
-                            <Select options={selectPhoneList}
-                              onChange={(e) => handleInputChange(index, 'code', e.value)}
-                              closeMenuOnSelect={true} />
-                          </Col>
-                        }
-                        <Col >
-                          <input
-                            type="text"
-                            className="form-control "
-                            placeholder='Button Value'
-                            value={ele.value}
-                            onChange={(e) => handleInputChange(index, 'value', e.target.value)}
-                          />
-                        </Col>
-
-                        <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                          <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
-                        </Col>
-                      </Row>))}
-                    <div>
-                      {useInteractive.dataList.length <= 1 &&
-                        <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
-                          <Plus size={18} /> <p className='m-0'>Call to Action</p>
-                        </button>
-                      }
-                    </div>
-                  </div>}
-
-                  {useInteractive.type === 'Quick' &&
+                <div className='mt-2 px-lg-1'>
+                  {useInteractive?.length > 0 &&
                     <div className='gap-1 d-flex flex-column  '>
-                      {useInteractive.dataList.map((ele, index) => (
-                        <Row key={index}>
-                          <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Quick Reply {index + 1} :</p></Col>
+                      {useInteractive?.map((ele, index) => {
 
-                          <Col lg="4">
-                            <input
-                              type="text"
-                              className="form-control "
-                              placeholder='Button Title'
-                              maxLength={25}
-                              value={ele.title}
-                              onChange={(e) => handleInputChange(index, 'title', e.target.value)}
-                            />
-                          </Col>
-                          <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                            <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
-                          </Col>
-                        </Row>))}
-                      <div>
-                        {
-
-                          useInteractive.dataList.length <= 2 &&
-                          <button className='btn btn-primary btn-sm d-flex gap-1' onClick={handleAddAction}>
-                            <Plus size={18} /> <p className='m-0'>Quick Reply</p>
-                          </button>
-                        }
-
-                      </div>
-                    </div>}
-
-                  {useInteractive.type === 'All' &&
-                    <div className='gap-1 d-flex flex-column  '>
-                      {useInteractive.dataList.sort((a, b) => ({ URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[a.actionType] - { URL: 1, PHONE_NUMBER: 2, QUICK_REPLY: 3 }[b.actionType])).map((ele, index) => {
-
-                        if (ele.actionType === 'QUICK_REPLY') {
+                        if (ele.type === 'QUICK_REPLY') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Quick Reply {index + 1} :</p></Col>
@@ -1021,11 +798,11 @@ export default function EditTemplate() {
                                 />
                               </Col>
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index, ele.type)}>X</div>
                               </Col>
                             </Row>)
                         }
-                        if (ele.actionType === 'URL') {
+                        if (ele.type === 'URL') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
@@ -1035,7 +812,7 @@ export default function EditTemplate() {
                                   className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
-                                  value={ele.actionType}
+                                  value={ele.type}
                                   disabled
                                 />
                               </Col>
@@ -1061,12 +838,12 @@ export default function EditTemplate() {
                               </Col>
 
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index, ele.type)}>X</div>
                               </Col>
                             </Row>
                           )
                         }
-                        if (ele.actionType === 'PHONE_NUMBER') {
+                        if (ele.type === 'PHONE_NUMBER') {
                           return (
                             <Row key={index}>
                               <Col lg="2" className='d-flex justify-content-center  align-items-center '><p className='m-0'>Call to Action {index + 1} :</p></Col>
@@ -1076,7 +853,7 @@ export default function EditTemplate() {
                                   className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
-                                  value={ele.actionType}
+                                  value={ele.type}
                                   disabled
                                 />
                               </Col>
@@ -1107,24 +884,25 @@ export default function EditTemplate() {
                               </Col>
 
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
-                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index)}>X</div>
+                                <div className='cursor-pointer' onClick={() => handleDeleteAction(index, ele.type)}>X</div>
                               </Col>
                             </Row>
                           )
                         }
                       })}
-                      <div className='d-flex gap-2'>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => handleAddAction("QUICK_REPLY")} >
-                          <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.QUICK_REPLY}</p></div>
-                        </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("URL")}>
-                          <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
-                        </div>
-                        <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.PHONE_NUMBER === 0 || useButtons.QUICK_REPLY === 0) ? 'disabled' : ''}`} onClick={() => handleAddAction("PHONE_NUMBER")}>
-                          <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
-                        </div>
-                      </div>
+
                     </div>}
+                  <div className='d-flex gap-2 mt-1'>
+                    <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center   gap-1 ${useButtons.QUICK_REPLY === 0 ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("QUICK_REPLY")} >
+                      <Plus size={18} /> <p className='m-0'>Quick Reply</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.QUICK_REPLY}</p></div>
+                    </div>
+                    <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.URL === 0) ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("URL")}>
+                      <Plus size={18} /> <p className='m-0'>URL</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.URL}</p></div>
+                    </div>
+                    <div className={`btn btn-primary btn-sm d-flex justify-content-center  align-items-center  gap-1 ${(useButtons.PHONE_NUMBER === 0) ? 'disabled' : ''}`} onClick={() => addInteractiveBtn("PHONE_NUMBER")}>
+                      <Plus size={18} /> <p className='m-0'>Phone Number</p> <div className='border d-flex justify-content-center  align-items-center rounded-5 m-0' style={{ background: "#b9b9b9", color: "#fff", height: "20px", width: "20px" }}><p className="m-0 font-small-3">{useButtons.PHONE_NUMBER}</p></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
