@@ -50,7 +50,6 @@ function Home() {
     .catch((error) => {
       console.log(error)
       setApiLoader(false)
-
     })
   }
 

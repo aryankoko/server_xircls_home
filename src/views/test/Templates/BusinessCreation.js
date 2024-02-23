@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Col, Container, Row } from 'react-bootstrap'
 import { Form, Label, Input, Button, Card, CardBody, InputGroup } from 'reactstrap'
-import { selectPhoneList } from '../../../../Helper/data'
+import { selectPhoneList } from '../../../Helper/data'
 import Select from "react-select"
-import { validForm } from '../../../Validator'
+import { validForm } from '../../Validator'
 import toast from 'react-hot-toast'
 
 function Settings() {

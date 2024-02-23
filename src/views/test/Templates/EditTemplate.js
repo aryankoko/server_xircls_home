@@ -40,27 +40,6 @@ export default function EditTemplate() {
       label: "None"
     }
   ]
-  const tempCatgList = [
-    { value: 'UTILITY', label: 'Utility' },
-    { value: 'MARKETING', label: 'Marketing' }
-  ]
-  const langList = [
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Spanish' },
-    { value: 'fr', label: 'French' },
-    { value: 'de', label: 'German' },
-    { value: 'it', label: 'Italian' },
-    { value: 'ja', label: 'Japanese' },
-    { value: 'zh', label: 'Chinese' },
-    { value: 'ru', label: 'Russian' },
-    { value: 'ar', label: 'Arabic' },
-    { value: 'pt', label: 'Portuguese' },
-    { value: 'hi', label: 'Hindi' },
-    { value: 'ko', label: 'Korean' },
-    { value: 'nl', label: 'Dutch' },
-    { value: 'tr', label: 'Turkish' },
-    { value: 'sv', label: 'Swedish' }
-  ]
 
   const [BasicTemplateData, setBasicTemplateData] = useState({
     templateName: '',
@@ -145,6 +124,7 @@ export default function EditTemplate() {
   useEffect(() => {
     handleMsgBodyChange()
   }, [useMsgBody])
+
 
   // body xxxxxxxxxxxxxxxxxxx ---------------------
 
@@ -285,7 +265,7 @@ export default function EditTemplate() {
     const getCurrentTemplate = (templateId) => {
       const formData = new FormData()
       formData.append("templateId", templateId)
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplateById/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplateById/', {
         method: 'POST',
         body: formData
       })
@@ -298,29 +278,35 @@ export default function EditTemplate() {
         .then(data => {
           // Handle the successful response here
           console.log('Response:', data)
-          let footer = ''
 
           const formatType = data.components[0]
           setCurrentTemplate(data)
-          if (["TEXT", "IMAGE", "VIDEO", "DOCUMENT"].includes(formatType.format)) {
-            if (formatType.format === "TEXT") {
-              setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), text: formatType.text })
-              console.log(formatType?.example?.header_text)
-              if (formatType?.example?.header_text.length > 0) {
-                setHeader_Parameters(formatType?.example?.header_text)
-              }
-            } else {
-              setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), file: formatType.example.header_handle[0] })
+          if (["IMAGE", "VIDEO", "DOCUMENT"].includes(formatType.format)) {
+            setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), file: formatType.example.header_handle[0] })
+          } else if (formatType.format === 'TEXT') {
+            setHeader({ ...Header, type: formatType.format.replace(/(\B)[^ ]*/g, match => (match.toLowerCase())).replace(/^[^ ]/g, match => (match.toUpperCase())), text: formatType.text })
+            if (formatType?.example?.header_text.length > 0) {
+              setHeader_Parameters(formatType?.example?.header_text)
+              // console.log(formatType?.example?.header_text)
             }
-            // alert(formatType)
+          } else {
+            setHeader({ ...Header, type: "None" })
+
           }
+          let footer = ''
           data.components.forEach((elm) => {
             if (elm.type === "BODY") {
               setMsgBody(elm.text)
               setBody_Parameters(elm.example.body_text[0])
+              handleBodyDisplay(elm.text, elm.example.body_text[0])
+              console.log(elm.example.body_text[0])
             }
             if (elm.type === "FOOTER") {
               footer = elm.text
+            }
+            if (elm.type === "BUTTONS") {
+              setInteractive(elm.buttons)
+              uptInteractiveBtnDisplay(elm.buttons)
             }
           })
 
@@ -338,6 +324,7 @@ export default function EditTemplate() {
     }
     getCurrentTemplate(templateID)
   }, [])
+  // handle submit
   const handleTemplateSubmit = () => {
     console.log("------------------------------------------------")
     console.log("Body_Parameters :   ", Body_Parameters)
@@ -360,19 +347,19 @@ export default function EditTemplate() {
       if (item.type === "PHONE_NUMBER") {
         return {
           type: item.type,
-          text: item.title,
+          text: item.text,
           phone_number: item.code.replace(/\+/g, '') + item.value
         }
       } else if (item.type === "URL") {
         return {
           type: item.type,
-          text: item.title,
-          url: item.value
+          text: item.text,
+          url: item.url
         }
       } else if (item.type === "QUICK_REPLY") {
         return {
           type: item.type,
-          text: item.title
+          text: item.text
         }
       } else {
         // Handle unmatched cases
@@ -437,10 +424,16 @@ export default function EditTemplate() {
     const formData = new FormData()
 
     formData.append('name', BasicTemplateData.templateName)
+    formData.append('templateId', CurrentTemplate.id)
     formData.append('category', BasicTemplateData.templateCategory)
     formData.append('language', BasicTemplateData.language)
     formData.append('components', JSON.stringify(components))
     formData.append('headerUrl', Header.file)
+    if (typeof Header.file === 'object' && Header.file !== null) {
+      formData.append('headerUrlChange', 1)
+    } else {
+      formData.append('headerUrlChange', 0)
+    }
 
     // Now you can use formData for your purpose
 
@@ -451,7 +444,7 @@ export default function EditTemplate() {
 
     // return null
 
-    fetch("https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/createTemplate/", {
+    fetch("https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/editTemplate/", {
       method: 'POST',
       body: formData
     })
@@ -462,10 +455,11 @@ export default function EditTemplate() {
         return response.json()
       }).then((res) => {
         console.log(res)
-        if (res.id) {
-          toast.success("Template has been created")
-        } else if (res.code === 100) {
-          toast.error(res.error_user_msg ?? res.message)
+        if (res.success) {
+          // toast.success(res.error_msg)
+          toast.success("Template has updated!")
+        } else if (!res.success) {
+          toast.error(res.error_msg)
         } else {
           toast.error("Something went wrong!")
         }
@@ -473,38 +467,18 @@ export default function EditTemplate() {
       }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
 
-    //   postReq("createTemplate", formData).then((res) => {
-    //     console.log(res)
-    //     if (res.data.code === 100) {
-    //       toast.error(res.data.error_user_msg)
-    //     } else {
-    //       // toast.success("Template has been created")
-
-    //     }
-    //     console.log(res)
-    //     if (res.data.id) {
-    //       toast.success("Template has been created")
-
-    //     }
-    //   setLoader(false)
-
-
-    // }).catch((err) => { console.log(err); setLoader(false) })
-
-    // Test if the inputString matches the pattern
-
-    // console.log("BasicTemplateData", BasicTemplateData)
-    // console.log("Body_Parameters", Body_Parameters)
-    // console.log("useMsgBody", useMsgBody)
-    // console.log("useInteractive", useInteractive)
-    // console.log("payData", payData)
-
   }
+
+  // if (!CurrentTemplate) {
+  //   return <FrontBaseLoader />
+  // }
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   return (
     <Container style={{ marginBottom: "200px" }}>
       {
-
+        !CurrentTemplate && <FrontBaseLoader />
+      }
+      {
         useLoader && <FrontBaseLoader />
       }
       <Card>
@@ -563,8 +537,6 @@ export default function EditTemplate() {
                   onChange={(e) => {
                     if (e && e.value !== Header.type.value) {
                       setHeader({ ...Header, type: e.value, file: '' })
-
-                      // setOptOutRespConfig(null)
                     }
                   }}
                 />
@@ -588,14 +560,17 @@ export default function EditTemplate() {
                       <button className={`btn btn-primary mt-1 ${Header_Parameters.length >= 1 ? 'd-none' : 'd-block'}`} onClick={addHeaderParam}>add parameter</button>
                       <div>
                         {
-                          Header_Parameters.map((item) => (
-                            <div className="mt-1">
-                              <Select options={paramVals}
-                                value={{ value: item, label: item }}
-                                onChange={(e) => { setHeader_Parameters([e.value]) }}
-                                closeMenuOnSelect={true} />
-                            </div>
-                          ))
+                          Header_Parameters.map((item) => {
+                            console.log(item)
+                            return (
+                              <div className="mt-1">
+                                <Select options={paramVals}
+                                  value={{ value: item, label: item }}
+                                  onChange={(e) => { setHeader_Parameters([e.value]) }}
+                                  closeMenuOnSelect={true} />
+                              </div>
+                            )
+                          })
                         }
                       </div>
                     </div>}
@@ -637,6 +612,7 @@ export default function EditTemplate() {
                     </p>
                     <div className='d-flex flex-column gap-1'>
                       {Body_Parameters?.map((paramData, index) => {
+                        console.log(paramData)
                         return (
                           <div className='d-flex' key={index + 1}>
                             <div className='w-25 d-flex justify-content-center align-items-center '>
@@ -645,6 +621,7 @@ export default function EditTemplate() {
                             <div className='w-100'>
                               <Select options={paramVals}
                                 value={{ value: paramData, label: paramData }}
+                                defaultValue={{ value: paramData, label: paramData }}
                                 onChange={(e) => handleParameterChange(index, e.label)}
                                 closeMenuOnSelect={true} />
 
@@ -691,9 +668,15 @@ export default function EditTemplate() {
                         Header.file === '' ? <Image size={45} color='#faad20' /> : <img
                           className='img-fluid border-0 rounded-3 w-100 object-fit-cover'
                           style={{ minHeight: "170px" }}
-                          // src={URL.createObjectURL(Header.file) ?? '' }
-                          src={Header.file === '' ? '' : Header.file}
-
+                          src={(function () {
+                            try {
+                              return URL.createObjectURL(Header.file)
+                            } catch (error) {
+                              // console.error('Error creating object URL:', error)
+                              return Header.file // Fallback to Header.file if there's an error
+                            }
+                          })()}
+                          // src={Header.file === '' ? '' : Header.file}
                           alt=""
                         />
 
@@ -705,7 +688,14 @@ export default function EditTemplate() {
                       {
                         Header.file === '' ? <PlayCircle size={45} color='#5f66cd' /> : <video className='rounded-3  object-fit-cover w-100' controls autoPlay mute style={{ height: "170px" }}>
                           <source
-                            src={Header.file === '' ? '' : Header.file}
+                            src={(function () {
+                              try {
+                                return URL.createObjectURL(Header.file)
+                              } catch (error) {
+                                console.error('Error creating object URL:', error)
+                                return Header.file // Fallback to Header.file if there's an error
+                              }
+                            })()}
                             type="video/mp4"
                           />
                           Video not supported.
@@ -729,22 +719,22 @@ export default function EditTemplate() {
                   </CardBody>
                   {
                     useInteractive && useInteractive.map((elem) => {
-                      if (elem.type === 'PHONE_NUMBER' && elem.title !== '') {
+                      if (elem.type === 'PHONE_NUMBER' && elem.text !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                            <Phone size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
+                            <Phone size={17} /><h6 className='m-0 text-primary' > {elem.text}</h6>
                           </div>)
                       }
-                      if (elem.type === 'URL' && elem.title !== '') {
+                      if (elem.type === 'URL' && elem.text !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                            <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.title}</h6>
+                            <ExternalLink size={17} /><h6 className='m-0 text-primary' > {elem.text}</h6>
                           </div>)
                       }
-                      if (elem.type === 'QUICK_REPLY' && elem.title !== '') {
+                      if (elem.type === 'QUICK_REPLY' && elem.text !== '') {
                         return (
                           <div className="border-top  bg-white  d-flex text-primary justify-content-center  align-items-center   " style={{ padding: "10px", gap: "8px" }} >
-                            <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.title}</h6>
+                            <CornerDownLeft size={17} /> <h6 className='m-0 text-primary' > {elem.text}</h6>
                           </div>)
                       }
                     })
@@ -765,16 +755,6 @@ export default function EditTemplate() {
                 Maximum 25 characters are allowed in CTA button title & Quick Replies.
               </p>
               <div className=''>
-                {/* <div className='d-flex w-75'>
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio1' >
-                    <Input type='radio' id='radio1' style={{ marginLeft: '15px' }} name='radio1' value='None' defaultChecked onChange={() => addInteractiveBtn("none")} />
-                    <p className="m-0">None</p>
-                  </Label>
-                  <Label className=' rounded form-check-label d-flex justify-content-start align-items-center gap-1' htmlFor='radio4' >
-                    <Input type='radio' id='radio4' style={{ marginLeft: '15px' }} name='radio1' value='All' onChange={() => addInteractiveBtn("QUICK_REPLY")} />
-                    <p className="m-0">Add Interactive Actions</p>
-                  </Label>
-                </div> */}
 
                 {/* UI Interactive */}
                 <div className='mt-2 px-lg-1'>
@@ -793,8 +773,8 @@ export default function EditTemplate() {
                                   className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
-                                  value={ele.title}
-                                  onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                                  value={ele.text}
+                                  onChange={(e) => handleInputChange(index, 'text', e.target.value)}
                                 />
                               </Col>
                               <Col lg="1" className=' d-flex  justify-content-center  align-items-center fs-4'>
@@ -823,8 +803,8 @@ export default function EditTemplate() {
                                   className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
-                                  value={ele.title}
-                                  onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                                  value={ele.text}
+                                  onChange={(e) => handleInputChange(index, 'text', e.target.value)}
                                 />
                               </Col>
                               <Col >
@@ -832,8 +812,8 @@ export default function EditTemplate() {
                                   type="text"
                                   className="form-control "
                                   placeholder='Button Value'
-                                  value={ele.value}
-                                  onChange={(e) => handleInputChange(index, 'value', e.target.value)}
+                                  value={ele.url}
+                                  onChange={(e) => handleInputChange(index, 'url', e.target.value)}
                                 />
                               </Col>
 
@@ -864,8 +844,8 @@ export default function EditTemplate() {
                                   className="form-control "
                                   placeholder='Button Title'
                                   maxLength={25}
-                                  value={ele.title}
-                                  onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                                  value={ele.text}
+                                  onChange={(e) => handleInputChange(index, 'text', e.target.value)}
                                 />
                               </Col>
                               <Col lg="1">

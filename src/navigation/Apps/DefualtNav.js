@@ -63,33 +63,40 @@ export const DefaultNav = [
         navLink: '/template/business-creation'
     },
     {
-        id: 'setting',
-        title: 'setting',
+        id: 'Contacts',
+        title: 'Contacts',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/template/setting'
+        navLink: '/template/Contacts'
     },
-    {
+     {
         id: 'project',
         title: 'project',
         icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
         navLink: '/template/project'
-    },
-    {
-        id: 'codeskin',
-        title: 'codeskin',
-        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/codeskin'
-    },
-    {
-        id: 'codeskin',
-        title: 'user details',
-        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/codeskin-user/:id'
-    },
-    {
-        id: 'test',
-        title: 'Tessst',
-        icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
-        navLink: '/test'
     }
+    // {
+    //     id: 'setting',
+    //     title: 'setting',
+    //     icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+    //     navLink: '/template/setting'
+    // },
+   
+    // {
+    //     id: 'codeskin',
+    //     title: 'codeskin',
+    //     icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+    //     navLink: '/codeskin'
+    // },
+    // {
+    //     id: 'codeskin',
+    //     title: 'user details',
+    //     icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+    //     navLink: '/codeskin-user/:id'
+    // },
+    // {
+    //     id: 'test',
+    //     title: 'Tessst',
+    //     icon: <img style={{marginRight: '18px'}} src={`${ownUrl}/images/website-slide/navbar/customer_group.png`} width='16px' />,
+    //     navLink: '/test'
+    // }
 ]

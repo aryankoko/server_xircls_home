@@ -17,9 +17,10 @@ export const configUrl = {
     signup: "/merchant/signup/",
     refresh: "/api/token/refresh/",
     // whatspp
-    getTemplates: "talks/getTemplates/",
-    createTemplate: "talks/createTemplate/",
-    sendMessage: "talks/sendMessage/",
+    getTemplates: "talk/getTemplates/",
+    createTemplate: "talk/createTemplate/",
+    sendMessage: "talk/sendMessage/",
+    import_customer: "talk/import_customer/",
     // affilate
     signupAffiliate: '/affiliate/affiliate_signup/',
     loginAffiliate: '/affiliate/affiliate_login/',

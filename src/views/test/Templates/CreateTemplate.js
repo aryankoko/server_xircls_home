@@ -287,9 +287,9 @@ export default function CreateTemplate() {
     console.log("useInteractive :  ", useInteractive)
     console.log("useButtons :  ", useButtons)
     // return null
-    // if (!formValidation()) {
-    //   return false
-    // }
+    if (!formValidation()) {
+      return false
+    }
     setLoader(true)
     const newInteractiveData = useInteractive.map(item => {
       if (item.title === '') {
@@ -383,14 +383,14 @@ export default function CreateTemplate() {
 
     // Now you can use formData for your purpose
 
-    console.log("payload", components)
-    console.log("useInteractive", useInteractive)
-    console.log(BasicTemplateData)
-    console.log(Header.file)
+    // console.log("payload", components)
+    // console.log("useInteractive", useInteractive)
+    // console.log(BasicTemplateData)
+    // console.log(Header.file)
 
     // return null
 
-    fetch("https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/createTemplate/", {
+    fetch("https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/createTemplate/", {
       method: 'POST',
       body: formData
     })
@@ -412,31 +412,23 @@ export default function CreateTemplate() {
       }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
 
-    //   postReq("createTemplate", formData).then((res) => {
-    //     console.log(res)
-    //     if (res.data.code === 100) {
-    //       toast.error(res.data.error_user_msg)
-    //     } else {
-    //       // toast.success("Template has been created")
-
-    //     }
-    //     console.log(res)
-    //     if (res.data.id) {
-    //       toast.success("Template has been created")
-
-    //     }
-    //   setLoader(false)
-
-
-    // }).catch((err) => { console.log(err); setLoader(false) })
-
-    // Test if the inputString matches the pattern
-
-    // console.log("BasicTemplateData", BasicTemplateData)
-    // console.log("Body_Parameters", Body_Parameters)
-    // console.log("useMsgBody", useMsgBody)
-    // console.log("useInteractive", useInteractive)
-    // console.log("payData", payData)
+      // postReq("createTemplate", formData)
+      // .then(response => {
+      //   if (!response.ok) {
+      //     throw new Error(`HTTP error! Status: ${response.status}`)
+      //   }
+      //   return response.json()
+      // }).then((res) => {
+      //   console.log(res)
+      //   if (res.id) {
+      //     toast.success("Template has been created")
+      //   } else if (res.code === 100) {
+      //     toast.error(res.error_user_msg ?? res.message)
+      //   } else {
+      //     toast.error("Something went wrong!")
+      //   }
+      //   setLoader(false)
+      // }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
   }
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

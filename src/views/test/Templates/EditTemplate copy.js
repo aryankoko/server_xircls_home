@@ -364,7 +364,7 @@ export default function EditTemplate() {
     const getCurrentTemplate = (templateId) => {
       const formData = new FormData()
       formData.append("templateId", templateId)
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplateById/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplateById/', {
         method: 'POST',
         body: formData
       })
@@ -550,7 +550,7 @@ export default function EditTemplate() {
 
     return null
 
-    // fetch("https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/createTemplate/", {
+    // fetch("https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/createTemplate/", {
     //   method: 'POST',
     //   body: formData
     // }).then((res) => {

@@ -17,6 +17,7 @@ import { postReq } from '../../../../assets/auth/jwtService'
 import FrontBaseLoader from '../../../Components/Loader/Loader'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import '../whatsapp.scss'
 
 
 export default function TemplateUI() {
@@ -33,6 +34,7 @@ export default function TemplateUI() {
    const [msgBody, setMsgBody] = useState('')
    const [oldBodyPara, setoldBodyPara] = useState([])
    const [useDisplayBody, setDisplayBody] = useState('')
+   const [useFileName, setFileName] = useState('')
 
    const [msgHeader, setMsgHeader] = useState('')
    const [oldHeaderPara, setoldHeaderPara] = useState([])
@@ -94,7 +96,7 @@ export default function TemplateUI() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplates/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplates/', {
          method: 'POST',
          body: formData
       })
@@ -134,6 +136,21 @@ export default function TemplateUI() {
 
       return updatedMessage
    }
+   const updateHeaderDisplayedMessage = (inputString, defData) => {
+      let updatedMessage = inputString
+      updatedMessage = updatedMessage.replace(/\*(.*?)\*/g, (_, p1) => `<strong>${p1}</strong>`)
+      updatedMessage = updatedMessage.replace(/_(.*?)_/g, (_, p1) => `<em>${p1}</em>`)
+      updatedMessage = updatedMessage.replace(/~(.*?)~/g, (_, p1) => `<del>${p1}</del>`)
+      if (defData.example) {
+         const data = defData.example.header_text[0]
+         updatedMessage = updatedMessage.replace(/{{(\d+)}}/g, (_match, index) => {
+            return `[${data}]`
+         })
+      }
+
+      return updatedMessage
+   }
+  
    // modal diplay ui message
    const updateDisplayedMessage2 = (inputString, apiPara) => {
       let updatedMessage = inputString
@@ -158,7 +175,7 @@ export default function TemplateUI() {
       setDisplayBody(updatedMessage)
       // return updatedMessage
    }
-   const updateHeaderDisplayedMessage = (inputString, apiPara) => {
+   const updateHeaderDisplayedMessageModal = (inputString, apiPara) => {
       let updatedMessage = inputString
       if (apiPara) {
 
@@ -185,7 +202,7 @@ export default function TemplateUI() {
       if (type === 'header') {
          setHeaderParameterList([value])
          console.log(value)
-         updateHeaderDisplayedMessage(msgHeader, oldHeaderPara)
+         updateHeaderDisplayedMessageModal(msgHeader, oldHeaderPara)
 
       } else {
 
@@ -229,7 +246,7 @@ export default function TemplateUI() {
          formData.append("link", CurrentTemplate.components[0].example.header_handle[0])
       } else if (CurrentTemplate.components[0].format === "DOCUMENT") {
          formData.append("type", "DOCUMENT")
-         formData.append("filename", "filename_123")
+         formData.append("filename", useFileName)
          formData.append("link", CurrentTemplate.components[0].example.header_handle[0])
       } else {
          formData.append("type", "TEXT")
@@ -242,7 +259,7 @@ export default function TemplateUI() {
       formData.append("phone", testPhone)
 
 
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/sendMessage/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/sendMessage/', {
          method: 'POST',
          body: formData
       })
@@ -276,7 +293,7 @@ export default function TemplateUI() {
 
       const formData = new FormData()
       formData.append("template_name", name)
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/deleteTemplate/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/deleteTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -304,7 +321,7 @@ export default function TemplateUI() {
    const inactiveTemplate = (template_id) => {
       const formData = new FormData()
       formData.append("template_id", template_id)
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/inactiveTemplate/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/inactiveTemplate/', {
          method: 'POST',
          body: formData
       })
@@ -333,7 +350,7 @@ export default function TemplateUI() {
       const formData = new FormData()
       formData.append("templateId", templateId)
 
-      fetch('https://6195-2402-e280-3d9c-20d-2f01-d53c-c021-4407.ngrok-free.app/getTemplateById/', {
+      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplateById/', {
          method: 'POST',
          body: formData
       })
@@ -352,7 +369,7 @@ export default function TemplateUI() {
                if (elm.type === "HEADER" && elm.format === "TEXT") {
                   setMsgHeader(elm.text)
                   setoldHeaderPara(elm.example?.header_text)
-                  updateHeaderDisplayedMessage(elm.text, elm.example?.header_text)
+                  updateHeaderDisplayedMessageModal(elm.text, elm.example?.header_text)
                   // console.log(elm.example?.header_text)
                }
                if (elm.type === "BODY") {
@@ -461,7 +478,9 @@ export default function TemplateUI() {
                                                          if (data.format === "TEXT") {
                                                             return (
                                                                <div className='p-1 pb-0'  >
-                                                                  <h6 className='fs-4 text-black bolder mb-1 '>{data.text}</h6>
+                                                                  <h6 className='fs-4 text-black bolder mb-1' dangerouslySetInnerHTML={{ __html: updateHeaderDisplayedMessage(data.text, data) }}></h6>
+
+                                                                  {/* <h6 className='fs-4 text-black bolder mb-1 '>{data.text}</h6> */}
                                                                </div>
                                                             )
                                                          }
@@ -584,6 +603,26 @@ export default function TemplateUI() {
                      <Row className=' justify-content-center  align-items-center '>
                         <Col md="6" className=''>
                            <div className='px-3'>
+
+                              {
+                                 CurrentTemplate && CurrentTemplate.components.map((data) => {
+                                    if (data.type === "HEADER" && data.format === "DOCUMENT" && data.example) {
+                                       // console.log(data.example.header_text)
+                                       return (
+                                          <div>
+                                             <h4 className='mt-3'>File Name</h4>
+                                             <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder={"file name"}
+                                                onChange={(e) => setFileName(e.target.value)}
+                                             />
+                                          </div>
+                                       )
+
+                                    }
+                                 })
+                              }
 
                               {
                                  CurrentTemplate && CurrentTemplate.components.map((data) => {

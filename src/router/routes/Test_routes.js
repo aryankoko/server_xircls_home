@@ -9,9 +9,10 @@ import CodeUserData from "../../views/test/codeSkin/CodeUserData"
 import CodeUserDetails from "../../views/test/codeSkin/CodeUserDetails"
 import EditTemplate from "../../views/test/Templates/EditTemplate"
 import CreateGroup from "../../views/test/Templates/group/CreateGroup"
-import Settings from "../../views/test/code_from_prasad/Settings/BusinessCreation"
-import Project from "../../views/test/code_from_prasad/Settings/Project"
+import Settings from "../../views/test/Templates/BusinessCreation"
+import Project from "../../views/test/Templates/Project"
 import SettingsTable from "../../views/test/code_from_prasad/Settings/SettingsTable"
+import WhatsAppContacts from "../../views/test/Templates/WhatsAppContacts"
 
 export const Test_routes = [
     {
@@ -57,6 +58,10 @@ export const Test_routes = [
     {
         path: '/template/create-group',
         element: <CreateGroup />
+    },
+    {
+        path: '/template/Contacts',
+        element: <WhatsAppContacts />
     },
     {
         path: '/template/business-creation',

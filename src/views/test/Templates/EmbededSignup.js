@@ -3,6 +3,7 @@ import { Card, CardBody, Col, Row } from 'reactstrap'
 import { selectPhoneList } from '../../../Helper/data'
 import Select from 'react-select'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 
 export default function EmbededSignup() {
@@ -65,19 +66,34 @@ export default function EmbededSignup() {
         newformData.append(key, value)
       }
     })
-    fetch('https://1231-2405-201-7-8937-659e-6bda-7839-62ec.ngrok-free.app/fbSignUp/', {
+    
+    fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/fbSignUp/', {
       method: 'POST',
       body: newformData
     })
-      .then((data) => data.json())
+      .then((response) => {
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Resource not found')
+          }
+          throw new Error('Network response was not ok')
+        }
+        return response.json()
+      })
       .then((res) => {
         window.location.replace(res.embeddedSignupURL)
       })
       .catch((err) => {
-        console.log(err)
+        if (err.message === 'Resource not found') {
+          toast.alert("Resource not found. Please check the URL.")
+        } else {
+          toast.alert("Something went wrong!")
+          console.log(err)
+        }
       })
     console.log(newformData)
   }
+  
   return (
     <div>
       <style>{`
