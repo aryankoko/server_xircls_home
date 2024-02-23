@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component'
 import toast from 'react-hot-toast'
 import { Button, Card, CardBody, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap'
 import { validForm } from '../../Validator'
+import { postReq } from '../../../assets/auth/jwtService'
 
 function Project() {
     const [data, setData] = useState({
@@ -32,13 +33,12 @@ function Project() {
     const checkStatus = () => {
         const newformData = new FormData()
         setShowStatus(true)
-        fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/fbVerification/', {
-            method: 'POST',
-            body: newformData
-        })
-            .then((response) => {
-                return response.json()
-            })
+        // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/fbVerification/', {
+        //     method: 'POST',
+        //     body: newformData
+        // })
+        
+        postReq('fbVerification', newformData)
             .then((res) => {
                 console.log(res)
                 setStatus({
@@ -55,32 +55,21 @@ function Project() {
     const postData = async (e) => {
         e.preventDefault()
         console.log(data)
-        try {
-            const response = await fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/projectCreation/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+        postReq('projectCreation', data)
+        .then(res => {
+            console.log(res)
+            checkStatus()
             })
-
-            if (response.ok) {
-                const responseData = await response.json()
-                console.log(responseData, "responseData")
-                if (responseData === false) {
-                    toast.error("Project already exists")
-                }
-                console.log('Data submitted successfully!')
-                checkStatus()
-                // console.log(response.json())
-            } else {
-                console.error('Error submitting data:', response.statusText)
-
-            }
-        } catch (error) {
-            toast.alert("Something went wrong!")
-            console.error('Error:', error.message)
-        }
+            .catch((error) => {
+              if (error.response && error.response.status === 500) {
+                  // Handle 500 error
+                  toast.error('Internal Server Error')
+              } else {
+                  // Handle other errors
+                  console.log(error)
+              }
+          })
+     
     }
 
     const handleSubmit = (e) => {

@@ -5,11 +5,12 @@ import { selectPhoneList } from '../../../Helper/data'
 import Select from "react-select"
 import { validForm } from '../../Validator'
 import toast from 'react-hot-toast'
+import { postReq } from '../../../assets/auth/jwtService'
 
 function Settings() {
   const [isValidPassword, setIsValidPassword] = useState()
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
     companyName: "",
     companySize: "",
@@ -24,10 +25,10 @@ function Settings() {
 
   const formValuesCheck = [
     {
-      name: 'fullName',
+      name: 'name',
       message: 'Enter Full Name',
       type: 'string',
-      id: 'fullName'
+      id: 'name'
     },
     {
       name: 'email',
@@ -88,7 +89,6 @@ function Settings() {
 
 
   const industryOptions = [
-    { value: '', label: 'Industry' },
     { value: 'Ecommerce', label: 'Ecommerce' },
     { value: 'Education', label: 'Education' },
     { value: 'Automotive', label: 'Automotive' },
@@ -115,7 +115,6 @@ function Settings() {
 
 
   const companySizeOptions = [
-    { value: '', label: 'Company Size' },
     { value: '1-10', label: '1-10 Employees' },
     { value: '10-20', label: '10-20 Employees' },
     { value: '20-50', label: '20-50 Employees' },
@@ -123,16 +122,36 @@ function Settings() {
     { value: '200+', label: '200+ Employees' }
   ]
 
+  const timeZoneData = [
+    { value: 'Asia/Kolkata', label: '(UTC+05:30) India Standard Time (IST)' },
+    { value: 'America/Los_Angeles', label: '(UTC-08:00) Pacific Time (US & Canada)' },
+    { value: 'America/Phoenix', label: '(UTC-07:00) Arizona' },
+    { value: 'America/Denver', label: '(UTC-07:00) Mountain Time (US & Canada)' },
+    { value: 'America/Chicago', label: '(UTC-06:00) Central Time (US & Canada)' },
+    { value: 'America/New_York', label: '(UTC-05:00) Eastern Time (US & Canada)' },
+    { value: 'America/Caracas', label: '(UTC-04:00) Caracas' }
+  ]
+
+  const currencyData = [
+    { value: 'USD', label: 'United States Dollar' },
+    { value: 'EUR', label: 'Euro' },
+    { value: 'JPY', label: 'Japanese Yen' },
+    { value: 'GBP', label: 'British Pound Sterling' },
+    { value: 'INR', label: 'Indian Rupee' }
+    
+]
+
 
   const validatePassword = (password) => {
-    const regexTest = /[!@#$%^&*(),.?":{}|<>]/
-    return password.length >= 6 && regexTest.test(password)
+    // const regexTest = /[!@#$%^&*(),.?":{}|<>]/
+    return password.length >= 5
   }
 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setIsValidPassword(validatePassword(value))
+    // console.log(validatePassword(value))
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -143,44 +162,41 @@ function Settings() {
     Object.entries(formData).map(([key, value]) => {
       form_data.append(key, value)
     })
-    try {
-      const response = await fetch('https://3a04-2405-201-7-8937-ad97-9647-754f-d215.ngrok-free.app/fetchUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'Application/json'
-        },
-        body: form_data
-      })
+    postReq("Business_view", formData)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        return response.json()
+      }).then((res) => {
+        console.log(res)
+        if (res.ok) {
+          toast.success('Account Created Successfully')
+        } else {
+          console.error('Error submitting data:', res.statusText)
+          toast.error('Something went wrong')
+        }
+        // setLoader(false)
+      }).catch((err) => { console.log(err);  toast.error("Something went wrong!") })
 
-      if (response.ok) {
-        console.log('Data submitted successfully!')
-        console.log(response.json())
-        console.log('Data submitted successfully!')
-        toast.success('Account Created Successfully')
-      } else {
-        console.error('Error submitting data:', response.statusText)
-        toast.error('Something went wrong')
-      }
-    } catch (error) {
-      console.error('Error:', error.message)
-    }
   }
 
   const handleSubmit = () => {
     const checkForm = validForm(formValuesCheck, formData)
+    console.log("formData", formData)
     console.log(checkForm, 'checkForm')
     if (checkForm && isValidPassword) {
       postData()
-    } else {
-      console.log('pass not valid')
+    } else if (!isValidPassword) {
       toast.error("Enter Valid Password")
+    } else {
+      console.log('Something went wrong!')
     }
   }
 
   return (
     <Container>
-      <Row>
-        <Col sm='12'>
+   
           <Card>
             <CardBody>
               <div className='title'>
@@ -188,19 +204,18 @@ function Settings() {
               </div>
             </CardBody>
           </Card>
-        </Col>
-      </Row>
+   
       <Card>
         <CardBody >
           <Row>
             <Col md={6}>
-              <Label for="fullName">Full Name</Label>
+              <Label for="name">Full Name</Label>
               <Input
-                name='fullName'
-                id='fullName'
+                name='name'
+                id='name'
                 type='text'
                 placeholder='Full Name'
-                value={formData.fullName}
+                value={formData.name}
                 onChange={handleInputChange}
               />
               <p id="fullName_val" className="text-danger m-0 p-0 vaildMessage"></p>
@@ -294,6 +309,7 @@ function Settings() {
                   name='mobileNumber'
                   id='mobileNumber'
                   type='text'
+                  className='ms-1'
                   placeholder='Mobile Number'
                   value={formData.mobileNumber}
                   onChange={handleInputChange}
@@ -305,12 +321,16 @@ function Settings() {
             </Col>
             <Col md={6} className="mt-1">
               <Label for="preferredBillingCurrency">Preferred Billing Currency</Label>
-              <Input
-                name='preferredBillingCurrency'
-                id='preferredBillingCurrency'
-                type='text' placeholder='INR'
-                value={formData.preferredBillingCurrency}
-                onChange={handleInputChange}
+            
+               <Select
+               name='preferredBillingCurrency'
+               id='preferredBillingCurrency'
+               type='text' 
+                options={currencyData}
+                value={currencyData.filter((ele) => ele.value === formData.preferredBillingCurrency)}
+                onChange={((value) => {
+                  handleInputChange({ target: { name: 'preferredBillingCurrency', value: value.value } })
+                })}
               />
               <p id="preferredBillingCurrency_val" className="text-danger m-0 p-0 vaildMessage"></p>
             </Col>
@@ -318,14 +338,18 @@ function Settings() {
           <Row>
             <Col md={6} className="mt-1">
               <Label for="timezone">Timezone</Label>
-              <Input
+              <Select
                 name='timezone'
                 id='timezone'
                 type='text'
+                options={timeZoneData}
                 placeholder='Timezone'
-                value={formData.timezone}
-                onChange={handleInputChange}
+                value={timeZoneData.filter((ele) => ele.value === formData.timezone)}
+                onChange={((value) => {
+                  handleInputChange({ target: { name: 'timezone', value: value.value } })
+                })}
               />
+
               <p id="timezone_val" className="text-danger m-0 p-0 vaildMessage"></p>
             </Col>
           </Row>

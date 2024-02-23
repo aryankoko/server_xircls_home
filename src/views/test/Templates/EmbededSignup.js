@@ -1,12 +1,17 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
 import { Card, CardBody, Col, Row } from 'reactstrap'
 import { selectPhoneList } from '../../../Helper/data'
 import Select from 'react-select'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { postReq } from '../../../assets/auth/jwtService'
+import FrontBaseLoader from '../../Components/Loader/Loader'
 
 
 export default function EmbededSignup() {
+  const [useLoader, setLoader] = useState(false)
+
   const [Country, setCountry] = useState([])
   const [state, setState] = useState([])
   const [formData, setFormData] = useState({
@@ -67,35 +72,34 @@ export default function EmbededSignup() {
       }
     })
     
-    fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/fbSignUp/', {
-      method: 'POST',
-      body: newformData
-    })
-      .then((response) => {
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Resource not found')
-          }
-          throw new Error('Network response was not ok')
-        }
-        return response.json()
-      })
+    // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/fbSignUp/', {
+    //   method: 'POST',
+    //   body: newformData
+    // })
+    setLoader(true)
+    postReq("embeddedSignup", newformData)
       .then((res) => {
-        window.location.replace(res.embeddedSignupURL)
-      })
-      .catch((err) => {
-        if (err.message === 'Resource not found') {
-          toast.alert("Resource not found. Please check the URL.")
+        if (res.status === 200) {
+          window.location.replace(res.data.embeddedSignupURL)
+          
         } else {
           toast.alert("Something went wrong!")
-          console.log(err)
         }
+        console.log(res)
       })
+      .catch((err) => {
+          console.log(err)
+      })
+    setLoader(false)
+
     console.log(newformData)
   }
   
   return (
     <div>
+      {
+        useLoader && <FrontBaseLoader/>
+      }
       <style>{`
       .css-13cymwt-control, .css-1hb7zxy-IndicatorsContainer, .css-t3ipsp-control, .css-3iigni-container, .css-16xfy0z-control, .social_input, .input-group-text{
         height: 33.44px;

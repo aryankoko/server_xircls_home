@@ -18,9 +18,16 @@ export const configUrl = {
     refresh: "/api/token/refresh/",
     // whatspp
     getTemplates: "talk/getTemplates/",
+    getTemplateById: "talk/getTemplateById/",
+    editTemplate: "talk/editTemplate/",
     createTemplate: "talk/createTemplate/",
     sendMessage: "talk/sendMessage/",
+    embeddedSignup: "talk/embeddedSignup/",
     import_customer: "talk/import_customer/",
+    fbVerification: "talk/fbVerification/",
+    projectCreation: "talk/projectCreation/",
+
+    Business_view: "talk/whatsapp/business_view/",
     // affilate
     signupAffiliate: '/affiliate/affiliate_signup/',
     loginAffiliate: '/affiliate/affiliate_login/',

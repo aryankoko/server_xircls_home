@@ -7,10 +7,10 @@ import { FiUpload } from "react-icons/fi"
 import { IoIosCheckmarkCircleOutline } from "react-icons/io"
 import toast from 'react-hot-toast'
 import { postReq } from '../../../assets/auth/jwtService'
+import FrontBaseLoader from '../../Components/Loader/Loader'
 export default function WhatsAppContacts() {
-  const [fileData, setFileData] = useState({
-    // name:'lol.csv'
-  })
+  const [fileData, setFileData] = useState({})
+  const [useLoader, setLoader] = useState(false)
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   const containerRef = useRef(null)
@@ -61,45 +61,64 @@ export default function WhatsAppContacts() {
     const form_data = new FormData()
     console.log('csvFile', fileData)
     form_data.append('csvFile', fileData)
-    // postReq('import_customer', form_data)
-    // .then((resp) => {
-    //   console.log(resp)
-    // })
-    // .catch((error) => {
-    //   console.log(error)
-    // })
-    fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/sendBulkMessage/', {
-      method: 'POST',
-      body: form_data
+    setLoader(true)
+    postReq('import_customer', form_data)
+   .then(res => {
+    console.log(res)
+      if (res.data.success) {
+        toast.success(res.data.message)
+      } else {
+        toast.alert(res.data.message)
+      }
+      setLoader(false)
     })
-      .then(response => {
-        if (response.status === 400) {
-          throw new Error('Bad Request: Invalid Data')
-        }
-        return response.json()
-      }).then(res => {
-        console.log(res)
-        if (res.success) {
-          toast.success(res.message)
-        } else {
-          toast.alert(res.message)
-        }
-      })
-      .catch((err) => {
-        if (err.message === 'Bad Request: Invalid Data') {
-          // Handle 400 error specifically
-          toast.alert("Invalid data provided. Please check your input.")
-        } else {
-          console.log(err)
-          toast.alert("Something went wrong!")
-        }
-        toast.alert("Something went wrong!")
+    .catch((error) => {
+      if (error.response && error.response.status === 500) {
+          // Handle 500 error
+          toast.error('Internal Server Error')
+      } else {
+          // Handle other errors
+          console.log(error)
+      }
+      setLoader(false)
+
+  })
+    
+    // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/sendBulkMessage/', {
+    //   method: 'POST',
+    //   body: form_data
+    // })
+    //   .then(response => {
+    //     if (response.status === 400) {
+    //       throw new Error('Bad Request: Invalid Data')
+    //     }
+    //     return response.json()
+    //   }).then(res => {
+    //     console.log(res)
+    //     if (res.success) {
+    //       toast.success(res.message)
+    //     } else {
+    //       toast.alert(res.message)
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     if (err.message === 'Bad Request: Invalid Data') {
+    //       // Handle 400 error specifically
+    //       toast.alert("Invalid data provided. Please check your input.")
+    //     } else {
+    //       console.log(err)
+    //       toast.alert("Something went wrong!")
+    //     }
+    //     toast.alert("Something went wrong!")
       
-    })
+    // })
   }
 
   return (
     <>
+    {
+     useLoader && <FrontBaseLoader/>
+    }
       <Row style={{ height: '75vh' }}>
         <Col md={'6'} className='d-grid align-items-center'>
           <div className='p-2'>

@@ -3,6 +3,7 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { Card, CardBody } from 'reactstrap'
 import AdvanceServerSide from '../../../Components/DataTable/AdvanceServerSide'
+import { getReq } from '../../../../assets/auth/jwtService'
 
 export default function WAbusinessTable() {
     const [isLoading, setIsLoading] = useState(true)
@@ -56,29 +57,29 @@ export default function WAbusinessTable() {
             isEnable: true
         }
     ]
-    const dummydata = [
-        {
-            id: "198633316664135",
-            account_review_status: "APPROVED",
-            business_verification_status: "verified",
-            currency: "INR",
-            message_template_namespace: "82fa975b_5d60_4ad8_8506_101cb2efe746",
-            name: "XIRCLS (AiSensy)",
-            on_behalf_of_business_info: {
-                name: "Xircls- The world's First Collaborative Marketing Network",
-                id: "666014908139771",
-                status: "APPROVED",
-                type: "SELF"
-            },
-            ownership_type: "CLIENT_OWNED",
-            primary_funding_id: "6894446444004683",
-            timezone_id: "71"
-        }
-    ]
+    // const dummydata = [
+    //     {
+    //         id: "198633316664135",
+    //         account_review_status: "APPROVED",
+    //         business_verification_status: "verified",
+    //         currency: "INR",
+    //         message_template_namespace: "82fa975b_5d60_4ad8_8506_101cb2efe746",
+    //         name: "XIRCLS (AiSensy)",
+    //         on_behalf_of_business_info: {
+    //             name: "Xircls- The world's First Collaborative Marketing Network",
+    //             id: "666014908139771",
+    //             status: "APPROVED",
+    //             type: "SELF"
+    //         },
+    //         ownership_type: "CLIENT_OWNED",
+    //         primary_funding_id: "6894446444004683",
+    //         timezone_id: "71"
+    //     }
+    // ]
 
     const getData = () => {
         setIsLoading(true)
-        axios.get('https://254c-2405-201-7-8937-7011-cd56-9600-10f0.ngrok-free.app/getWABAInformation/')
+        getReq("Business_view")
             .then(response => {
                 // Handle the successful response here
                 console.log('Response:', response.data)
@@ -95,20 +96,29 @@ export default function WAbusinessTable() {
     }
 
     return (
-        <Card>
-            <CardBody>
+        <>
+            <Card>
+                <CardBody className='d-flex justify-content-between  align-items-center '>
 
-                <AdvanceServerSide
-                    tableName="WhatsApp Business"
-                    tableCol={columns}
-                    data={dummydata}
-                    count={total}
-                    getData={getData}
-                    isLoading={isLoading}
-                    advanceFilter={true}
+                    <h4 className='m-0'> WhatsApp Business</h4>
+                    <button className='btn btn-primary'>Create Business</button>
+                </CardBody>
+            </Card>
+            <Card>
+                <CardBody>
 
-                />
-            </CardBody>
-        </Card>
+                    <AdvanceServerSide
+                        tableName="WhatsApp Business"
+                        tableCol={columns}
+                        data={tableData}
+                        count={total}
+                        getData={getData}
+                        isLoading={isLoading}
+                        advanceFilter={true}
+
+                    />
+                </CardBody>
+            </Card>
+        </>
     )
 }

@@ -76,10 +76,6 @@ export default function TemplateUI() {
       {
          title: "Approved",
          icon: <Check size={20} />
-      },
-      {
-         title: "Action Required",
-         icon: <AlertCircle size={20} />
       }
    ]
 
@@ -96,10 +92,11 @@ export default function TemplateUI() {
       formData.append("searchValue", searchValue)
 
 
-      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplates/', {
-         method: 'POST',
-         body: formData
-      })
+      // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/getTemplates/', {
+      //    method: 'POST',
+      //    body: formData
+      // })
+      postReq("getTemplates", formData)
          .then(response => {
             if (!response.ok) {
                throw new Error(`HTTP error! Status: ${response.status}`)
@@ -150,7 +147,7 @@ export default function TemplateUI() {
 
       return updatedMessage
    }
-  
+
    // modal diplay ui message
    const updateDisplayedMessage2 = (inputString, apiPara) => {
       let updatedMessage = inputString
@@ -259,10 +256,11 @@ export default function TemplateUI() {
       formData.append("phone", testPhone)
 
 
-      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/sendMessage/', {
-         method: 'POST',
-         body: formData
-      })
+      // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/sendMessage/', {
+      //    method: 'POST',
+      //    body: formData
+      // })
+      postReq("sendMessage", formData)
          .then(response => {
             if (!response.ok) {
                throw new Error(`HTTP error! Status: ${response.status}`)
@@ -321,10 +319,11 @@ export default function TemplateUI() {
    const inactiveTemplate = (template_id) => {
       const formData = new FormData()
       formData.append("template_id", template_id)
-      fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/inactiveTemplate/', {
-         method: 'POST',
-         body: formData
-      })
+      // fetch('https://daf4-2402-e280-3d9c-20d-a5e9-6dbd-1388-ddc3.ngrok-free.app/inactiveTemplate/', {
+      //    method: 'POST',
+      //    body: formData
+      // })
+      postReq("inactiveTemplate", formData)
          .then(response => {
             if (!response.ok) {
                throw new Error(`HTTP error! Status: ${response.status}`)
@@ -573,7 +572,7 @@ export default function TemplateUI() {
 
                                                    <button className='btn btn-primary' onClick={() => nagivate(`/template/editTemplate/${SigleTemplate.id}`)} >Edit</button>
                                                    {/* <button className='btn btn-primary' onClick={() => delTemplate(SigleTemplate.name)} >Delete</button> */}
-                                                   {/* <button className='btn btn-primary' onClick={() => inactiveTemplate(SigleTemplate.id)}>Inactive</button> */}
+                                                   <button className='btn btn-danger' onClick={() => inactiveTemplate(SigleTemplate.id)}>Inactive</button>
                                                    <button className='btn btn-primary' onClick={() => getCurrentTemplate(SigleTemplate.id)}>Test</button>
                                                 </div>
                                              </div>

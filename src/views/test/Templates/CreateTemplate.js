@@ -278,14 +278,14 @@ export default function CreateTemplate() {
   }
 
   const handleTemplateSubmit = () => {
-    console.log("------------------------------------------------")
-    console.log("Body_Parameters :   ", Body_Parameters)
-    console.log("useMsgBody :  ", useMsgBody)
-    console.log("Header :  ", Header)
-    console.log("Header_Parameters :  ", Header_Parameters)
-    console.log("BasicTemplateData :  ", BasicTemplateData)
-    console.log("useInteractive :  ", useInteractive)
-    console.log("useButtons :  ", useButtons)
+    // console.log("------------------------------------------------")
+    // console.log("Body_Parameters :   ", Body_Parameters)
+    // console.log("useMsgBody :  ", useMsgBody)
+    // console.log("Header :  ", Header)
+    // console.log("Header_Parameters :  ", Header_Parameters)
+    // console.log("BasicTemplateData :  ", BasicTemplateData)
+    // console.log("useInteractive :  ", useInteractive)
+    // console.log("useButtons :  ", useButtons)
     // return null
     if (!formValidation()) {
       return false
@@ -380,6 +380,12 @@ export default function CreateTemplate() {
     formData.append('language', BasicTemplateData.language)
     formData.append('components', JSON.stringify(components))
     formData.append('headerUrl', Header.file)
+    if (Header_Parameters.length > 0) {
+      formData.append('headerVariableList', JSON.stringify(Header_Parameters))
+    }
+    if (Body_Parameters.length > 0) {
+      formData.append('bodyVariableList', JSON.stringify(Body_Parameters))
+    }
 
     // Now you can use formData for your purpose
 
@@ -394,6 +400,7 @@ export default function CreateTemplate() {
       method: 'POST',
       body: formData
     })
+    // postReq("createTemplate", formData)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -410,25 +417,6 @@ export default function CreateTemplate() {
         }
         setLoader(false)
       }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
-
-
-      // postReq("createTemplate", formData)
-      // .then(response => {
-      //   if (!response.ok) {
-      //     throw new Error(`HTTP error! Status: ${response.status}`)
-      //   }
-      //   return response.json()
-      // }).then((res) => {
-      //   console.log(res)
-      //   if (res.id) {
-      //     toast.success("Template has been created")
-      //   } else if (res.code === 100) {
-      //     toast.error(res.error_user_msg ?? res.message)
-      //   } else {
-      //     toast.error("Something went wrong!")
-      //   }
-      //   setLoader(false)
-      // }).catch((err) => { console.log(err); setLoader(false); toast.error("Something went wrong!") })
 
   }
   // massgae body function olny ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
